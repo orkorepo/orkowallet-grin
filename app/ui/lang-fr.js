@@ -316,7 +316,7 @@ const LANG_FR = {
   "1 dakika": "1 minute",
   "1 saat": "1 heure",
   "Hakkında": "À propos",
-  "OrkoWallet – Grin 0.1.0 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.1.0 · bibliothèques officielles grin-wallet 5.5.1 et grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
+  "OrkoWallet – Grin 0.1.1 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.1.1 · bibliothèques officielles grin-wallet 5.5.1 et grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
   "Ağ değişince açık cüzdan kapanır ve uygulama yeniden başlar.": "En changeant de réseau, le portefeuille ouvert se ferme et l’application redémarre.",
   "Uygulama seçtiğin ağ ile yeniden başlayacak.": "L’application redémarrera sur le réseau choisi.",
   "Node havuzu ({net})": "Pool de nœuds ({net})",
@@ -471,4 +471,9 @@ const LANG_FR = {
   "24 kelime (önerilen)": "24 mots (recommandé)",
   "12 kelime (daha kısa)": "12 mots (plus court)",
   "İkisi de güvenlidir; 24 kelime daha geniş bir pay bırakır, 12 kelimeyi yazmak ve saklamak daha kolaydır.": "Les deux sont sûres ; 24 mots laissent une marge plus large, 12 mots sont plus faciles à noter et à conserver.",
+  "Bağış": "Don",
+  "OrkoWallet ücretsiz ve açık kaynaklıdır. Geliştirmeye destek olmak istersen aşağıdaki adrese Grin gönderebilirsin.": "OrkoWallet est gratuit et open source. Si vous souhaitez soutenir son développement, vous pouvez envoyer des Grin à l’adresse ci-dessous.",
+  "Bağış yap": "Faire un don",
+  "Bağış yalnızca Mainnet üzerinde gönderilebilir.": "Les dons ne peuvent être envoyés que sur le Mainnet.",
+  "Bağış göndermek için önce bir cüzdan aç.": "Ouvrez d’abord un portefeuille pour faire un don.",
 };

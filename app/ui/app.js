@@ -1143,6 +1143,19 @@ $('set-net-apply').addEventListener('click', async () => {
 });
 document.querySelectorAll('input[name="theme"]').forEach((r) => r.addEventListener('change', () => applyTheme(r.value)));
 $('dlg-settings').addEventListener('close', () => applyTheme(state.status.settings.theme));
+// Donations go to the project's Grin address; the normal Send dialog opens with it filled in, the amount is up to the user.
+const DONATE_ADDRESS = 'grin1tzlscdyzl0pgns8rw9sl7q9wqptftjez2xsdrszj9se4vmvwj8wqajj4yz';
+$('set-donate-copy').addEventListener('click', () => copy(DONATE_ADDRESS));
+$('set-donate').addEventListener('click', () => {
+  if (state.status.network !== 'mainnet') return toast(t('Bağış yalnızca Mainnet üzerinde gönderilebilir.'));
+  if (!state.open) return toast(t('Bağış göndermek için önce bir cüzdan aç.'));
+  $('dlg-settings').close();
+  openDialog('send');
+  $('s-addr').value = DONATE_ADDRESS;
+  $('s-addr').dispatchEvent(new Event('input', { bubbles: true }));
+  $('s-amount').focus();
+});
+
 $('set-save').addEventListener('click', async () => {
   const s = state.status.settings;
   const theme = document.querySelector('input[name="theme"]:checked')?.value || 'system';

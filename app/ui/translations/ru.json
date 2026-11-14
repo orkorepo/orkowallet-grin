@@ -314,7 +314,7 @@
  "1 dakika": "1 минута",
  "1 saat": "1 час",
  "Hakkında": "О программе",
- "OrkoWallet – Grin 0.1.0 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.1.0 · официальные библиотеки grin-wallet 5.5.1 и grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
+ "OrkoWallet – Grin 0.1.1 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.1.1 · официальные библиотеки grin-wallet 5.5.1 и grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
  "Ağ değişince açık cüzdan kapanır ve uygulama yeniden başlar.": "При смене сети открытый кошелёк закроется, а приложение перезапустится.",
  "Uygulama seçtiğin ağ ile yeniden başlayacak.": "Приложение перезапустится с выбранной сетью.",
  "Node havuzu ({net})": "Пул узлов ({net})",
@@ -468,5 +468,10 @@
  "Kurtarma ifadesi uzunluğu": "Длина фразы восстановления",
  "24 kelime (önerilen)": "24 слова (рекомендуется)",
  "12 kelime (daha kısa)": "12 слов (короче)",
- "İkisi de güvenlidir; 24 kelime daha geniş bir pay bırakır, 12 kelimeyi yazmak ve saklamak daha kolaydır.": "Оба варианта надёжны; 24 слова дают больший запас прочности, 12 слов проще записать и хранить."
+ "İkisi de güvenlidir; 24 kelime daha geniş bir pay bırakır, 12 kelimeyi yazmak ve saklamak daha kolaydır.": "Оба варианта надёжны; 24 слова дают больший запас прочности, 12 слов проще записать и хранить.",
+ "Bağış": "Пожертвование",
+ "OrkoWallet ücretsiz ve açık kaynaklıdır. Geliştirmeye destek olmak istersen aşağıdaki adrese Grin gönderebilirsin.": "OrkoWallet бесплатен и имеет открытый исходный код. Если вы хотите поддержать разработку, отправьте Grin на адрес ниже.",
+ "Bağış yap": "Пожертвовать",
+ "Bağış yalnızca Mainnet üzerinde gönderilebilir.": "Пожертвования можно отправлять только в Mainnet.",
+ "Bağış göndermek için önce bir cüzdan aç.": "Сначала откройте кошелёк, чтобы сделать пожертвование."
 }

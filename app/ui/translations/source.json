@@ -1260,8 +1260,8 @@
   "en": "About"
  },
  {
-  "tr": "OrkoWallet – Grin 0.1.0 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap",
-  "en": "OrkoWallet – Grin 0.1.0 · official grin-wallet 5.5.1 and grin 5.5.2 libraries · Tor 0.4.9.16 · Orkoswap"
+  "tr": "OrkoWallet – Grin 0.1.1 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap",
+  "en": "OrkoWallet – Grin 0.1.1 · official grin-wallet 5.5.1 and grin 5.5.2 libraries · Tor 0.4.9.16 · Orkoswap"
  },
  {
   "tr": "Ağ değişince açık cüzdan kapanır ve uygulama yeniden başlar.",
@@ -1874,6 +1874,26 @@
  {
   "tr": "İkisi de güvenlidir; 24 kelime daha geniş bir pay bırakır, 12 kelimeyi yazmak ve saklamak daha kolaydır.",
   "en": "Both are secure; 24 words leave a wider margin, 12 words are easier to write down and keep."
+ },
+ {
+  "tr": "Bağış",
+  "en": "Donate"
+ },
+ {
+  "tr": "OrkoWallet ücretsiz ve açık kaynaklıdır. Geliştirmeye destek olmak istersen aşağıdaki adrese Grin gönderebilirsin.",
+  "en": "OrkoWallet is free and open source. If you want to support its development you can send Grin to the address below."
+ },
+ {
+  "tr": "Bağış yap",
+  "en": "Donate"
+ },
+ {
+  "tr": "Bağış yalnızca Mainnet üzerinde gönderilebilir.",
+  "en": "Donations can only be sent on Mainnet."
+ },
+ {
+  "tr": "Bağış göndermek için önce bir cüzdan aç.",
+  "en": "Open a wallet first to send a donation."
  },
  {
   "tr": "Gönderilebilir bakiye yok.",

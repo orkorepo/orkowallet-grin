@@ -314,7 +314,7 @@
  "1 dakika": "1 Minute",
  "1 saat": "1 Stunde",
  "Hakkında": "Info",
- "OrkoWallet – Grin 0.1.0 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.1.0 · offizielle Bibliotheken grin-wallet 5.5.1 und grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
+ "OrkoWallet – Grin 0.1.1 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.1.1 · offizielle Bibliotheken grin-wallet 5.5.1 und grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
  "Ağ değişince açık cüzdan kapanır ve uygulama yeniden başlar.": "Beim Netzwerkwechsel wird die geöffnete Wallet geschlossen und die App neu gestartet.",
  "Uygulama seçtiğin ağ ile yeniden başlayacak.": "Die App wird mit dem gewählten Netzwerk neu starten.",
  "Node havuzu ({net})": "Node-Pool ({net})",
@@ -468,5 +468,10 @@
  "Kurtarma ifadesi uzunluğu": "Länge der Wiederherstellungsphrase",
  "24 kelime (önerilen)": "24 Wörter (empfohlen)",
  "12 kelime (daha kısa)": "12 Wörter (kürzer)",
- "İkisi de güvenlidir; 24 kelime daha geniş bir pay bırakır, 12 kelimeyi yazmak ve saklamak daha kolaydır.": "Beide sind sicher; 24 Wörter bieten eine größere Sicherheitsreserve, 12 Wörter lassen sich leichter aufschreiben und aufbewahren."
+ "İkisi de güvenlidir; 24 kelime daha geniş bir pay bırakır, 12 kelimeyi yazmak ve saklamak daha kolaydır.": "Beide sind sicher; 24 Wörter bieten eine größere Sicherheitsreserve, 12 Wörter lassen sich leichter aufschreiben und aufbewahren.",
+ "Bağış": "Spenden",
+ "OrkoWallet ücretsiz ve açık kaynaklıdır. Geliştirmeye destek olmak istersen aşağıdaki adrese Grin gönderebilirsin.": "OrkoWallet ist kostenlos und Open Source. Wenn Sie die Entwicklung unterstützen möchten, können Sie Grin an die folgende Adresse senden.",
+ "Bağış yap": "Spenden",
+ "Bağış yalnızca Mainnet üzerinde gönderilebilir.": "Spenden können nur im Mainnet gesendet werden.",
+ "Bağış göndermek için önce bir cüzdan aç.": "Öffnen Sie zuerst eine Wallet, um zu spenden."
 }

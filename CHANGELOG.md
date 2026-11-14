@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.1
+
+- New wallets can be created with a 12- or 24-word recovery phrase (restore already accepted 12 to 24 words)
+- "Max" button in Send: sends the whole spendable balance, the network fee is taken from it
+- Settings: number of confirmations needed to spend (1 to 10, default 10), one setting for all wallets
+- Drop-down lists follow the light and dark theme
+- Settings → About: Donate
+- Minimum wallet password length is 4 characters
+
 ## 0.1.0 – first public release
 
 - Wallet core on the official grin-wallet 5.5.1 / grin 5.5.2 libraries

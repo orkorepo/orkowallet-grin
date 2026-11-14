@@ -314,7 +314,7 @@
  "1 dakika": "1 分钟",
  "1 saat": "1 小时",
  "Hakkında": "关于",
- "OrkoWallet – Grin 0.1.0 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.1.0 · 官方库 grin-wallet 5.5.1 和 grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
+ "OrkoWallet – Grin 0.1.1 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.1.1 · 官方库 grin-wallet 5.5.1 和 grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
  "Ağ değişince açık cüzdan kapanır ve uygulama yeniden başlar.": "切换网络时，已打开的钱包会关闭，应用会重启。",
  "Uygulama seçtiğin ağ ile yeniden başlayacak.": "应用将以您所选的网络重新启动。",
  "Node havuzu ({net})": "节点池（{net}）",
@@ -468,5 +468,10 @@
  "Kurtarma ifadesi uzunluğu": "助记词长度",
  "24 kelime (önerilen)": "24 个单词（推荐）",
  "12 kelime (daha kısa)": "12 个单词（更短）",
- "İkisi de güvenlidir; 24 kelime daha geniş bir pay bırakır, 12 kelimeyi yazmak ve saklamak daha kolaydır.": "两者都是安全的；24 个单词的安全余量更大，12 个单词更便于抄写和保管。"
+ "İkisi de güvenlidir; 24 kelime daha geniş bir pay bırakır, 12 kelimeyi yazmak ve saklamak daha kolaydır.": "两者都是安全的；24 个单词的安全余量更大，12 个单词更便于抄写和保管。",
+ "Bağış": "捐赠",
+ "OrkoWallet ücretsiz ve açık kaynaklıdır. Geliştirmeye destek olmak istersen aşağıdaki adrese Grin gönderebilirsin.": "OrkoWallet 免费且开源。如果您想支持它的开发，可以向下方地址发送 Grin。",
+ "Bağış yap": "捐赠",
+ "Bağış yalnızca Mainnet üzerinde gönderilebilir.": "捐赠只能在主网上发送。",
+ "Bağış göndermek için önce bir cüzdan aç.": "请先打开一个钱包再捐赠。"
 }
