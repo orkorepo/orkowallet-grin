@@ -144,11 +144,14 @@ pub struct SendOptions {
     pub fluff: bool,
     /// Try to hand the payment to the recipient over Tor. False = only create the Slatepack text.
     pub tor: bool,
+    /// The amount already includes the network fee: spend everything and let the fee come out of it
+    /// ("send max"). Implies `use_all`.
+    pub amount_includes_fee: bool,
 }
 
 impl Default for SendOptions {
     fn default() -> Self {
-        SendOptions { change_outputs: 1, use_all: false, ttl_blocks: None, fluff: false, tor: true }
+        SendOptions { change_outputs: 1, use_all: false, ttl_blocks: None, fluff: false, tor: true, amount_includes_fee: false }
     }
 }
 
@@ -266,12 +269,14 @@ pub fn wallet_exists(dir: &Path) -> bool {
 
 impl Wallet {
     /// Create a new wallet. With `recovery` = Some(words) the wallet is restored from those words
-    /// (run `scan` afterwards); otherwise a new 24 word phrase is generated.
+    /// (run `scan` afterwards); otherwise a new phrase is generated: `words` = 12 or 24 (anything else
+    /// gives 24).
     /// Returns the opened wallet and the recovery phrase to show the user once.
     pub fn create(
         settings: Settings,
         password: &str,
         recovery: Option<&str>,
+        words: usize,
     ) -> Result<(Wallet, ZeroingString)> {
         set_chain(settings.network);
         if wallet_exists(&settings.dir) {
@@ -289,12 +294,14 @@ impl Wallet {
                 None,
                 Some(settings.tor_config()),
             )?;
-            let words = recovery.map(|r| ZeroingString::from(r.trim()));
-            if let Some(w) = &words {
+            let words_in = recovery.map(|r| ZeroingString::from(r.trim()));
+            if let Some(w) = &words_in {
                 lc.validate_mnemonic(w.clone())
                     .map_err(|_| anyhow!("the recovery phrase is not valid"))?;
             }
-            lc.create_wallet(None, words, 32, ZeroingString::from(password), false)?;
+            // Entropy bytes: 16 = 12 words, 32 = 24 words.
+            let entropy = if words == 12 { 16 } else { 32 };
+            lc.create_wallet(None, words_in, entropy, ZeroingString::from(password), false)?;
         }
         let wallet = Self::open_inst(settings, inst, pool, password)?;
         let phrase = {
@@ -594,7 +601,8 @@ impl Wallet {
             minimum_confirmations: min_confirmations,
             max_outputs: 500,
             num_change_outputs: opts.change_outputs.clamp(1, 8) as u32,
-            selection_strategy_is_use_all: opts.use_all,
+            selection_strategy_is_use_all: opts.use_all || opts.amount_includes_fee,
+            amount_includes_fee: Some(opts.amount_includes_fee),
             ttl_blocks: opts.ttl_blocks,
             // Proof of payment whenever we know the receiver, like grin-wallet.
             payment_proof_recipient_address: dest.clone(),
@@ -618,6 +626,32 @@ impl Wallet {
             .owner
             .create_slatepack_message(self.mask(), &slate, Some(0), recipients)?;
         Ok(SendOutcome::Slatepack { tx_slate_id: id, message, tor_error })
+    }
+
+    /// The most that can be sent in one payment: every spendable output (with `min_confirmations`)
+    /// minus the network fee. Returns (amount to send in the transaction, what to pass as `amount`
+    /// together with `amount_includes_fee`, fee).
+    pub fn max_sendable(&self, min_confirmations: u64) -> Result<(u64, u64, u64)> {
+        let (_, info) = self.balance(min_confirmations)?;
+        let spendable = info.amount_currently_spendable;
+        if spendable == 0 {
+            return Ok((0, 0, 0));
+        }
+        let args = InitTxArgs {
+            src_acct_name: None,
+            amount: spendable,
+            minimum_confirmations: min_confirmations,
+            max_outputs: 500,
+            num_change_outputs: 1,
+            selection_strategy_is_use_all: true,
+            amount_includes_fee: Some(true),
+            estimate_only: Some(true),
+            ..Default::default()
+        };
+        let slate = self.owner.init_send_tx(self.mask(), args)?;
+        let total = slate.amount;
+        let fee = slate.fee_fields.fee();
+        Ok((total.saturating_sub(fee), total, fee))
     }
 
     /// Hand a locked payment to the recipient over Tor, finalize it and post it to the chain.

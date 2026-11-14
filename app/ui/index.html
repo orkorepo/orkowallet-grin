@@ -138,6 +138,7 @@
           </label>
           <label class="field" id="wf-words-f" hidden>Kurtarma ifadesi
             <textarea id="wf-words" rows="4" class="mono" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+            <span class="hint">Kurtarma ifadesi 12, 15, 18, 21 veya 24 kelime olabilir.</span>
           </label>
           <label class="field" id="wf-since-f" hidden>Bu cüzdanı ne zaman oluşturdun?
             <select id="wf-since"></select>
@@ -146,6 +147,10 @@
           <label class="field" id="wf-path-f" hidden>Cüzdan klasörü
             <input id="wf-path" class="mono" spellcheck="false" autocomplete="off" placeholder="C:\Users\...\.grin\main">
             <span class="hint"><span>İçinde</span> <code>wallet_data</code> <span>klasörü olan klasör. Dosyalar kopyalanır, aslına dokunulmaz.</span></span>
+          </label>
+          <label class="field" id="wf-len-f" hidden>Kurtarma ifadesi uzunluğu
+            <select id="wf-len"><option value="24">24 kelime (önerilen)</option><option value="12">12 kelime (daha kısa)</option></select>
+            <span class="hint">İkisi de güvenlidir; 24 kelime daha geniş bir pay bırakır, 12 kelimeyi yazmak ve saklamak daha kolaydır.</span>
           </label>
           <label class="field">Node bağlantısı
             <select id="wf-conn">
@@ -262,10 +267,6 @@
                 <form class="ws-form" id="ws-form" novalidate>
                   <h3>Genel</h3>
                   <label class="field">Cüzdan adı <input id="ws-f-name" maxlength="40"></label>
-                  <label class="field">Harcamak için gereken onay sayısı
-                    <input id="ws-f-conf" type="number" min="1" max="1000">
-                    <span class="hint">Gelen bir ödeme bu kadar blok onayı alınca harcanabilir. Grin varsayılanı 10 (~10 dk).</span>
-                  </label>
                   <label class="field">Node bağlantısı
                     <select id="ws-f-conn">
                       <option value="auto">Otomatik (node havuzu)</option>
@@ -406,7 +407,7 @@
           <button class="link" type="button" id="s-recheck" hidden>Tekrar kontrol et</button>
         </div>
         <label class="field">Tutar
-          <span class="amount-wrap"><input id="s-amount" class="mono" inputmode="decimal" autocomplete="off" placeholder="0.0"><span class="unit">ツ</span></span>
+          <span class="amount-wrap"><input id="s-amount" class="mono" inputmode="decimal" autocomplete="off" placeholder="0.0"><button type="button" class="max-btn" id="s-max" title="Harcanabilir tüm bakiyeyi gönderir; ağ ücreti bu tutardan düşülür.">Maks</button><span class="unit">ツ</span></span>
           <span class="hint"><span>Kullanılabilir</span>: <span id="s-avail" class="num">–</span> ツ · <span>Ağ ücreti otomatik eklenir.</span></span>
         </label>
         <label class="field" id="s-pass-f" hidden>Parola
@@ -658,6 +659,10 @@
               <legend>Gönderme</legend>
               <label class="check"><input type="checkbox" id="set-fluff"> Hemen yayınla (Dandelion kapalı)</label>
               <span class="hint">Dandelion, işlemin kaynağını gizlemek için önce rastgele node'lara iletilmesini sağlar. Kapatırsan işlem hızlı yayılır ama gizlilik azalır.</span>
+              <label class="field">Harcamak için gereken onay sayısı
+                <select id="set-minconf"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option></select>
+                <span class="hint">Gelen bir ödeme bu kadar blok onayı alınca harcanabilir. Grin varsayılanı 10 (~10 dk). 1 onayda harcamak daha hızlıdır, ama zincir yeniden düzenlenirse işlem geçersiz kalabilir.</span>
+              </label>
               <label class="field">Değişim çıktısı sayısı
                 <select id="set-change"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
               </label>
@@ -712,6 +717,7 @@
   <script src="lang-ru.js"></script>
   <script src="lang-zh.js"></script>
   <script src="i18n.js"></script>
+  <script src="dropdown.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

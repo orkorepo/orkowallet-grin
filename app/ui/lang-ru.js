@@ -462,4 +462,13 @@ const LANG_RU = {
   "Beklenmeyen bir hata oluştu (ayrıntılar log dosyasında).": "Произошла непредвиденная ошибка (подробности в файле журнала).",
   "İşlem yarıda kaldı": "Операция прервана",
   "Başlatılamadı: {e}": "Не удалось запустить: {e}",
+  "Maks": "Макс.",
+  "Harcanabilir tüm bakiyeyi gönderir; ağ ücreti bu tutardan düşülür.": "Отправляет весь доступный баланс; комиссия сети вычитается из этой суммы.",
+  "Kurtarma ifadesi 12, 15, 18, 21 veya 24 kelime olabilir.": "Фраза восстановления может состоять из 12, 15, 18, 21 или 24 слов.",
+  "Gelen bir ödeme bu kadar blok onayı alınca harcanabilir. Grin varsayılanı 10 (~10 dk). 1 onayda harcamak daha hızlıdır, ama zincir yeniden düzenlenirse işlem geçersiz kalabilir.": "Входящий платёж становится доступным после указанного числа подтверждений блоков. По умолчанию в Grin — 10 (~10 мин). С 1 подтверждением тратить быстрее, но транзакция может стать недействительной при реорганизации цепочки.",
+  "Gönderilebilir bakiye yok.": "Нет баланса для отправки.",
+  "Kurtarma ifadesi uzunluğu": "Длина фразы восстановления",
+  "24 kelime (önerilen)": "24 слова (рекомендуется)",
+  "12 kelime (daha kısa)": "12 слов (короче)",
+  "İkisi de güvenlidir; 24 kelime daha geniş bir pay bırakır, 12 kelimeyi yazmak ve saklamak daha kolaydır.": "Оба варианта надёжны; 24 слова дают больший запас прочности, 12 слов проще записать и хранить.",
 };

@@ -508,6 +508,15 @@ const EN = {
   'Beklenmeyen bir hata oluştu (ayrıntılar log dosyasında).': 'An unexpected error occurred (details in the log file).',
   'İşlem yarıda kaldı': 'The operation was interrupted',
   'Başlatılamadı: {e}': 'Could not start: {e}',
+  'Maks': 'Max',
+  'Harcanabilir tüm bakiyeyi gönderir; ağ ücreti bu tutardan düşülür.': 'Sends the whole spendable balance; the network fee is taken from this amount.',
+  'Kurtarma ifadesi 12, 15, 18, 21 veya 24 kelime olabilir.': 'The recovery phrase can have 12, 15, 18, 21 or 24 words.',
+  'Gelen bir ödeme bu kadar blok onayı alınca harcanabilir. Grin varsayılanı 10 (~10 dk). 1 onayda harcamak daha hızlıdır, ama zincir yeniden düzenlenirse işlem geçersiz kalabilir.': 'An incoming payment becomes spendable after this many block confirmations. Grin default is 10 (~10 min). Spending after 1 confirmation is faster, but the transaction can become invalid if the chain reorganises.',
+  'Kurtarma ifadesi uzunluğu': 'Recovery phrase length',
+  '24 kelime (önerilen)': '24 words (recommended)',
+  '12 kelime (daha kısa)': '12 words (shorter)',
+  'İkisi de güvenlidir; 24 kelime daha geniş bir pay bırakır, 12 kelimeyi yazmak ve saklamak daha kolaydır.': 'Both are secure; 24 words leave a wider margin, 12 words are easier to write down and keep.',
+  'Gönderilebilir bakiye yok.': 'There is no balance to send.',
 };
 
 // lang-xx.js (loaded before this file) define LANG_DE/FR/RU/ZH; a missing entry falls back to English.

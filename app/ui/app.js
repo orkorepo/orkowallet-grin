@@ -164,6 +164,7 @@ function openForm(mode) {
   $('wf-submit').textContent = t(f.submit); $('wf-hint').textContent = t(f.hint);
   $('wf-words-f').hidden = mode !== 'restore';
   $('wf-since-f').hidden = mode !== 'restore';
+  $('wf-len-f').hidden = mode !== 'create'; $('wf-len').value = '24';
   fillSince($('wf-since'), true);
   $('wf-since').value = 'all';
   $('wf-path-f').hidden = mode !== 'import';
@@ -197,7 +198,7 @@ $('wf').addEventListener('submit', async (e) => {
   await busy($('wf-submit'), async () => {
     try {
       if (mode === 'create') {
-        state.createdWords = await invoke('wallet_create', { name, password, connection });
+        state.createdWords = await invoke('wallet_create', { name, password, connection, words: Number($('wf-len').value) || 24 });
         showWords();
       } else if (mode === 'restore') {
         await invoke('wallet_restore', { name, password, words: $('wf-words').value, connection, since: $('wf-since').value });
@@ -590,7 +591,6 @@ function fillWalletSettings() {
   const w = state.open;
   const conn = w.connection === 'integrated' ? 'integrated' : w.connection === 'custom' ? 'custom' : 'auto';
   $('ws-f-name').value = w.name;
-  $('ws-f-conf').value = w.min_confirmations;
   $('ws-f-conn').value = conn;
   $('ws-f-url').value = w.custom_url;
   $('ws-f-url-f').hidden = conn !== 'custom';
@@ -603,7 +603,7 @@ $('ws-form').addEventListener('submit', async (e) => {
   try {
     const reconnect = await invoke('wallet_update', {
       id: state.open.id, name: $('ws-f-name').value, connection: $('ws-f-conn').value,
-      customUrl: $('ws-f-url').value, minConfirmations: Number($('ws-f-conf').value) || 10,
+      customUrl: $('ws-f-url').value,
     });
     state.status = await invoke('status'); state.open = state.status.open_wallet;
     $('ws-name').textContent = state.open.name;
@@ -1047,7 +1047,7 @@ $('nd-conn-apply').addEventListener('click', async (e) => {
     try {
       const reconnect = await invoke('wallet_update', {
         id: state.open.id, name: state.open.name, connection: mode,
-        customUrl: mode === 'custom' ? $('nd-conn-url').value : '', minConfirmations: state.open.min_confirmations,
+        customUrl: mode === 'custom' ? $('nd-conn-url').value : '',
       });
       state.status = await invoke('status'); state.open = state.status.open_wallet;
       if (reconnect) {
@@ -1089,7 +1089,7 @@ function openDialog(name) {
     $('set-backup-none').hidden = !!state.open;
     selectSettingsTab('general');
     $('set-confirm-pw').checked = s.send.confirm_password; $('set-fluff').checked = s.send.fluff;
-    $('set-change').value = String(s.send.change_outputs); $('set-strategy').value = s.send.strategy; $('set-ttl').value = s.send.ttl_blocks;
+    $('set-minconf').value = String(s.send.min_confirmations || 10); $('set-change').value = String(s.send.change_outputs); $('set-strategy').value = s.send.strategy; $('set-ttl').value = s.send.ttl_blocks;
     $('set-retry').checked = s.send.retry; $('set-retry-min').value = s.send.retry_minutes; $('set-retry-min').disabled = !s.send.retry;
     $('set-backup-box').hidden = !state.open; err('set-backup-note');
     return $('dlg-settings').showModal();
@@ -1152,6 +1152,7 @@ $('set-save').addEventListener('click', async () => {
     const send = {
       confirm_password: $('set-confirm-pw').checked, fluff: $('set-fluff').checked, change_outputs: Number($('set-change').value) || 1,
       strategy: $('set-strategy').value, ttl_blocks: Math.max(0, Number($('set-ttl').value) || 0),
+      min_confirmations: Math.min(10, Math.max(1, Number($('set-minconf').value) || 10)),
       retry: $('set-retry').checked, retry_minutes: Math.min(240, Math.max(1, Number($('set-retry-min').value) || 30)),
     };
     await invoke('save_settings', { theme, language, autoLockMinutes: minutes, node: s.node, send });
@@ -1292,6 +1293,20 @@ function checkRecipient() {
 $('s-addr').addEventListener('input', checkRecipient);
 $('s-recheck').addEventListener('click', checkRecipient);
 
+// "Maks": the whole spendable balance minus the network fee; the backend recomputes it when sending.
+let sendMax = false;
+$('s-amount').addEventListener('input', () => { sendMax = false; });
+$('s-max').addEventListener('click', async () => {
+  err('send-error');
+  await busy($('s-max'), async () => {
+    try {
+      const v = await invoke('max_sendable');
+      if (Number(v) <= 0) return err('send-error', t('Gönderilebilir bakiye yok.'));
+      $('s-amount').value = v; sendMax = true;
+    } catch (x) { err('send-error', E(x)); }
+  });
+});
+
 $('s-submit').addEventListener('click', async () => {
   err('send-error');
   const amount = $('s-amount').value.trim(), address = $('s-addr').value.trim();
@@ -1299,7 +1314,8 @@ $('s-submit').addEventListener('click', async () => {
   if (sendMethod === 'tor' && !address) return err('send-error', t('Tor ile göndermek için alıcının adresini yaz.'));
   await busy($('s-submit'), async () => {
     try {
-      const r = await invoke('send', { amount, address, password: $('s-pass').value || null, method: sendMethod });
+      const r = await invoke('send', { amount, address, password: $('s-pass').value || null, method: sendMethod, sendMax });
+      sendMax = false;
       $('s-pass').value = '';
       $('send-step-form').hidden = true;
       $('s-amount').value = ''; $('s-addr').value = ''; stopRecipientCheck(); $('s-recipient-box').hidden = true;

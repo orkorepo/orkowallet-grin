@@ -72,11 +72,13 @@ struct SendCfg {
     retry: bool,
     /// For how many minutes (one attempt per minute).
     retry_minutes: u64,
+    /// Confirmations an incoming payment needs before it counts as spendable (1-10, Grin default 10).
+    min_confirmations: u64,
 }
 
 impl Default for SendCfg {
     fn default() -> Self {
-        SendCfg { confirm_password: false, fluff: false, change_outputs: 1, strategy: "smallest".into(), ttl_blocks: 0, retry: true, retry_minutes: 30 }
+        SendCfg { confirm_password: false, fluff: false, change_outputs: 1, strategy: "smallest".into(), ttl_blocks: 0, retry: true, retry_minutes: 30, min_confirmations: 10 }
     }
 }
 
@@ -477,6 +479,7 @@ fn save_settings(state: St<'_>, theme: String, language: String, auto_lock_minut
             v.change_outputs = v.change_outputs.clamp(1, 8);
             v.ttl_blocks = v.ttl_blocks.min(100_000);
             v.retry_minutes = v.retry_minutes.clamp(1, 240);
+            v.min_confirmations = v.min_confirmations.clamp(1, 10);
             if v.strategy != "all" {
                 v.strategy = "smallest".into();
             }
@@ -536,13 +539,13 @@ async fn open_with(
         }
         let (mut w, words) = match mode {
             OpenMode::Unlock => (Wallet::open(settings, &password)?, None),
-            OpenMode::Create => {
-                let (w, phrase) = Wallet::create(settings, &password, None)?;
+            OpenMode::Create(n) => {
+                let (w, phrase) = Wallet::create(settings, &password, None, n)?;
                 (w, Some(phrase.split_whitespace().map(String::from).collect()))
             }
             // No scan here: the wallet opens at once and `start_scan` runs it in the background.
             OpenMode::Restore(words) => {
-                let (w, _) = Wallet::create(settings, &password, Some(&words))?;
+                let (w, _) = Wallet::create(settings, &password, Some(&words), 24)?;
                 (w, None)
             }
         };
@@ -564,7 +567,7 @@ async fn open_with(
 
 enum OpenMode {
     Unlock,
-    Create,
+    Create(usize),
     Restore(String),
 }
 
@@ -668,12 +671,12 @@ fn discard(state: &AppState, id: &str) {
 }
 
 #[tauri::command]
-async fn wallet_create(state: St<'_>, name: String, password: String, connection: String) -> Result<Vec<String>, String> {
+async fn wallet_create(state: St<'_>, name: String, password: String, connection: String, words: Option<usize>) -> Result<Vec<String>, String> {
     check_password(&password)?;
     let meta = new_meta(&name, &connection);
     state.write_meta(&meta)?;
     let id = meta.id.clone();
-    match open_with(state.inner().clone(), meta, password, OpenMode::Create).await {
+    match open_with(state.inner().clone(), meta, password, OpenMode::Create(if words == Some(12) { 12 } else { 24 })).await {
         Ok(w) => Ok(w.unwrap_or_default()),
         Err(e) => {
             discard(&state, &id);
@@ -817,7 +820,7 @@ fn win_close(app: tauri::AppHandle) {
     app.exit(0); // RunEvent::Exit stops the integrated node cleanly
 }
 #[tauri::command]
-fn wallet_update(state: St<'_>, id: String, name: String, connection: String, custom_url: String, min_confirmations: u64) -> Result<bool, String> {
+fn wallet_update(state: St<'_>, id: String, name: String, connection: String, custom_url: String) -> Result<bool, String> {
     let mut m = state.read_meta(&id)?;
     let connection = match connection.as_str() {
         "integrated" => "integrated",
@@ -834,7 +837,6 @@ fn wallet_update(state: St<'_>, id: String, name: String, connection: String, cu
     m.name = if name.trim().is_empty() { m.name } else { name.trim().chars().take(40).collect() };
     m.connection = connection.into();
     m.custom_url = custom_url;
-    m.min_confirmations = min_confirmations.clamp(1, 1000);
     state.write_meta(&m)?;
     let mut open = state.open.write().unwrap();
     if let Some(o) = open.as_ref().filter(|o| o.meta.id == id) {
@@ -983,10 +985,11 @@ struct Overview {
 #[tauri::command]
 async fn overview(state: St<'_>) -> Result<Overview, String> {
     let o = state.open()?;
+    let min_conf = state.settings.lock().unwrap().send.min_confirmations.clamp(1, 10);
     blocking(move || {
         let w = &o.wallet;
         let (sp, onion) = w.address()?;
-        let (fresh, i) = w.balance(o.meta.min_confirmations)?;
+        let (fresh, i) = w.balance(min_conf)?;
         let account = w.accounts()?.into_iter().find(|a| a.2).map(|a| a.0).unwrap_or_default();
         Ok(Overview {
             name: o.meta.name.clone(),
@@ -1000,7 +1003,7 @@ async fn overview(state: St<'_>) -> Result<Overview, String> {
             total: amount_to_hr_string(i.total, true),
             height: i.last_confirmed_height,
             node_ok: fresh,
-            min_confirmations: o.meta.min_confirmations,
+            min_confirmations: min_conf,
             node_in_use: w.node_in_use(),
             node_failovers: w.node_failovers(),
             connection: o.meta.connection.clone(),
@@ -1254,7 +1257,18 @@ struct SendDto {
 }
 
 #[tauri::command]
-async fn send(state: St<'_>, amount: String, address: String, password: Option<String>, method: String) -> Result<SendDto, String> {
+async fn max_sendable(state: St<'_>) -> Result<String, String> {
+    let o = state.open()?;
+    let min_conf = state.settings.lock().unwrap().send.min_confirmations.clamp(1, 10);
+    blocking(move || {
+        let (max, _, _) = o.wallet.max_sendable(min_conf)?;
+        Ok(amount_to_hr_string(max, true))
+    })
+    .await
+}
+
+#[tauri::command]
+async fn send(state: St<'_>, amount: String, address: String, password: Option<String>, method: String, send_max: Option<bool>) -> Result<SendDto, String> {
     let over_tor = method != "slatepack";
     if over_tor && address.trim().is_empty() {
         return Err("Tor ile göndermek için alıcının adresini yaz.".into());
@@ -1275,9 +1289,22 @@ async fn send(state: St<'_>, amount: String, address: String, password: Option<S
         ttl_blocks: (cfg.ttl_blocks > 0).then_some(cfg.ttl_blocks),
         fluff: cfg.fluff,
         tor: over_tor,
+        amount_includes_fee: false,
     };
-    let amount = amount_from_hr_string(amount.trim().replace(',', ".").as_str())
-        .map_err(|_| "Tutar geçersiz.".to_string())?;
+    let min_conf = cfg.min_confirmations.clamp(1, 10);
+    let mut opts = opts;
+    let amount = if send_max.unwrap_or(false) {
+        // "Max": everything spendable goes out and the fee is taken from it.
+        let w = o.wallet.clone();
+        let (_, total, _) = blocking(move || w.max_sendable(min_conf)).await?;
+        if total == 0 {
+            return Err("Gönderilebilir bakiye yok.".into());
+        }
+        opts.amount_includes_fee = true;
+        total
+    } else {
+        amount_from_hr_string(amount.trim().replace(',', ".").as_str()).map_err(|_| "Tutar geçersiz.".to_string())?
+    };
     if amount == 0 {
         return Err("Tutar sıfırdan büyük olmalı.".into());
     }
@@ -1288,7 +1315,7 @@ async fn send(state: St<'_>, amount: String, address: String, password: Option<S
     let st = state.inner().clone();
     blocking(move || {
         let d = (!dest.is_empty()).then_some(dest.as_str());
-        Ok(match o.wallet.send(amount, d, o.meta.min_confirmations, &opts)? {
+        Ok(match o.wallet.send(amount, d, min_conf, &opts)? {
             SendOutcome::PostedOverTor { tx_slate_id } => SendDto {
                 kind: "tor".into(),
                 slate_id: tx_slate_id,
@@ -1903,6 +1930,7 @@ fn main() {
             scan_status,
             verify_password,
             send_jobs,
+            max_sendable,
             export_transactions,
             backup_wallet,
             open_data_folder,

@@ -459,5 +459,14 @@
  "Kopyalanamadı: {e}": "Copie impossible : {e}",
  "Beklenmeyen bir hata oluştu (ayrıntılar log dosyasında).": "Une erreur inattendue s’est produite (détails dans le fichier journal).",
  "İşlem yarıda kaldı": "L’opération a été interrompue",
- "Başlatılamadı: {e}": "Démarrage impossible : {e}"
+ "Başlatılamadı: {e}": "Démarrage impossible : {e}",
+ "Maks": "Max",
+ "Harcanabilir tüm bakiyeyi gönderir; ağ ücreti bu tutardan düşülür.": "Envoie tout le solde disponible ; les frais de réseau sont déduits de ce montant.",
+ "Kurtarma ifadesi 12, 15, 18, 21 veya 24 kelime olabilir.": "La phrase de récupération peut comporter 12, 15, 18, 21 ou 24 mots.",
+ "Gelen bir ödeme bu kadar blok onayı alınca harcanabilir. Grin varsayılanı 10 (~10 dk). 1 onayda harcamak daha hızlıdır, ama zincir yeniden düzenlenirse işlem geçersiz kalabilir.": "Un paiement reçu devient disponible après ce nombre de confirmations de bloc. La valeur par défaut de Grin est 10 (~10 min). Dépenser après 1 confirmation est plus rapide, mais la transaction peut devenir invalide si la chaîne est réorganisée.",
+ "Gönderilebilir bakiye yok.": "Aucun solde à envoyer.",
+ "Kurtarma ifadesi uzunluğu": "Longueur de la phrase de récupération",
+ "24 kelime (önerilen)": "24 mots (recommandé)",
+ "12 kelime (daha kısa)": "12 mots (plus court)",
+ "İkisi de güvenlidir; 24 kelime daha geniş bir pay bırakır, 12 kelimeyi yazmak ve saklamak daha kolaydır.": "Les deux sont sûres ; 24 mots laissent une marge plus large, 12 mots sont plus faciles à noter et à conserver."
 }

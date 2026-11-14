@@ -78,7 +78,7 @@ fn main() -> Result<()> {
     let cmd = args.first().cloned().unwrap_or_default();
 
     let mut w = if cmd == "create" {
-        let (w, phrase) = Wallet::create(settings, &pass, words.as_deref())?;
+        let (w, phrase) = Wallet::create(settings, &pass, words.as_deref(), 24)?;
         println!("recovery phrase: {}", &*phrase);
         w
     } else {

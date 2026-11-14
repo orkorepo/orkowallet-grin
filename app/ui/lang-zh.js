@@ -462,4 +462,13 @@ const LANG_ZH = {
   "Beklenmeyen bir hata oluştu (ayrıntılar log dosyasında).": "发生意外错误（详情见日志文件）。",
   "İşlem yarıda kaldı": "操作已中断",
   "Başlatılamadı: {e}": "启动失败：{e}",
+  "Maks": "最大",
+  "Harcanabilir tüm bakiyeyi gönderir; ağ ücreti bu tutardan düşülür.": "发送全部可用余额；网络手续费将从该金额中扣除。",
+  "Kurtarma ifadesi 12, 15, 18, 21 veya 24 kelime olabilir.": "助记词可以是 12、15、18、21 或 24 个单词。",
+  "Gelen bir ödeme bu kadar blok onayı alınca harcanabilir. Grin varsayılanı 10 (~10 dk). 1 onayda harcamak daha hızlıdır, ama zincir yeniden düzenlenirse işlem geçersiz kalabilir.": "收到的付款在达到此数量的区块确认后即可使用。Grin 默认值为 10（约 10 分钟）。1 个确认即可花费，速度更快，但如果链发生重组，交易可能失效。",
+  "Gönderilebilir bakiye yok.": "没有可发送的余额。",
+  "Kurtarma ifadesi uzunluğu": "助记词长度",
+  "24 kelime (önerilen)": "24 个单词（推荐）",
+  "12 kelime (daha kısa)": "12 个单词（更短）",
+  "İkisi de güvenlidir; 24 kelime daha geniş bir pay bırakır, 12 kelimeyi yazmak ve saklamak daha kolaydır.": "两者都是安全的；24 个单词的安全余量更大，12 个单词更便于抄写和保管。",
 };

@@ -575,3 +575,28 @@ li.enter { animation: slidein .55s cubic-bezier(.2, .8, .2, 1); }
 .sbox .spane .row input { flex: 1 1 auto; min-width: 0; }
 .sbox .spane .row > .btn { flex: 0 0 auto; }
 
+
+/* send: "Maks" button inside the amount field */
+#s-amount { padding-right: 84px; }
+.max-btn { position: absolute; right: 36px; top: 50%; transform: translateY(-50%); padding: 3px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg-2); color: var(--accent); font: 700 var(--fs-sm, 12px) var(--font); cursor: pointer; }
+.max-btn:hover { background: var(--accent-soft); }
+
+/* themed drop-downs (dropdown.js) */
+.dd { position: relative; display: block; min-width: 0; }
+.dd-native { position: absolute; left: 0; top: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.dd-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; text-align: left; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line-strong); background: var(--bg-2); color: var(--text); font: 400 var(--fs-md) var(--font); cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.dd-btn:hover { border-color: var(--input-hover); }
+.dd-btn:focus-visible, .dd-btn[aria-expanded="true"] { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.dd-btn:disabled { opacity: .55; cursor: default; }
+.dd-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dd-chev { flex: none; width: 8px; height: 8px; border-right: 2px solid var(--text-dim); border-bottom: 2px solid var(--text-dim); transform: translateY(-2px) rotate(45deg); transition: transform .15s; }
+.dd-btn[aria-expanded="true"] .dd-chev { transform: translateY(2px) rotate(-135deg); }
+.dd-list { position: fixed; inset: auto; margin: 0; padding: 4px; overflow-y: auto; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--bg-1); color: var(--text); box-shadow: var(--shadow); }
+.dd-list:not(:popover-open) { display: none; }
+.dd-opt { padding: 8px 10px; border-radius: 8px; font: 400 var(--fs-md) var(--font); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dd-opt.on { background: var(--bg-3); }
+.dd-opt.sel { color: var(--accent); font-weight: 600; background: var(--accent-soft); }
+.dd-opt.off { opacity: .5; cursor: default; }
+.pager-size .dd { display: inline-block; }
+.pager-size .dd-btn { padding: 3px 8px; width: auto; }
+.tc-engine .dd { flex: 1; }
