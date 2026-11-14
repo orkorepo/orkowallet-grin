@@ -1,7 +1,7 @@
 # Security
 
 ## Reporting a vulnerability
-Email security@orkoswap.io (PGP key to be published) with details and a way to reproduce. Please do not open a public issue for vulnerabilities. We aim to answer within 72 hours.
+Email info@orkoswap.io (PGP key to be published) with details and a way to reproduce. Please do not open a public issue for vulnerabilities. We aim to answer within 72 hours.
 
 ## What the wallet protects
 - **Keys never leave this computer.** The seed is encrypted by grin-wallet's own storage with your password. The recovery phrase is shown only after the password is entered again, and the window is excluded from screenshots and screen recording while it is on screen.

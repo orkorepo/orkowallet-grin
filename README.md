@@ -7,7 +7,7 @@
 A desktop wallet for [Grin](https://grin.mw) by Orkoswap. It runs the **official** grin-wallet 5.5.1 and grin 5.5.2 libraries (no re-implemented cryptography), sends and receives over **Tor**, and can run its own node.
 
 <p align="center">
-  <img src="docs/screenshots/wallet.png" alt="Wallet view" width="860">
+  <img src="docs/screenshots/wallet-dark.png" alt="Wallet view, dark theme" width="860">
 </p>
 
 ## Download
@@ -24,10 +24,21 @@ Get the Windows installer (`OrkoWallet-Grin_0.1.0_x64-setup.exe`) from the [Rele
 - Transaction history with paging, CSV export, wallet backup.
 - Interface in six languages: Türkçe, English, Deutsch, Français, Русский, 简体中文.
 
+### Light theme
+
+<img src="docs/screenshots/wallet.png" alt="Wallet view, light theme" width="860">
+
 | | |
 |---|---|
 | ![Send](docs/screenshots/send.png) | ![Node panel](docs/screenshots/nodes.png) |
 | ![Settings](docs/screenshots/settings.png) | ![Wallets](docs/screenshots/wallets.png) |
+
+### Dark theme
+
+| | |
+|---|---|
+| ![Send](docs/screenshots/send-dark.png) | ![Node panel](docs/screenshots/nodes-dark.png) |
+| ![Settings](docs/screenshots/settings-dark.png) | ![Wallets](docs/screenshots/wallets-dark.png) |
 
 ## Build (Windows)
 
