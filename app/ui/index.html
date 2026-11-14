@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OrkoWallet – Grin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="loading">
+  <header class="topbar" id="topbar">
+    <div class="brand">
+      <img src="logo-mark.svg" alt="" width="28" height="28" class="brand-mark">
+      <span class="brand-word"><span class="brand-orko">Orko</span>Wallet <span class="brand-sub">– Grin</span></span>
+    </div>
+    <span class="chip chip-warn" id="net-chip" hidden></span>
+    <div class="topbar-right">
+      <span class="wallet-label" id="wallet-label" hidden><span id="ws-name">–</span> <span class="dim" id="ws-account"></span></span>
+      <button class="tor-pill" id="tor-pill" type="button" aria-live="polite" hidden><span class="dot"></span><span id="tor-text">Tor kapalı</span></button>
+      <button class="btn btn-sm" id="btn-lock" type="button" hidden title="Kilitle: ekranı parolaya bağlar, cüzdan çalışmaya devam eder. Çıkış yap: cüzdanı tamamen kapatır.">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Kilitle</button>
+      <button class="btn btn-sm" id="btn-logout" type="button" hidden title="Çıkış yapınca cüzdan kapanır ve Tor adresin çevrimdışı olur; ödeme alamazsın.">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h4M15 8l4 4-4 4M19 12H9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Çıkış yap</button>
+      <button class="icon-btn" data-open="settings" type="button" aria-label="Ayarlar" title="Ayarlar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm8.1-2.6.1-.9-.1-.9 2-1.6-2-3.4-2.4 1a7 7 0 0 0-1.6-.9L15.8 3h-3.6l-.4 2.6c-.6.2-1.1.5-1.6.9l-2.4-1-2 3.4 2 1.6-.1.9.1.9-2 1.6 2 3.4 2.4-1c.5.4 1 .7 1.6.9l.4 2.6h3.6l.4-2.6c.6-.2 1.1-.5 1.6-.9l2.4 1 2-3.4-2-1.6Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="winctl">
+        <button class="wbtn" id="win-min" type="button" aria-label="Küçült" title="Küçült"><svg viewBox="0 0 12 12"><path d="M2 6h8" stroke="currentColor" stroke-width="1.2"/></svg></button>
+        <button class="wbtn" id="win-max" type="button" aria-label="Ekranı kapla / geri al" title="Ekranı kapla / geri al"><svg viewBox="0 0 12 12"><rect x="2.5" y="2.5" width="7" height="7" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button>
+        <button class="wbtn wclose" id="win-close" type="button" aria-label="Kapat" title="Kapat"><svg viewBox="0 0 12 12"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1.2"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <div class="shell">
+    <!-- ============================================================ NODE PANEL -->
+    <aside class="nodebar" id="nodebar" data-mode="remote" aria-label="Node">
+      <section class="nb-card">
+        <div class="nb-card-head"><h3>Node</h3><span class="chip" id="nb-mode">–</span></div>
+        <p class="nb-url mono" id="nb-url"></p>
+        <div class="nb-sync"><span class="dot" id="nb-dot"></span><span id="nb-sync">Bağlanıyor…</span></div>
+        <div class="bar" id="nb-bar" hidden><span id="nb-bar-fill"></span></div>
+        <p class="error" id="nb-error"></p>
+        <div class="nb-actions">
+          <button class="btn btn-sm" type="button" id="nb-start" title="Gömülü node Grin zincirini bu bilgisayara indirir (ana ağda birkaç GB, ilk senkron uzun sürer). Sonra cüzdanın kimseye sormadan çalışır.">Kendi node'unu çalıştır</button>
+          <button class="btn btn-sm danger-text" type="button" id="nb-stop" hidden>Node'u durdur</button>
+          <button class="link" type="button" data-open="node">Node ayarları</button>
+        </div>
+      </section>
+
+      <section class="nb-card own-only">
+        <div class="nb-card-head"><h3>Header</h3><span class="eq" id="eq-chip" hidden></span></div>
+        <dl class="grid4">
+          <div class="w2"><dt>Hash</dt><dd><button class="hashbtn mono" type="button" id="hd-hash">–</button></dd></div>
+          <div><dt>Height</dt><dd class="num" id="hd-height">–</dd></div>
+          <div><dt>Difficulty</dt><dd class="num" id="hd-diff">–</dd></div>
+          <div class="w2"><dt>Time</dt><dd id="hd-time">–</dd></div>
+        </dl>
+      </section>
+
+      <section class="nb-card">
+        <div class="nb-card-head"><h3>Block</h3></div>
+        <dl class="grid4">
+          <div class="w2"><dt>Hash</dt><dd><button class="hashbtn mono" type="button" id="bk-hash">–</button></dd></div>
+          <div><dt>Height</dt><dd class="num" id="bk-height">–</dd></div>
+          <div><dt>Difficulty</dt><dd class="num" id="bk-diff">–</dd></div>
+          <div class="w2"><dt>Time</dt><dd id="bk-time">–</dd></div>
+        </dl>
+      </section>
+
+      <section class="nb-card">
+        <div class="nb-card-head"><h3>Data</h3></div>
+        <dl class="grid4">
+          <div><dt>Main pool</dt><dd class="num" id="d-main">–</dd></div>
+          <div><dt>Stem pool</dt><dd class="num" id="d-stem">–</dd></div>
+          <div><dt>Size</dt><dd class="num" id="d-size">–</dd></div>
+          <div><dt>Peers</dt><dd class="num" id="d-peers">–</dd></div>
+        </dl>
+      </section>
+
+      <section class="nb-card own-only grow">
+        <div class="nb-card-head"><h3>Peers</h3></div>
+        <ul class="peers fit" id="nb-peers"></ul>
+      </section>
+
+      <section class="nb-card remote-only grow">
+        <div class="nb-card-head"><h3>Node havuzu</h3></div>
+        <ul class="nb-pool fit" id="nb-pool"></ul>
+      </section>
+
+      <section class="nb-card grow">
+        <div class="nb-card-head"><h3>Blocks</h3></div>
+        <ul class="blocks fit" id="nb-blocks"></ul>
+      </section>
+    </aside>
+
+    <main class="content" id="app">
+      <!-- boot -->
+      <section class="screen center" data-screen="boot"><div class="spinner" aria-label="Yükleniyor"></div></section>
+
+      <!-- ============================================================ WALLETS -->
+      <section class="screen" data-screen="wallets" hidden>
+        <div class="wl2">
+          <div class="wl2-hero">
+            <img src="logo-mark.svg" alt="" width="56" height="56" class="hero-mark">
+            <div>
+              <h1>Cüzdanlar</h1>
+              <p class="muted" id="wl-net"></p>
+            </div>
+          </div>
+          <p class="muted wl2-intro" id="wl-empty" hidden>Bu ağda henüz cüzdanın yok. Yeni bir cüzdan oluştur, kurtarma ifadenle geri yükle ya da grin-wallet / Grim cüzdan klasörünü içe aktar. Anahtarların yalnızca bu bilgisayarda durur; ödemeler Tor üzerinden gelir ve gider.</p>
+          <ul class="wl2-list" id="wl-list"></ul>
+          <h3 class="wl2-sub">Cüzdan ekle</h3>
+          <div class="wl2-tiles">
+            <button class="tile" type="button" data-form="create">
+              <span class="tile-ico"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+              <strong>Yeni cüzdan</strong><span>Sıfırdan oluştur, 24 kelimelik kurtarma ifadeni al.</span>
+            </button>
+            <button class="tile" type="button" data-form="restore">
+              <span class="tile-ico"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <strong>Geri yükle</strong><span>Kurtarma ifadenle eski cüzdanını geri getir.</span>
+            </button>
+            <button class="tile" type="button" data-form="import">
+              <span class="tile-ico"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <strong>İçe aktar</strong><span>grin-wallet ya da Grim klasörünü kopyala.</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- create / restore / import (one form, three modes) -->
+      <section class="screen center" data-screen="form" hidden>
+        <form class="card narrow" id="wf" novalidate>
+          <button class="back link" type="button" data-go="wallets">← Cüzdanlar</button>
+          <h2 id="wf-title">Yeni cüzdan</h2>
+          <p class="muted" id="wf-desc"></p>
+          <label class="field">Cüzdan adı
+            <input id="wf-name" maxlength="40" autocomplete="off" placeholder="Örn. Günlük">
+          </label>
+          <label class="field" id="wf-words-f" hidden>Kurtarma ifadesi
+            <textarea id="wf-words" rows="4" class="mono" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+          </label>
+          <label class="field" id="wf-since-f" hidden>Bu cüzdanı ne zaman oluşturdun?
+            <select id="wf-since"></select>
+            <span class="hint">Cüzdan hemen açılır; eski işlemlerin arkada taranır. Seçtiğin yıldan önce gelen para görünmez, emin değilsen "Bilmiyorum"u seç (sonradan "Cüzdanı onar" ile de taratabilirsin).</span>
+          </label>
+          <label class="field" id="wf-path-f" hidden>Cüzdan klasörü
+            <input id="wf-path" class="mono" spellcheck="false" autocomplete="off" placeholder="C:\Users\...\.grin\main">
+            <span class="hint"><span>İçinde</span> <code>wallet_data</code> <span>klasörü olan klasör. Dosyalar kopyalanır, aslına dokunulmaz.</span></span>
+          </label>
+          <label class="field">Node bağlantısı
+            <select id="wf-conn">
+              <option value="auto">Otomatik: birkaç node, hata olunca kendiliğinden geçer (önerilen)</option>
+              <option value="integrated">Kendi node'um (gömülü, senkron gerekir)</option>
+            </select>
+          </label>
+          <label class="field"><span id="wf-pass-l">Parola</span>
+            <input type="password" id="wf-pass" autocomplete="new-password">
+          </label>
+          <label class="field" id="wf-pass2-f">Parola (tekrar)
+            <input type="password" id="wf-pass2" autocomplete="new-password">
+          </label>
+          <p class="error" id="wf-error" role="alert"></p>
+          <button class="btn btn-primary btn-lg" type="submit" id="wf-submit">Oluştur</button>
+          <p class="hint" id="wf-hint" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <!-- new wallet: words + verify -->
+      <section class="screen center" data-screen="words" hidden>
+        <div class="card wide" id="words-show">
+          <h2>Kurtarma ifaden</h2>
+          <div class="callout warn">
+            <strong>Bu kelimeleri kâğıda yaz ve güvenli bir yerde sakla.</strong>
+            Bilgisayarın bozulursa paran yalnızca bu kelimelerle geri gelir. Kimseyle paylaşma, ekran görüntüsü alma, internete kaydetme.
+          </div>
+          <ol class="words" id="words-grid"></ol>
+          <label class="check"><input type="checkbox" id="words-ok"> Kelimeleri sırasıyla kâğıda yazdım.</label>
+          <button class="btn btn-primary btn-lg" id="words-next" type="button" disabled>Devam</button>
+        </div>
+        <form class="card narrow" id="words-verify" hidden novalidate>
+          <h2>Kontrol edelim</h2>
+          <p class="muted">Yazdığın kâğıda bakarak istenen kelimeleri gir.</p>
+          <div id="verify-fields" class="stack"></div>
+          <p class="error" id="verify-error" role="alert"></p>
+          <div class="row">
+            <button class="btn" type="button" id="verify-back">Kelimelere dön</button>
+            <button class="btn btn-primary" type="submit">Bitir</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ============================================================ WALLET -->
+      <section class="screen" data-screen="wallet" hidden>
+        <div class="wallet-grid">
+          <div class="col-main">
+            <div class="card balance">
+              <div class="balance-top">
+                <div>
+                  <div class="balance-label">Kullanılabilir bakiye</div>
+                  <div class="balance-amount"><span id="b-spendable" class="num">–</span> <span class="unit">ツ</span></div>
+                </div>
+                <div class="actions">
+                  <button class="btn btn-primary" data-open="send" type="button">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Gönder</button>
+                  <button class="btn" data-open="receive" type="button">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Al</button>
+                  <button class="btn" data-open="slatepack" type="button">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8l4 4v12H4V4h4Zm0 0v5h8V4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Slatepack</button>
+                </div>
+              </div>
+              <dl class="balance-sub">
+                <div><dt>Onay bekliyor</dt><dd class="num" id="b-awaiting">–</dd></div>
+                <div><dt>Olgunlaşmamış</dt><dd class="num" id="b-immature">–</dd></div>
+                <div><dt>Kilitli</dt><dd class="num" id="b-locked">–</dd></div>
+                <div><dt>Toplam</dt><dd class="num" id="b-total">–</dd></div>
+                <div><dt>Cüzdan yüksekliği</dt><dd class="num" id="b-height">–</dd></div>
+              </dl>
+              <p class="node-warn" id="node-warn" hidden></p>
+              <div class="scan-banner" id="scan-banner" hidden>
+                <div class="scan-text" id="scan-text" aria-live="polite"></div>
+                <div class="bar"><span id="scan-fill"></span></div>
+              </div>
+            </div>
+
+            <div class="card tabs-card">
+              <div class="tabs" role="tablist">
+                <button role="tab" type="button" data-tab="txs" aria-selected="true">İşlemler</button>
+                <button role="tab" type="button" data-tab="accounts">Hesaplar</button>
+                <button role="tab" type="button" data-tab="wsettings">Cüzdan ayarları</button>
+              </div>
+
+              <div class="tab txpane" data-pane="txs">
+                <div class="tx-bar">
+                  <div class="seg2" id="tx-filters" role="radiogroup">
+                    <button type="button" role="radio" data-f="all" aria-checked="true">Tümü</button>
+                    <button type="button" role="radio" data-f="in" aria-checked="false">Gelen</button>
+                    <button type="button" role="radio" data-f="out" aria-checked="false">Giden</button>
+                    <button type="button" role="radio" data-f="pending" aria-checked="false">Bekleyen</button>
+                  </div>
+                  <span class="muted" id="tx-count"></span>
+                  <button class="link" id="btn-refresh" type="button">Yenile</button>
+                </div>
+                <ul class="tx-list" id="tx-list"></ul>
+                <p class="empty" id="tx-empty" hidden>Henüz işlem yok. Tor adresini paylaşarak ödeme alabilirsin.</p>
+                <div class="pager" id="tx-pager" hidden>
+                  <span class="muted" id="tx-range"></span>
+                  <div class="pager-pages" id="tx-pages"></div>
+                </div>
+              </div>
+
+              <div class="tab" data-pane="accounts" hidden>
+                <p class="muted">Hesaplar bir cüzdanın içindeki ayrı bölmelerdir; her hesabın bakiyesi ve adresi ayrıdır. Aynı kurtarma ifadesiyle hepsi geri gelir.</p>
+                <ul class="acc-list" id="acc-list"></ul>
+                <form class="row" id="acc-form" novalidate>
+                  <input id="acc-name" maxlength="30" placeholder="Yeni hesap adı" autocomplete="off">
+                  <button class="btn" type="submit">Hesap ekle</button>
+                </form>
+                <p class="error" id="acc-error" role="alert"></p>
+              </div>
+
+              <div class="tab" data-pane="wsettings" hidden>
+                <form class="ws-form" id="ws-form" novalidate>
+                  <h3>Genel</h3>
+                  <label class="field">Cüzdan adı <input id="ws-f-name" maxlength="40"></label>
+                  <label class="field">Harcamak için gereken onay sayısı
+                    <input id="ws-f-conf" type="number" min="1" max="1000">
+                    <span class="hint">Gelen bir ödeme bu kadar blok onayı alınca harcanabilir. Grin varsayılanı 10 (~10 dk).</span>
+                  </label>
+                  <label class="field">Node bağlantısı
+                    <select id="ws-f-conn">
+                      <option value="auto">Otomatik (node havuzu)</option>
+                      <option value="custom">Tek node (kendim seçeceğim)</option>
+                      <option value="integrated">Kendi node'um (gömülü)</option>
+                    </select>
+                    <span class="hint">Otomatik modda cüzdan, listedeki node'lardan sağlıklı ve hızlı olanla başlar; bir node bozuk yanıt verirse sıradakine kendiliğinden geçer.</span>
+                  </label>
+                  <label class="field" id="ws-f-url-f" hidden>Bu cüzdan için node adresi
+                    <input id="ws-f-url" class="mono" spellcheck="false" autocomplete="off" list="node-datalist" placeholder="https://…">
+                    <datalist id="node-datalist"></datalist>
+                  </label>
+                  <p class="error" id="ws-error" role="alert"></p>
+                  <p class="callout" id="ws-note" hidden></p>
+                  <div class="row end"><button class="btn btn-primary" type="submit">Kaydet</button></div>
+                </form>
+
+                <div class="ws-block">
+                  <h3>Güvenlik</h3>
+                  <div class="row">
+                    <button class="btn" type="button" data-open="password">Parolayı değiştir</button>
+                    <button class="btn" type="button" data-open="phrase">Kurtarma ifadesini göster</button>
+                  </div>
+                </div>
+                <div class="ws-block">
+                  <h3>Bakım</h3>
+                  <p class="hint">Bakiye ya da işlemler yanlış görünüyorsa cüzdanı zincirle yeniden eşleştir. Tarama arkada sürer; ilerlemesi bakiye kartında görünür.</p>
+                  <label class="field">Nereden taransın
+                    <select id="rescan-since"></select>
+                  </label>
+                  <div class="row"><button class="btn" type="button" id="btn-rescan">Cüzdanı onar (yeniden tara)</button></div>
+                </div>
+                <div class="ws-block danger">
+                  <h3>Cüzdanı sil</h3>
+                  <p class="hint">Cüzdan dosyaları bu bilgisayardan silinir. Kurtarma ifaden yoksa paran kaybolur.</p>
+                  <div class="row"><button class="btn danger-text" type="button" data-open="delete">Cüzdanı sil…</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: Tor -->
+          <div class="col-side">
+            <div class="card tor-card">
+              <div class="tor-card-head">
+                <h2>Tor adresin</h2>
+                <span class="state-chip" id="tc-state">–</span>
+              </div>
+              <code class="tor-addr mono" id="tc-addr">–</code>
+              <div class="row">
+                <button class="btn btn-primary" type="button" id="tc-copy">Adresi kopyala</button>
+                <button class="btn" type="button" data-qr-toggle="tc-qr">QR</button>
+              </div>
+              <div class="qr" id="tc-qr" hidden></div>
+              <div class="tc-progress" id="tc-progress" hidden>
+                <div class="tc-pline"><span class="tc-pct" id="tc-pct">0%</span><div class="bar"><span id="tc-bar-fill"></span></div></div>
+                <ol class="steps" id="tc-steps">
+                  <li data-step="1"><span class="sdot"></span><span>Tor ağına bağlan</span></li>
+                  <li data-step="2"><span class="sdot"></span><span>Adresi duyur</span></li>
+                  <li data-step="3"><span class="sdot"></span><span>Erişim testi</span></li>
+                </ol>
+              </div>
+              <p class="tc-note" id="tc-note"></p>
+              <details class="tc-onion">
+                <summary>Onion adresi</summary>
+                <code class="mono" id="tc-onion">–</code>
+                <button class="link" type="button" id="tc-onion-copy">Kopyala</button>
+              </details>
+              <p class="dim tc-acc" id="tc-account"></p>
+              <p class="dim tc-acc" id="tc-node"></p>
+            </div>
+
+            <div class="card tor-conn">
+              <h2>Tor bağlantısı</h2>
+              <p class="hint hint-top">Tor engelleniyorsa ya da bağlanmıyorsa bir köprü seç. Değişiklik hemen uygulanır.</p>
+              <div class="chips" role="radiogroup" aria-label="Tor köprüleri">
+                <label class="chip-radio"><input type="radio" name="bridges" value="none"><span>Doğrudan</span></label>
+                <label class="chip-radio"><input type="radio" name="bridges" value="snowflake"><span>Snowflake</span></label>
+                <label class="chip-radio"><input type="radio" name="bridges" value="obfs4"><span>obfs4</span></label>
+                <label class="chip-radio"><input type="radio" name="bridges" value="custom"><span>Özel</span></label>
+              </div>
+              <textarea id="tor-custom" class="mono" rows="3" spellcheck="false" placeholder="obfs4 1.2.3.4:443 PARMAKIZI cert=… iat-mode=0&#10;webtunnel [2001:db8::1]:443 … url=https://…" hidden></textarea>
+              <div class="row tc-engine">
+                <select id="tor-engine" aria-label="Tor motoru">
+                  <option value="bundled">Uygulamayla gelen Tor (önerilen)</option>
+                  <option value="arti">Gömülü Arti (deneysel)</option>
+                </select>
+                <button class="btn" type="button" id="tor-apply">Uygula</button>
+              </div>
+              <p class="error" id="tor-error" role="alert"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ============================================================ LOCK SCREEN -->
+  <div class="lockscreen" id="lockscreen" hidden role="dialog" aria-modal="true" aria-labelledby="lk-title">
+    <form class="card narrow hero" id="lk-form" novalidate>
+      <img src="logo-mark.svg" alt="" width="56" height="56" class="hero-mark">
+      <h2 id="lk-title">Cüzdan kilitli</h2>
+      <p class="muted" id="lk-name"></p>
+      <p class="hint">Cüzdan kilitli. Arka planda çalışmaya devam eder, ödemeler gelmeye devam eder.</p>
+      <label class="field">Parola <input type="password" id="lk-pass" autocomplete="current-password"></label>
+      <p class="error" id="lk-error" role="alert"></p>
+      <button class="btn btn-primary btn-lg" type="submit" id="lk-submit">Kilidi aç</button>
+      <button class="link" type="button" id="lk-logout">Çıkış yap</button>
+    </form>
+  </div>
+
+  <!-- ============================================================ DIALOGS -->
+  <dialog id="dlg-unlock" aria-labelledby="ul-title">
+    <form class="dlg" id="ul-form" novalidate>
+      <div class="dlg-head"><h2 id="ul-title">Cüzdanı aç</h2><button class="icon-btn" type="button" data-close aria-label="Kapat">✕</button></div>
+      <label class="field">Parola <input type="password" id="ul-pass" autocomplete="current-password"></label>
+      <p class="error" id="ul-error" role="alert"></p>
+      <button class="btn btn-primary btn-lg" type="submit" id="ul-submit">Aç</button>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-send" aria-labelledby="send-title">
+    <form class="dlg" id="send-form" novalidate>
+      <div class="dlg-head"><h2 id="send-title">Grin gönder</h2><button class="icon-btn" type="button" data-close aria-label="Kapat">✕</button></div>
+      <div id="send-step-form">
+        <div class="seg2 s-method" id="s-method" role="radiogroup" aria-label="Gönderme yöntemi">
+          <button type="button" role="radio" data-m="tor" aria-checked="true">Tor ile gönder</button>
+          <button type="button" role="radio" data-m="slatepack" aria-checked="false">Slatepack ile gönder</button>
+        </div>
+        <p class="method-desc" id="s-method-desc"></p>
+        <label class="field" id="s-addr-field"><span id="s-addr-l">Alıcının adresi</span>
+          <input id="s-addr" class="mono" spellcheck="false" autocomplete="off" placeholder="grin1…">
+          <span class="hint" id="s-addr-hint"></span>
+        </label>
+        <div id="s-recipient-box" hidden>
+          <p class="recipient" id="s-recipient" aria-live="polite"></p>
+          <div class="bar" id="s-rbar" hidden><span id="s-rbar-fill"></span></div>
+          <button class="link" type="button" id="s-recheck" hidden>Tekrar kontrol et</button>
+        </div>
+        <label class="field">Tutar
+          <span class="amount-wrap"><input id="s-amount" class="mono" inputmode="decimal" autocomplete="off" placeholder="0.0"><span class="unit">ツ</span></span>
+          <span class="hint"><span>Kullanılabilir</span>: <span id="s-avail" class="num">–</span> ツ · <span>Ağ ücreti otomatik eklenir.</span></span>
+        </label>
+        <label class="field" id="s-pass-f" hidden>Parola
+          <input type="password" id="s-pass" autocomplete="current-password">
+        </label>
+        <p class="error" id="send-error" role="alert"></p>
+        <button class="btn btn-primary btn-lg" id="s-submit" type="button">Gönder</button>
+      </div>
+      <div id="send-step-done" hidden>
+        <div class="result ok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div><strong>Gönderildi.</strong> <span>Alıcı imzaladı, işlem zincire iletildi. Onaylanması birkaç dakika sürer.</span></div></div>
+        <button class="btn btn-lg" type="button" data-close>Kapat</button>
+      </div>
+      <div id="send-step-queued" hidden>
+        <div class="result warn"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <div><strong>Alıcıya şu an ulaşılamadı.</strong> <span id="q-text"></span></div></div>
+        <button class="btn btn-lg" type="button" data-close>Kapat</button>
+      </div>
+      <div id="send-step-sp" hidden>
+        <p class="callout" id="sp-why"></p>
+        <p><strong>1.</strong> <span>Bu Slatepack metnini alıcıya ilet (kopyala ya da QR).</span></p>
+        <div class="sp-box">
+          <textarea id="sp-out" class="mono" rows="5" readonly></textarea>
+          <div class="row"><button class="btn" type="button" data-copy="sp-out">Kopyala</button><button class="btn" type="button" data-qr-toggle="sp-qr">QR</button></div>
+          <div class="qr" id="sp-qr" hidden></div>
+        </div>
+        <p><strong>2.</strong> <span>Alıcının sana geri verdiği yanıtı yapıştır (alıcı Tor kullanıyorsa bu adım kendiliğinden tamamlanır):</span></p>
+        <textarea id="sp-reply" class="mono" rows="4" spellcheck="false" placeholder="BEGINSLATEPACK. …"></textarea>
+        <p class="error" id="sp-error" role="alert"></p>
+        <div class="row">
+          <button class="btn danger-text" type="button" id="sp-cancel">İşlemi iptal et</button>
+          <button class="btn btn-primary" type="button" id="sp-finalize">Tamamla ve gönder</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-receive" aria-labelledby="recv-title">
+    <div class="dlg">
+      <div class="dlg-head"><h2 id="recv-title">Grin al</h2><button class="icon-btn" type="button" data-close aria-label="Kapat">✕</button></div>
+      <p class="muted">Bu adresi gönderene ver. Uygulama açık ve Tor hazırken ödemeler kendiliğinden gelir.</p>
+      <div class="addr-box">
+        <div class="qr" id="r-qr"></div>
+        <code class="addr mono" id="r-addr">–</code>
+        <button class="btn" type="button" data-copy-text="r-addr">Adresi kopyala</button>
+      </div>
+      <p class="tc-note" id="r-tor"></p>
+      <p class="hint">Gönderen Tor kullanamıyorsa sana bir Slatepack metni verir; onu "Slatepack" düğmesiyle işle.</p>
+    </div>
+  </dialog>
+
+  <dialog id="dlg-slatepack" aria-labelledby="sp-title">
+    <div class="dlg">
+      <div class="dlg-head"><h2 id="sp-title">Slatepack işle</h2><button class="icon-btn" type="button" data-close aria-label="Kapat">✕</button></div>
+      <div id="pp-step-form">
+        <p class="muted">Sana verilen Slatepack metnini yapıştır. Gelen bir ödemeyse imzalanır; kendi gönderdiğin bir ödemenin yanıtıysa tamamlanıp zincire iletilir.</p>
+        <textarea id="pp-in" class="mono" rows="6" spellcheck="false" placeholder="BEGINSLATEPACK. …"></textarea>
+        <p class="error" id="pp-error" role="alert"></p>
+        <button class="btn btn-primary btn-lg" type="button" id="pp-submit">İşle</button>
+      </div>
+      <div id="pp-step-reply" hidden>
+        <div class="result ok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div><strong>İmzalandı.</strong> <span>Ödemenin tamamlanması için bu yanıtı gönderene geri ver.</span></div></div>
+        <p class="callout" id="pp-reply-hint"></p>
+        <div class="sp-box">
+          <textarea id="pp-out" class="mono" rows="5" readonly></textarea>
+          <div class="row"><button class="btn" type="button" data-copy="pp-out">Kopyala</button><button class="btn" type="button" data-qr-toggle="pp-qr">QR</button></div>
+          <div class="qr" id="pp-qr" hidden></div>
+        </div>
+      </div>
+      <div id="pp-step-done" hidden>
+        <div class="result ok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><div id="pp-done-text"></div></div>
+        <button class="btn btn-lg" type="button" data-close>Kapat</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="dlg-tx" aria-labelledby="tx-title">
+    <div class="dlg">
+      <div class="dlg-head"><h2 id="tx-title">İşlem</h2><button class="icon-btn" type="button" data-close aria-label="Kapat">✕</button></div>
+      <dl class="kv" id="tx-kv"></dl>
+      <div class="sp-box" id="tx-proof-box" hidden>
+        <textarea id="tx-proof" class="mono" rows="6" readonly></textarea>
+        <div class="row"><button class="btn" type="button" data-copy="tx-proof">Kanıtı kopyala</button></div>
+      </div>
+      <p class="error" id="tx-error" role="alert"></p>
+      <div class="row">
+        <button class="btn" type="button" id="tx-proof-btn" hidden>Ödeme kanıtı</button>
+        <button class="btn" type="button" id="tx-repost" hidden>Yeniden yayınla</button>
+        <button class="btn danger-text" type="button" id="tx-cancel" hidden>İşlemi iptal et</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="dlg-password" aria-labelledby="pw-title">
+    <form class="dlg" id="pw-form" novalidate>
+      <div class="dlg-head"><h2 id="pw-title">Parolayı değiştir</h2><button class="icon-btn" type="button" data-close aria-label="Kapat">✕</button></div>
+      <label class="field">Mevcut parola <input type="password" id="pw-old" autocomplete="current-password"></label>
+      <label class="field">Yeni parola <input type="password" id="pw-new" autocomplete="new-password"></label>
+      <label class="field">Yeni parola (tekrar) <input type="password" id="pw-new2" autocomplete="new-password"></label>
+      <p class="error" id="pw-error" role="alert"></p>
+      <button class="btn btn-primary" type="submit" id="pw-submit">Değiştir</button>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-phrase" aria-labelledby="ph-title">
+    <form class="dlg" id="ph-form" novalidate>
+      <div class="dlg-head"><h2 id="ph-title">Kurtarma ifadesi</h2><button class="icon-btn" type="button" data-close aria-label="Kapat">✕</button></div>
+      <div id="ph-ask">
+        <p class="callout warn">Ekranında kimse görmüyorken aç. Kelimeleri kimseyle paylaşma.</p>
+        <label class="field">Parola <input type="password" id="ph-pass" autocomplete="current-password"></label>
+        <p class="error" id="ph-error" role="alert"></p>
+        <button class="btn btn-primary" type="submit" id="ph-submit">Göster</button>
+      </div>
+      <ol class="words" id="ph-words" hidden></ol>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-delete" aria-labelledby="del-title">
+    <form class="dlg" id="del-form" novalidate>
+      <div class="dlg-head"><h2 id="del-title">Cüzdanı sil</h2><button class="icon-btn" type="button" data-close aria-label="Kapat">✕</button></div>
+      <p class="callout warn" id="del-text"></p>
+      <label class="check"><input type="checkbox" id="del-ok"> Kurtarma ifadem yanımda / bu cüzdandaki parayı kaybetmeyi kabul ediyorum.</label>
+      <label class="field">Parola <input type="password" id="del-pass" autocomplete="current-password"></label>
+      <p class="error" id="del-error" role="alert"></p>
+      <button class="btn danger-fill" type="submit" id="del-submit" disabled>Kalıcı olarak sil</button>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-node" class="sdlg" aria-labelledby="nd-title">
+    <form class="sbox" id="nd-form" novalidate>
+      <div class="dlg-head"><h2 id="nd-title">Node ayarları</h2><button class="icon-btn" type="button" data-close aria-label="Kapat">✕</button></div>
+      <div class="sgrid">
+        <nav class="snav" role="tablist" aria-label="Node ayarları">
+          <button type="button" role="tab" data-ntab="pool" aria-selected="true">Node'lar</button>
+          <button type="button" role="tab" data-ntab="conn">Bağlantı</button>
+          <button type="button" role="tab" data-ntab="own">Gömülü node</button>
+        </nav>
+        <div class="spanes">
+          <div class="spane" data-npane="pool">
+            <fieldset>
+              <legend id="nd-pool-title">Node havuzu</legend>
+              <p class="hint hint-top">Cüzdan listedeki sağlıklı ve hızlı node ile başlar. Bir node'u seçip "Bunu kullan" dersen cüzdan hemen ona geçer; o bozulursa yine havuzdaki diğerine geçilir. Yeni eklenen node cüzdan yeniden açılınca havuza girer.</p>
+              <ul class="node-list" id="nd-list"></ul>
+              <div class="row">
+                <input id="nd-new" class="mono" spellcheck="false" autocomplete="off" placeholder="https://node-adresin:3413">
+                <button class="btn" type="button" id="nd-add">Ekle</button>
+              </div>
+              <div class="row">
+                <button class="btn" type="button" id="nd-check">Şimdi kontrol et</button>
+                <button class="btn" type="button" id="nd-auto-pick">Otomatik seç</button>
+              </div>
+              <p class="error" id="nd-list-error" role="alert"></p>
+            </fieldset>
+          </div>
+
+          <div class="spane" data-npane="conn" hidden>
+            <fieldset id="nd-conn-box">
+              <legend>Bu cüzdanın node bağlantısı</legend>
+              <label class="radio"><input type="radio" name="ndconn" value="auto"> Otomatik (node havuzu) <span class="dim">hata olunca diğerine geçer</span></label>
+              <label class="radio"><input type="radio" name="ndconn" value="custom"> Tek node <span class="dim">başka node'a geçmez</span></label>
+              <select id="nd-conn-url" aria-label="Tek node"></select>
+              <label class="radio"><input type="radio" name="ndconn" value="integrated"> Kendi node'um (gömülü)</label>
+              <p class="hint">Bağlantı türü cüzdan yeniden açılınca geçerli olur.</p>
+              <div class="row"><button class="btn" type="button" id="nd-conn-apply">Uygula</button></div>
+              <p class="error" id="nd-conn-error" role="alert"></p>
+              <p class="callout" id="nd-conn-note" hidden></p>
+            </fieldset>
+            <p class="muted" id="nd-conn-none">Önce bir cüzdan aç.</p>
+          </div>
+
+          <div class="spane" data-npane="own" hidden>
+            <fieldset>
+              <legend>Gömülü node</legend>
+              <label class="check"><input type="checkbox" id="nd-auto"> Uygulama açılınca gömülü node'u başlat</label>
+              <label class="check"><input type="checkbox" id="nd-archive"> Arşiv modu (tüm geçmiş, çok daha fazla disk)</label>
+              <label class="field">Ek eşler (her satıra host:port)
+                <textarea id="nd-peers" class="mono" rows="3" spellcheck="false"></textarea>
+              </label>
+              <label class="check"><input type="checkbox" id="nd-only"> Yalnızca bu eşlere bağlan (özel test ağı)</label>
+              <span class="hint">Gömülü node değişiklikleri uygulama yeniden açılınca geçerli olur.</span>
+            </fieldset>
+            <p class="error" id="nd-error" role="alert"></p>
+          </div>
+        </div>
+      </div>
+      <div class="row end sfoot"><button class="btn" type="button" data-close>Kapat</button><button class="btn btn-primary" type="submit">Gömülü node ayarlarını kaydet</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-settings" class="sdlg" aria-labelledby="set-title">
+    <div class="sbox">
+      <div class="dlg-head"><h2 id="set-title">Ayarlar</h2><button class="icon-btn" type="button" data-close aria-label="Kapat">✕</button></div>
+      <div class="sgrid">
+        <nav class="snav" role="tablist" aria-label="Ayarlar">
+          <button type="button" role="tab" data-stab="general" aria-selected="true">Genel</button>
+          <button type="button" role="tab" data-stab="security">Güvenlik</button>
+          <button type="button" role="tab" data-stab="sending">Gönderme</button>
+          <button type="button" role="tab" data-stab="backup">Yedekleme</button>
+          <button type="button" role="tab" data-stab="about">Hakkında</button>
+        </nav>
+        <div class="spanes">
+          <div class="spane" data-spane="general">
+            <fieldset>
+              <legend>Dil</legend>
+              <select id="set-lang">
+                <option value="auto">Otomatik (sistem dili)</option>
+                <option value="tr">Türkçe</option>
+                <option value="en">English</option>
+                <option value="de">Deutsch</option>
+                <option value="fr">Français</option>
+                <option value="ru">Русский</option>
+                <option value="zh">简体中文</option>
+              </select>
+            </fieldset>
+            <fieldset>
+              <legend>Görünüm</legend>
+              <label class="radio"><input type="radio" name="theme" value="system"> Sistem</label>
+              <label class="radio"><input type="radio" name="theme" value="dark"> Koyu</label>
+              <label class="radio"><input type="radio" name="theme" value="light"> Açık</label>
+            </fieldset>
+            <fieldset>
+              <legend>Ağ</legend>
+              <select id="set-network">
+                <option value="mainnet">Ana ağ (gerçek Grin)</option>
+                <option value="testnet">Test ağı (deneme, para değeri yok)</option>
+                <option value="usernet" id="opt-usernet" hidden>Yerel test (usernet)</option>
+              </select>
+              <p class="hint">Ağ değiştirmek uygulamayı yeniden başlatır; her ağın cüzdanları ve node'u ayrıdır. Test ağı yalnızca denemeler içindir, gerçek para taşımaz.</p>
+              <div class="row"><button class="btn" type="button" id="set-net-apply" disabled>Ağı değiştir ve yeniden başlat</button></div>
+            </fieldset>
+          </div>
+
+          <div class="spane" data-spane="security" hidden>
+            <fieldset id="set-lock-box">
+              <legend>Otomatik kilit</legend>
+              <select id="set-autolock"></select>
+              <p class="hint">Kullanılmazsa ekranı kilitler. Cüzdan arka planda çalışmaya devam eder.</p>
+            </fieldset>
+            <fieldset>
+              <legend>Parola</legend>
+              <label class="check"><input type="checkbox" id="set-confirm-pw"> Her gönderimden önce parolayı tekrar iste</label>
+              <p class="hint">Ekranı açık bırakan birinin senin adına para göndermesini engeller.</p>
+            </fieldset>
+          </div>
+
+          <div class="spane" data-spane="sending" hidden>
+            <fieldset id="set-send-box">
+              <legend>Gönderme</legend>
+              <label class="check"><input type="checkbox" id="set-fluff"> Hemen yayınla (Dandelion kapalı)</label>
+              <span class="hint">Dandelion, işlemin kaynağını gizlemek için önce rastgele node'lara iletilmesini sağlar. Kapatırsan işlem hızlı yayılır ama gizlilik azalır.</span>
+              <label class="field">Değişim çıktısı sayısı
+                <select id="set-change"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
+              </label>
+              <label class="field">Girdi seçimi
+                <select id="set-strategy"><option value="smallest">En küçükler (yeterli en az çıktı)</option><option value="all">Hepsi (tüm çıktıları birleştir)</option></select>
+              </label>
+              <label class="field">İşlem geçerlilik süresi (blok, 0 = sınırsız)
+                <input id="set-ttl" type="number" min="0" max="100000">
+              </label>
+            </fieldset>
+            <fieldset>
+              <legend>Alıcı çevrimdışıysa</legend>
+              <label class="check"><input type="checkbox" id="set-retry"> Dakikada bir yeniden dene</label>
+              <label class="field">Kaç dakika boyunca
+                <input id="set-retry-min" type="number" min="1" max="240">
+              </label>
+              <span class="hint">Tor ile gönderirken alıcıya ulaşılamazsa işlem hemen başarısız olmaz: seçtiğin süre boyunca dakikada bir denenir. Süre dolarsa işlem başarısız olur ve tutar serbest kalır. Yeniden deneme yalnızca uygulama ve cüzdan açıkken sürer. Kapatırsan her gönderim ilk denemede başarısız olur.</span>
+            </fieldset>
+          </div>
+
+          <div class="spane" data-spane="backup" hidden>
+            <fieldset id="set-backup-box">
+              <legend>Yedek ve dışa aktarma</legend>
+              <div class="row">
+                <button class="btn" type="button" id="set-backup">Cüzdanı yedekle</button>
+                <button class="btn" type="button" id="set-csv">İşlemleri CSV olarak aktar</button>
+              </div>
+              <p class="hint" id="set-backup-note"></p>
+            </fieldset>
+            <p class="muted" id="set-backup-none">Yedeklemek için önce bir cüzdan aç.</p>
+          </div>
+
+          <div class="spane" data-spane="about" hidden>
+            <fieldset>
+              <legend>Hakkında</legend>
+              <p class="hint hint-top">OrkoWallet – Grin 0.1.0 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap</p>
+            </fieldset>
+            <fieldset>
+              <legend>Destek</legend>
+              <div class="row"><button class="btn" type="button" id="set-logs">Günlük klasörünü aç</button></div>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+      <div class="row end sfoot"><button class="btn btn-primary" type="button" id="set-save">Kaydet</button></div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <script src="lang-de.js"></script>
+  <script src="lang-fr.js"></script>
+  <script src="lang-ru.js"></script>
+  <script src="lang-zh.js"></script>
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

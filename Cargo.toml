@@ -1,0 +1,10 @@
+[workspace]
+resolver = "2"
+members = ["core", "app/src-tauri"]
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
+# A wallet must never wrap silently on arithmetic overflow.
+overflow-checks = true

@@ -1,0 +1,1846 @@
+[
+ {
+  "tr": "OrkoWallet – Grin",
+  "en": "OrkoWallet – Grin"
+ },
+ {
+  "tr": "Ağ",
+  "en": "Network"
+ },
+ {
+  "tr": "Ana ağ",
+  "en": "Mainnet"
+ },
+ {
+  "tr": "Test ağı",
+  "en": "Testnet"
+ },
+ {
+  "tr": "Yerel",
+  "en": "Local"
+ },
+ {
+  "tr": "Yerel test ağı",
+  "en": "Local test network"
+ },
+ {
+  "tr": "Ayarlar",
+  "en": "Settings"
+ },
+ {
+  "tr": "Kilitle",
+  "en": "Lock"
+ },
+ {
+  "tr": "Çıkış yap",
+  "en": "Log out"
+ },
+ {
+  "tr": "Kapat",
+  "en": "Close"
+ },
+ {
+  "tr": "Vazgeç",
+  "en": "Cancel"
+ },
+ {
+  "tr": "Kaydet",
+  "en": "Save"
+ },
+ {
+  "tr": "Kaydedildi",
+  "en": "Saved"
+ },
+ {
+  "tr": "Kopyala",
+  "en": "Copy"
+ },
+ {
+  "tr": "Kopyalandı",
+  "en": "Copied"
+ },
+ {
+  "tr": "Kopyalanamadı; metni seçip Ctrl+C ile kopyala",
+  "en": "Could not copy; select the text and press Ctrl+C"
+ },
+ {
+  "tr": "Yenile",
+  "en": "Refresh"
+ },
+ {
+  "tr": "Yükleniyor",
+  "en": "Loading"
+ },
+ {
+  "tr": "Geri",
+  "en": "Back"
+ },
+ {
+  "tr": "← Cüzdanlar",
+  "en": "← Wallets"
+ },
+ {
+  "tr": "Gömülü",
+  "en": "Built-in"
+ },
+ {
+  "tr": "Uzak",
+  "en": "Remote"
+ },
+ {
+  "tr": "Bağlanıyor…",
+  "en": "Connecting…"
+ },
+ {
+  "tr": "Bağlı",
+  "en": "Connected"
+ },
+ {
+  "tr": "Bağlı · {n} sn önce güncellendi",
+  "en": "Connected · updated {n} s ago"
+ },
+ {
+  "tr": "Node'a ulaşılamıyor",
+  "en": "Node unreachable"
+ },
+ {
+  "tr": "Node başlatılamadı",
+  "en": "Node could not start"
+ },
+ {
+  "tr": "Node kapanıyor…",
+  "en": "Node is shutting down…"
+ },
+ {
+  "tr": "Node başlatılıyor",
+  "en": "Node is starting"
+ },
+ {
+  "tr": "Hazırlanıyor",
+  "en": "Preparing"
+ },
+ {
+  "tr": "Senkronize",
+  "en": "In sync"
+ },
+ {
+  "tr": "Eş (peer) bekleniyor",
+  "en": "Waiting for peers"
+ },
+ {
+  "tr": "Blok başlıkları indiriliyor ({a} / {b})",
+  "en": "Downloading block headers ({a} / {b})"
+ },
+ {
+  "tr": "Bloklar indiriliyor ({a} / {b})",
+  "en": "Downloading blocks ({a} / {b})"
+ },
+ {
+  "tr": "Zincir durumu indiriliyor",
+  "en": "Downloading chain state"
+ },
+ {
+  "tr": "Zincir durumu kuruluyor",
+  "en": "Setting up chain state"
+ },
+ {
+  "tr": "Zincir durumu kaydediliyor",
+  "en": "Saving chain state"
+ },
+ {
+  "tr": "Kernel'ler doğrulanıyor",
+  "en": "Verifying kernels"
+ },
+ {
+  "tr": "Range proof'lar doğrulanıyor",
+  "en": "Verifying range proofs"
+ },
+ {
+  "tr": "Kapanıyor",
+  "en": "Shutting down"
+ },
+ {
+  "tr": "Senkronize ediliyor ({a} / {b})",
+  "en": "Syncing ({a} / {b})"
+ },
+ {
+  "tr": "Uzak node",
+  "en": "Remote node"
+ },
+ {
+  "tr": "Kendi node'unu çalıştır",
+  "en": "Run your own node"
+ },
+ {
+  "tr": "Node'u durdur",
+  "en": "Stop node"
+ },
+ {
+  "tr": "Node ayarları",
+  "en": "Node settings"
+ },
+ {
+  "tr": "Gömülü node Grin zincirini bu bilgisayara indirir (ana ağda birkaç GB, ilk senkron uzun sürer). Sonra cüzdanın kimseye sormadan çalışır.",
+  "en": "The built-in node downloads the Grin chain to this computer (several GB on mainnet, the first sync takes long). After that your wallet works without asking anyone."
+ },
+ {
+  "tr": "Header",
+  "en": "Header"
+ },
+ {
+  "tr": "Block",
+  "en": "Block"
+ },
+ {
+  "tr": "Data",
+  "en": "Data"
+ },
+ {
+  "tr": "Peers",
+  "en": "Peers"
+ },
+ {
+  "tr": "Blocks",
+  "en": "Blocks"
+ },
+ {
+  "tr": "Hash",
+  "en": "Hash"
+ },
+ {
+  "tr": "Height",
+  "en": "Height"
+ },
+ {
+  "tr": "Difficulty",
+  "en": "Difficulty"
+ },
+ {
+  "tr": "Time",
+  "en": "Time"
+ },
+ {
+  "tr": "Main pool",
+  "en": "Main pool"
+ },
+ {
+  "tr": "Stem pool",
+  "en": "Stem pool"
+ },
+ {
+  "tr": "Size",
+  "en": "Size"
+ },
+ {
+  "tr": "Eşit",
+  "en": "Equal"
+ },
+ {
+  "tr": "Header önde (+{n})",
+  "en": "Header ahead (+{n})"
+ },
+ {
+  "tr": "Henüz blok bilgisi yok",
+  "en": "No block data yet"
+ },
+ {
+  "tr": "Henüz eş yok",
+  "en": "No peers yet"
+ },
+ {
+  "tr": "Eş bilgisi uzak node'larda görünmez; kendi node'unu çalıştırınca burada listelenir.",
+  "en": "Peer information is not available on remote nodes; run your own node to see it here."
+ },
+ {
+  "tr": "gelen",
+  "en": "inbound"
+ },
+ {
+  "tr": "giden",
+  "en": "outbound"
+ },
+ {
+  "tr": "{n} sn önce",
+  "en": "{n} s ago"
+ },
+ {
+  "tr": "{n} dk önce",
+  "en": "{n} min ago"
+ },
+ {
+  "tr": "{n} sa önce",
+  "en": "{n} h ago"
+ },
+ {
+  "tr": "{n} gün önce",
+  "en": "{n} d ago"
+ },
+ {
+  "tr": "{n} sn",
+  "en": "{n} s"
+ },
+ {
+  "tr": "{n} dk",
+  "en": "{n} min"
+ },
+ {
+  "tr": "Gömülü node başlatılıyor",
+  "en": "Starting the built-in node"
+ },
+ {
+  "tr": "Node durduruldu",
+  "en": "Node stopped"
+ },
+ {
+  "tr": "Kullanılan node: {url}",
+  "en": "Node in use: {url}"
+ },
+ {
+  "tr": "Cüzdanlar",
+  "en": "Wallets"
+ },
+ {
+  "tr": "{net} · {n} cüzdan",
+  "en": "{net} · {n} wallets"
+ },
+ {
+  "tr": "+ Yeni cüzdan",
+  "en": "+ New wallet"
+ },
+ {
+  "tr": "Geri yükle",
+  "en": "Restore"
+ },
+ {
+  "tr": "İçe aktar",
+  "en": "Import"
+ },
+ {
+  "tr": "Bu ağda henüz cüzdanın yok",
+  "en": "You have no wallet on this network yet"
+ },
+ {
+  "tr": "Yeni bir cüzdan oluştur, kurtarma ifadenle geri yükle ya da grin-wallet / Grim cüzdan klasörünü içe aktar. Anahtarların yalnızca bu bilgisayarda durur; ödemeler Tor üzerinden gelir ve gider.",
+  "en": "Create a new wallet, restore one with your recovery phrase, or import a grin-wallet / Grim wallet folder. Your keys stay on this computer only; payments come and go over Tor."
+ },
+ {
+  "tr": "Oluşturuldu {date}",
+  "en": "Created {date}"
+ },
+ {
+  "tr": "İçe aktarıldı",
+  "en": "Imported"
+ },
+ {
+  "tr": "Kendi node'u",
+  "en": "Own node"
+ },
+ {
+  "tr": "Node havuzu",
+  "en": "Node pool"
+ },
+ {
+  "tr": "Aç",
+  "en": "Open"
+ },
+ {
+  "tr": "“{name}” cüzdanını aç",
+  "en": "Open wallet “{name}”"
+ },
+ {
+  "tr": "Parola",
+  "en": "Password"
+ },
+ {
+  "tr": "Cüzdanın parolası",
+  "en": "Wallet password"
+ },
+ {
+  "tr": "Parola (tekrar)",
+  "en": "Password (again)"
+ },
+ {
+  "tr": "Yeni cüzdan",
+  "en": "New wallet"
+ },
+ {
+  "tr": "Bu parola cüzdan dosyanı bu bilgisayarda şifreler. Unutursan cüzdanı yalnızca kurtarma ifadesiyle açabilirsin.",
+  "en": "This password encrypts your wallet file on this computer. If you forget it you can only recover the wallet with the recovery phrase."
+ },
+ {
+  "tr": "Oluştur",
+  "en": "Create"
+ },
+ {
+  "tr": "Cüzdanı geri yükle",
+  "en": "Restore wallet"
+ },
+ {
+  "tr": "grin-wallet, Grim ya da bu uygulamadan aldığın kurtarma ifadesi çalışır; adresin aynı kalır.",
+  "en": "A recovery phrase from grin-wallet, Grim or this app works; your address stays the same."
+ },
+ {
+  "tr": "Geri yüklemeden sonra zincir taranır; uzak node ile birkaç dakika sürebilir.",
+  "en": "After restoring, the chain is scanned in the background; this can take a few minutes."
+ },
+ {
+  "tr": "Cüzdanı içe aktar",
+  "en": "Import wallet"
+ },
+ {
+  "tr": "grin-wallet ya da Grim cüzdan klasörünü kopyalayarak açar. Parola o cüzdanın mevcut parolasıdır.",
+  "en": "Copies a grin-wallet or Grim wallet folder and opens it. The password is that wallet's current password."
+ },
+ {
+  "tr": "Cüzdan adı",
+  "en": "Wallet name"
+ },
+ {
+  "tr": "Örn. Günlük",
+  "en": "e.g. Daily"
+ },
+ {
+  "tr": "Kurtarma ifadesi",
+  "en": "Recovery phrase"
+ },
+ {
+  "tr": "Cüzdan klasörü",
+  "en": "Wallet folder"
+ },
+ {
+  "tr": "İçinde <code>wallet_data</code> klasörü olan klasör. Dosyalar kopyalanır, aslına dokunulmaz.",
+  "en": "The folder that contains <code>wallet_data</code>. Files are copied; the original is untouched."
+ },
+ {
+  "tr": "İçinde",
+  "en": "The folder that contains"
+ },
+ {
+  "tr": "klasörü olan klasör. Dosyalar kopyalanır, aslına dokunulmaz.",
+  "en": "Files are copied; the original is untouched."
+ },
+ {
+  "tr": "Node bağlantısı",
+  "en": "Node connection"
+ },
+ {
+  "tr": "Otomatik: birkaç node, hata olunca kendiliğinden geçer (önerilen)",
+  "en": "Automatic: several nodes, switches by itself on errors (recommended)"
+ },
+ {
+  "tr": "Kendi node'um (gömülü, senkron gerekir)",
+  "en": "My own node (built-in, needs to sync)"
+ },
+ {
+  "tr": "Bu cüzdanı ne zaman oluşturdun?",
+  "en": "When did you create this wallet?"
+ },
+ {
+  "tr": "Cüzdan hemen açılır; eski işlemlerin arkada taranır. Seçtiğin yıldan önce gelen para görünmez, emin değilsen \"Bilmiyorum\"u seç (sonradan \"Cüzdanı onar\" ile de taratabilirsin).",
+  "en": "The wallet opens at once; your old transactions are scanned in the background. Money received before the year you pick will not show up. If unsure choose \"I don't know\" (you can also rescan later with \"Repair wallet\")."
+ },
+ {
+  "tr": "Bilmiyorum / emin değilim: en baştan (en uzun, en güvenli)",
+  "en": "I don't know / not sure: from the start (longest, safest)"
+ },
+ {
+  "tr": "{y} veya sonrasında",
+  "en": "{y} or later"
+ },
+ {
+  "tr": "Bu cüzdan hiç kullanılmadı (tarama yok)",
+  "en": "This wallet was never used (no scan)"
+ },
+ {
+  "tr": "Kurtarma ifaden",
+  "en": "Your recovery phrase"
+ },
+ {
+  "tr": "Bu kelimeleri kâğıda yaz ve güvenli bir yerde sakla.",
+  "en": "Write these words on paper and keep them somewhere safe."
+ },
+ {
+  "tr": "Bilgisayarın bozulursa paran yalnızca bu kelimelerle geri gelir. Kimseyle paylaşma, ekran görüntüsü alma, internete kaydetme.",
+  "en": "If your computer breaks, your money only comes back with these words. Share them with nobody, do not take screenshots, do not save them online."
+ },
+ {
+  "tr": "Kelimeleri sırasıyla kâğıda yazdım.",
+  "en": "I wrote the words down in order."
+ },
+ {
+  "tr": "Devam",
+  "en": "Continue"
+ },
+ {
+  "tr": "Kontrol edelim",
+  "en": "Let's check"
+ },
+ {
+  "tr": "Yazdığın kâğıda bakarak istenen kelimeleri gir.",
+  "en": "Look at your paper and enter the requested words."
+ },
+ {
+  "tr": "Kelimelere dön",
+  "en": "Back to the words"
+ },
+ {
+  "tr": "Bitir",
+  "en": "Finish"
+ },
+ {
+  "tr": "{n}. kelime",
+  "en": "Word {n}"
+ },
+ {
+  "tr": "Bazı kelimeler tutmuyor. Kâğıdı kontrol et.",
+  "en": "Some words do not match. Check your paper."
+ },
+ {
+  "tr": "Ekranında kimse görmüyorken aç. Kelimeleri kimseyle paylaşma.",
+  "en": "Open this only when nobody can see your screen. Share the words with nobody."
+ },
+ {
+  "tr": "Göster",
+  "en": "Show"
+ },
+ {
+  "tr": "Kurtarma ifadesi geçersiz. Kelimeleri ve sırasını kontrol et.",
+  "en": "The recovery phrase is not valid. Check the words and their order."
+ },
+ {
+  "tr": "Kurtarma ifadesi 12-24 kelime olmalı, {n} kelime girildi.",
+  "en": "The recovery phrase must be 12-24 words, you entered {n}."
+ },
+ {
+  "tr": "Kullanılabilir bakiye",
+  "en": "Spendable balance"
+ },
+ {
+  "tr": "Gönder",
+  "en": "Send"
+ },
+ {
+  "tr": "Al",
+  "en": "Receive"
+ },
+ {
+  "tr": "Slatepack",
+  "en": "Slatepack"
+ },
+ {
+  "tr": "Onay bekliyor",
+  "en": "Awaiting confirmation"
+ },
+ {
+  "tr": "Olgunlaşmamış",
+  "en": "Immature"
+ },
+ {
+  "tr": "Kilitli",
+  "en": "Locked"
+ },
+ {
+  "tr": "Toplam",
+  "en": "Total"
+ },
+ {
+  "tr": "Cüzdan yüksekliği",
+  "en": "Wallet height"
+ },
+ {
+  "tr": "İşlemler",
+  "en": "Transactions"
+ },
+ {
+  "tr": "Hesaplar",
+  "en": "Accounts"
+ },
+ {
+  "tr": "Cüzdan ayarları",
+  "en": "Wallet settings"
+ },
+ {
+  "tr": "{n} işlem",
+  "en": "{n} transactions"
+ },
+ {
+  "tr": "Henüz işlem yok. Tor adresini paylaşarak ödeme alabilirsin.",
+  "en": "No transactions yet. Share your Tor address to receive payments."
+ },
+ {
+  "tr": "Node'a ulaşılamıyor; gösterilen bakiye son bilinen değer.",
+  "en": "Node unreachable; the balance shown is the last known value."
+ },
+ {
+  "tr": "Kendi node'una ulaşılamıyor ya da node henüz senkronize değil; gösterilen bakiye son bilinen değer. Node panelinden node'u başlat.",
+  "en": "Your own node is unreachable or not yet in sync; the balance shown is the last known value. Start the node from the Node panel."
+ },
+ {
+  "tr": "Eski işlemlerin taranıyor: %{p}{eta}. Bu sırada bakiye eksik görünebilir; cüzdanı kullanmaya devam edebilirsin.",
+  "en": "Scanning your old transactions: {p}%{eta}. The balance may look incomplete meanwhile; you can keep using the wallet."
+ },
+ {
+  "tr": " · yaklaşık {n} dk kaldı",
+  "en": " · about {n} min left"
+ },
+ {
+  "tr": " · az kaldı",
+  "en": " · almost done"
+ },
+ {
+  "tr": "Tarama yarıda kaldı: {e}. Cüzdanı yeniden açınca kaldığı yerden sürer; ya da Cüzdan ayarları > Bakım'dan yeniden başlat.",
+  "en": "The scan stopped: {e}. It continues when you open the wallet again, or restart it from Wallet settings > Maintenance."
+ },
+ {
+  "tr": "Tarama bitti, bakiye güncel",
+  "en": "Scan finished, balance is up to date"
+ },
+ {
+  "tr": "Tarama başladı; ilerlemesi bakiye kartında",
+  "en": "Scan started; progress shows on the balance card"
+ },
+ {
+  "tr": "Zaten bir tarama sürüyor.",
+  "en": "A scan is already running."
+ },
+ {
+  "tr": "Tarama beklenmedik şekilde durdu (ayrıntılar log dosyasında).",
+  "en": "The scan stopped unexpectedly (details in the log file)."
+ },
+ {
+  "tr": "Alındı",
+  "en": "Received"
+ },
+ {
+  "tr": "Gönderildi",
+  "en": "Sent"
+ },
+ {
+  "tr": "Alma iptal edildi",
+  "en": "Receive cancelled"
+ },
+ {
+  "tr": "Gönderim iptal edildi",
+  "en": "Send cancelled"
+ },
+ {
+  "tr": "Madencilik ödülü",
+  "en": "Mining reward"
+ },
+ {
+  "tr": "İptal edildi",
+  "en": "Cancelled"
+ },
+ {
+  "tr": "Onaylandı",
+  "en": "Confirmed"
+ },
+ {
+  "tr": "Zincirde onay bekliyor",
+  "en": "Waiting for confirmation on the chain"
+ },
+ {
+  "tr": "Alıcının yanıtı bekleniyor (tutar kilitli)",
+  "en": "Waiting for the recipient's reply (amount locked)"
+ },
+ {
+  "tr": "Yanıt bekliyor",
+  "en": "Waiting for reply"
+ },
+ {
+  "tr": "Durum",
+  "en": "Status"
+ },
+ {
+  "tr": "Tutar",
+  "en": "Amount"
+ },
+ {
+  "tr": "Ağ ücreti",
+  "en": "Network fee"
+ },
+ {
+  "tr": "Oluşturuldu",
+  "en": "Created"
+ },
+ {
+  "tr": "Girdi / çıktı",
+  "en": "Inputs / outputs"
+ },
+ {
+  "tr": "Geçerlilik (blok)",
+  "en": "Valid until (block)"
+ },
+ {
+  "tr": "İşlem kimliği",
+  "en": "Transaction ID"
+ },
+ {
+  "tr": "Kernel",
+  "en": "Kernel"
+ },
+ {
+  "tr": "Yerel no",
+  "en": "Local no."
+ },
+ {
+  "tr": "İşlem",
+  "en": "Transaction"
+ },
+ {
+  "tr": "Ödeme kanıtı",
+  "en": "Payment proof"
+ },
+ {
+  "tr": "Kanıtı kopyala",
+  "en": "Copy proof"
+ },
+ {
+  "tr": "Yeniden yayınla",
+  "en": "Rebroadcast"
+ },
+ {
+  "tr": "Yeniden yayınlandı",
+  "en": "Rebroadcast done"
+ },
+ {
+  "tr": "İşlemi iptal et",
+  "en": "Cancel transaction"
+ },
+ {
+  "tr": "İşlem iptal edildi",
+  "en": "Transaction cancelled"
+ },
+ {
+  "tr": "İşlem iptal edildi, tutar serbest",
+  "en": "Transaction cancelled, amount released"
+ },
+ {
+  "tr": "Hesaplar bir cüzdanın içindeki ayrı bölmelerdir; her hesabın bakiyesi ve adresi ayrıdır. Aynı kurtarma ifadesiyle hepsi geri gelir.",
+  "en": "Accounts are separate compartments inside one wallet; each has its own balance and address. All of them come back with the same recovery phrase."
+ },
+ {
+  "tr": "Etkin",
+  "en": "Active"
+ },
+ {
+  "tr": "Etkinleştir",
+  "en": "Activate"
+ },
+ {
+  "tr": "Yeni hesap adı",
+  "en": "New account name"
+ },
+ {
+  "tr": "Hesap ekle",
+  "en": "Add account"
+ },
+ {
+  "tr": "Hesap adı yaz.",
+  "en": "Enter an account name."
+ },
+ {
+  "tr": "Hesap adı boş olamaz",
+  "en": "The account name cannot be empty"
+ },
+ {
+  "tr": "“{name}” hesabı etkin; Tor adresi değişti",
+  "en": "Account “{name}” is active; the Tor address changed"
+ },
+ {
+  "tr": "Hesap: {name} · her hesabın adresi ayrıdır",
+  "en": "Account: {name} · every account has its own address"
+ },
+ {
+  "tr": "Genel",
+  "en": "General"
+ },
+ {
+  "tr": "Harcamak için gereken onay sayısı",
+  "en": "Confirmations needed to spend"
+ },
+ {
+  "tr": "Gelen bir ödeme bu kadar blok onayı alınca harcanabilir. Grin varsayılanı 10 (~10 dk).",
+  "en": "An incoming payment can be spent after this many block confirmations. Grin default is 10 (~10 min)."
+ },
+ {
+  "tr": "Otomatik (node havuzu)",
+  "en": "Automatic (node pool)"
+ },
+ {
+  "tr": "Tek node (kendim seçeceğim)",
+  "en": "One node (I choose)"
+ },
+ {
+  "tr": "Kendi node'um (gömülü)",
+  "en": "My own node (built-in)"
+ },
+ {
+  "tr": "Bu cüzdan için node adresi",
+  "en": "Node address for this wallet"
+ },
+ {
+  "tr": "Otomatik modda cüzdan, listedeki node'lardan sağlıklı ve hızlı olanla başlar; bir node bozuk yanıt verirse sıradakine kendiliğinden geçer.",
+  "en": "In automatic mode the wallet starts on the healthiest, fastest node of the list; if a node gives a bad answer it switches to the next by itself."
+ },
+ {
+  "tr": "Kaydedildi. Yeni node bağlantısı cüzdan yeniden açılınca geçerli olur.",
+  "en": "Saved. The new node connection applies when the wallet is opened again."
+ },
+ {
+  "tr": "Şimdi kapat",
+  "en": "Close now"
+ },
+ {
+  "tr": "Güvenlik",
+  "en": "Security"
+ },
+ {
+  "tr": "Parolayı değiştir",
+  "en": "Change password"
+ },
+ {
+  "tr": "Kurtarma ifadesini göster",
+  "en": "Show recovery phrase"
+ },
+ {
+  "tr": "Bakım",
+  "en": "Maintenance"
+ },
+ {
+  "tr": "Bakiye ya da işlemler yanlış görünüyorsa cüzdanı zincirle yeniden eşleştir. Tarama arkada sürer; ilerlemesi bakiye kartında görünür.",
+  "en": "If the balance or transactions look wrong, re-match the wallet with the chain. The scan runs in the background; progress shows on the balance card."
+ },
+ {
+  "tr": "Nereden taransın",
+  "en": "Scan from"
+ },
+ {
+  "tr": "Cüzdanı onar (yeniden tara)",
+  "en": "Repair wallet (rescan)"
+ },
+ {
+  "tr": "Cüzdanı sil",
+  "en": "Delete wallet"
+ },
+ {
+  "tr": "Cüzdan dosyaları bu bilgisayardan silinir. Kurtarma ifaden yoksa paran kaybolur.",
+  "en": "The wallet files are deleted from this computer. Without your recovery phrase the money is lost."
+ },
+ {
+  "tr": "Cüzdanı sil…",
+  "en": "Delete wallet…"
+ },
+ {
+  "tr": "Mevcut parola",
+  "en": "Current password"
+ },
+ {
+  "tr": "Yeni parola",
+  "en": "New password"
+ },
+ {
+  "tr": "Yeni parola (tekrar)",
+  "en": "New password (again)"
+ },
+ {
+  "tr": "Değiştir",
+  "en": "Change"
+ },
+ {
+  "tr": "Parola değiştirildi",
+  "en": "Password changed"
+ },
+ {
+  "tr": "Yeni parola en az 4 karakter olmalı.",
+  "en": "The new password must be at least 4 characters."
+ },
+ {
+  "tr": "Yeni parolalar aynı değil.",
+  "en": "The new passwords do not match."
+ },
+ {
+  "tr": "Parola en az 4 karakter olmalı.",
+  "en": "The password must be at least 4 characters."
+ },
+ {
+  "tr": "Parolalar aynı değil.",
+  "en": "The passwords do not match."
+ },
+ {
+  "tr": "Parola yanlış.",
+  "en": "Wrong password."
+ },
+ {
+  "tr": "{name} bu bilgisayardan silinecek. Kurtarma ifaden yanında değilse içindeki para kaybolur. Bu işlem geri alınamaz.",
+  "en": "{name} will be deleted from this computer. If you do not have your recovery phrase, the money in it is lost. This cannot be undone."
+ },
+ {
+  "tr": "Kurtarma ifadem yanımda / bu cüzdandaki parayı kaybetmeyi kabul ediyorum.",
+  "en": "I have my recovery phrase / I accept losing the money in this wallet."
+ },
+ {
+  "tr": "Kalıcı olarak sil",
+  "en": "Delete permanently"
+ },
+ {
+  "tr": "Tor adresin",
+  "en": "Your Tor address"
+ },
+ {
+  "tr": "Adresi kopyala",
+  "en": "Copy address"
+ },
+ {
+  "tr": "QR",
+  "en": "QR"
+ },
+ {
+  "tr": "Onion adresi",
+  "en": "Onion address"
+ },
+ {
+  "tr": "Tor bağlantısı",
+  "en": "Tor connection"
+ },
+ {
+  "tr": "Tor engelleniyorsa ya da bağlanmıyorsa bir köprü seç. Değişiklik hemen uygulanır.",
+  "en": "If Tor is blocked or does not connect, pick a bridge. The change applies at once."
+ },
+ {
+  "tr": "Köprü yok (doğrudan)",
+  "en": "No bridge (direct)"
+ },
+ {
+  "tr": "Snowflake",
+  "en": "Snowflake"
+ },
+ {
+  "tr": "(en dayanıklı)",
+  "en": "(most resilient)"
+ },
+ {
+  "tr": "obfs4",
+  "en": "obfs4"
+ },
+ {
+  "tr": "(yerleşik)",
+  "en": "(built-in)"
+ },
+ {
+  "tr": "Kendi köprülerim",
+  "en": "My own bridges"
+ },
+ {
+  "tr": "Tor motoru",
+  "en": "Tor engine"
+ },
+ {
+  "tr": "Uygulamayla gelen Tor (önerilen)",
+  "en": "Tor shipped with the app (recommended)"
+ },
+ {
+  "tr": "Gömülü Arti (deneysel)",
+  "en": "Built-in Arti (experimental)"
+ },
+ {
+  "tr": "Uygula",
+  "en": "Apply"
+ },
+ {
+  "tr": "Tor kapalı",
+  "en": "Tor off"
+ },
+ {
+  "tr": "Kapalı",
+  "en": "Off"
+ },
+ {
+  "tr": "Hata",
+  "en": "Error"
+ },
+ {
+  "tr": "Yayılıyor",
+  "en": "Publishing"
+ },
+ {
+  "tr": "Çevrimiçi",
+  "en": "Online"
+ },
+ {
+  "tr": "Bağlanıyor %{p}",
+  "en": "Connecting {p}%"
+ },
+ {
+  "tr": "Tor bağlanıyor {p}%",
+  "en": "Tor connecting {p}%"
+ },
+ {
+  "tr": "Tor hatası",
+  "en": "Tor error"
+ },
+ {
+  "tr": "Tor hazır",
+  "en": "Tor ready"
+ },
+ {
+  "tr": "Tor hazır · adres yayılıyor",
+  "en": "Tor ready · address spreading"
+ },
+ {
+  "tr": "Tor kapalı: Tor üzerinden ödeme alınamaz, Slatepack ile alabilirsin.",
+  "en": "Tor is off: you cannot receive over Tor, but you can receive with Slatepack."
+ },
+ {
+  "tr": "Tor ağına bağlanılıyor; birkaç saniye sürer.",
+  "en": "Connecting to the Tor network; takes a few seconds."
+ },
+ {
+  "tr": "Tor bağlanamadı. Aşağıdan bir köprü (Snowflake) seçip \"Uygula\"ya bas.",
+  "en": "Tor could not connect. Pick a bridge (Snowflake) below and press \"Apply\"."
+ },
+ {
+  "tr": "Tor hazır. Adresinin Tor ağında bulunabilir olması ~{n} dk daha sürebilir; bu sırada gelen ödeme denemeleri başarısız olabilir.",
+  "en": "Tor is ready. It can take ~{n} more min for your address to become findable on Tor; payment attempts may fail meanwhile."
+ },
+ {
+  "tr": "Adresin Tor ağında çevrimiçi: ödemeler doğrudan gelebilir.",
+  "en": "Your address is online on Tor: payments can arrive directly."
+ },
+ {
+  "tr": "Tor motoru cüzdan yeniden açılınca değişecek",
+  "en": "The Tor engine changes when the wallet is opened again"
+ },
+ {
+  "tr": "Tor yeni ayarlarla yeniden bağlanıyor",
+  "en": "Tor is reconnecting with the new settings"
+ },
+ {
+  "tr": "En az bir köprü satırı yaz.",
+  "en": "Enter at least one bridge line."
+ },
+ {
+  "tr": "Grin gönder",
+  "en": "Send Grin"
+ },
+ {
+  "tr": "Alıcının adresi",
+  "en": "Recipient's address"
+ },
+ {
+  "tr": "Adres yoksa boş bırak; alıcıya vereceğin bir Slatepack metni oluşur.",
+  "en": "If you have no address leave it empty; a Slatepack text to hand to the recipient is created."
+ },
+ {
+  "tr": "Kullanılabilir",
+  "en": "Available"
+ },
+ {
+  "tr": "Ağ ücreti otomatik eklenir.",
+  "en": "The network fee is added automatically."
+ },
+ {
+  "tr": "Alıcı Tor üzerinde aranıyor…",
+  "en": "Looking for the recipient on Tor…"
+ },
+ {
+  "tr": "Alıcı çevrimiçi; ödeme Tor üzerinden doğrudan gidecek.",
+  "en": "Recipient is online; the payment will go directly over Tor."
+ },
+ {
+  "tr": "Alıcıya şu an Tor ile ulaşılamıyor. Yine de gönderebilirsin: alıcıya vereceğin bir Slatepack metni oluşur.",
+  "en": "The recipient cannot be reached over Tor right now. You can still send: a Slatepack text to hand over is created."
+ },
+ {
+  "tr": "Bu, bu ağ için geçerli bir Grin adresi değil.",
+  "en": "This is not a valid Grin address for this network."
+ },
+ {
+  "tr": "Bu adres bu ağ için geçerli bir Grin adresi değil.",
+  "en": "This address is not a valid Grin address for this network."
+ },
+ {
+  "tr": "Tutar gir.",
+  "en": "Enter an amount."
+ },
+ {
+  "tr": "Tutar geçersiz.",
+  "en": "The amount is not valid."
+ },
+ {
+  "tr": "Tutar sıfırdan büyük olmalı.",
+  "en": "The amount must be greater than zero."
+ },
+ {
+  "tr": "Gönderildi.",
+  "en": "Sent."
+ },
+ {
+  "tr": "Alıcı imzaladı, işlem zincire iletildi. Onaylanması birkaç dakika sürer.",
+  "en": "The recipient signed it and the transaction was posted to the chain. Confirmation takes a few minutes."
+ },
+ {
+  "tr": "Alıcıya Tor üzerinden ulaşılamadı, bu yüzden ödeme Slatepack ile tamamlanacak. Tutar, işlem bitene ya da iptal edilene kadar kilitli kalır.",
+  "en": "The recipient could not be reached over Tor, so the payment will be completed with Slatepack. The amount stays locked until it finishes or is cancelled."
+ },
+ {
+  "tr": "Ödeme Slatepack ile tamamlanacak. Tutar, işlem bitene ya da iptal edilene kadar kilitli kalır.",
+  "en": "The payment will be completed with Slatepack. The amount stays locked until it finishes or is cancelled."
+ },
+ {
+  "tr": "Bu Slatepack metnini alıcıya ilet (kopyala ya da QR).",
+  "en": "Pass this Slatepack text to the recipient (copy or QR)."
+ },
+ {
+  "tr": "Alıcının sana geri verdiği yanıtı yapıştır (alıcı Tor kullanıyorsa bu adım kendiliğinden tamamlanır):",
+  "en": "Paste the reply the recipient gives back (if the recipient uses Tor this step completes by itself):"
+ },
+ {
+  "tr": "Tamamla ve gönder",
+  "en": "Finish and send"
+ },
+ {
+  "tr": "Alıcının yanıtını yapıştır.",
+  "en": "Paste the recipient's reply."
+ },
+ {
+  "tr": "Bu metin bu gönderimin yanıtı değil.",
+  "en": "This text is not the reply to this payment."
+ },
+ {
+  "tr": "Grin al",
+  "en": "Receive Grin"
+ },
+ {
+  "tr": "Bu adresi gönderene ver. Uygulama açık ve Tor hazırken ödemeler kendiliğinden gelir.",
+  "en": "Give this address to the sender. While the app is open and Tor is ready, payments arrive by themselves."
+ },
+ {
+  "tr": "Gönderen Tor kullanamıyorsa sana bir Slatepack metni verir; onu \"Slatepack\" düğmesiyle işle.",
+  "en": "If the sender cannot use Tor they give you a Slatepack text; process it with the \"Slatepack\" button."
+ },
+ {
+  "tr": "Slatepack işle",
+  "en": "Process Slatepack"
+ },
+ {
+  "tr": "Sana verilen Slatepack metnini yapıştır. Gelen bir ödemeyse imzalanır; kendi gönderdiğin bir ödemenin yanıtıysa tamamlanıp zincire iletilir.",
+  "en": "Paste the Slatepack text you were given. An incoming payment gets signed; a reply to a payment you sent gets finished and posted to the chain."
+ },
+ {
+  "tr": "İşle",
+  "en": "Process"
+ },
+ {
+  "tr": "Slatepack metnini yapıştır.",
+  "en": "Paste the Slatepack text."
+ },
+ {
+  "tr": "İmzalandı.",
+  "en": "Signed."
+ },
+ {
+  "tr": "Ödemenin tamamlanması için bu yanıtı gönderene geri ver.",
+  "en": "Give this reply back to the sender so the payment can finish."
+ },
+ {
+  "tr": "Ödeme alındı.",
+  "en": "Payment received."
+ },
+ {
+  "tr": "İmzalı yanıt gönderene Tor üzerinden iletildi.",
+  "en": "The signed reply was sent to the sender over Tor."
+ },
+ {
+  "tr": "Tamamlandı.",
+  "en": "Done."
+ },
+ {
+  "tr": "İşlem zincire iletildi.",
+  "en": "The transaction was posted to the chain."
+ },
+ {
+  "tr": "Yetersiz bakiye (ücret dahil). Onay bekleyen tutarlar henüz harcanamaz.",
+  "en": "Insufficient balance (fee included). Amounts awaiting confirmation cannot be spent yet."
+ },
+ {
+  "tr": "Kilitli ekran",
+  "en": "Locked screen"
+ },
+ {
+  "tr": "Cüzdan kilitli",
+  "en": "Wallet locked"
+ },
+ {
+  "tr": "Kilidi aç",
+  "en": "Unlock"
+ },
+ {
+  "tr": "Cüzdan kilitli. Arka planda çalışmaya devam eder, ödemeler gelmeye devam eder.",
+  "en": "The wallet is locked. It keeps running in the background and payments keep arriving."
+ },
+ {
+  "tr": "Kilitle: ekranı parolaya bağlar, cüzdan çalışmaya devam eder. Çıkış yap: cüzdanı tamamen kapatır.",
+  "en": "Lock: puts the screen behind the password, the wallet keeps running. Log out: closes the wallet completely."
+ },
+ {
+  "tr": "Çıkış yapınca cüzdan kapanır ve Tor adresin çevrimdışı olur; ödeme alamazsın.",
+  "en": "Logging out closes the wallet and your Tor address goes offline; you cannot receive payments."
+ },
+ {
+  "tr": "Cüzdan kapanıyor…",
+  "en": "Closing the wallet…"
+ },
+ {
+  "tr": "Dil",
+  "en": "Language"
+ },
+ {
+  "tr": "Otomatik (sistem dili)",
+  "en": "Automatic (system language)"
+ },
+ {
+  "tr": "Görünüm",
+  "en": "Appearance"
+ },
+ {
+  "tr": "Sistem",
+  "en": "System"
+ },
+ {
+  "tr": "Koyu",
+  "en": "Dark"
+ },
+ {
+  "tr": "Açık",
+  "en": "Light"
+ },
+ {
+  "tr": "Ağ değiştirmek uygulamayı yeniden başlatır; her ağın cüzdanları ve node'u ayrıdır. Test ağı yalnızca denemeler içindir, gerçek para taşımaz.",
+  "en": "Changing the network restarts the app; every network has its own wallets and node. The testnet is for trying things out only and carries no real money."
+ },
+ {
+  "tr": "Ana ağ (gerçek Grin)",
+  "en": "Mainnet (real Grin)"
+ },
+ {
+  "tr": "Test ağı (deneme, para değeri yok)",
+  "en": "Testnet (for trying, no monetary value)"
+ },
+ {
+  "tr": "Yerel test (usernet)",
+  "en": "Local test (usernet)"
+ },
+ {
+  "tr": "Ağı değiştir ve yeniden başlat",
+  "en": "Switch network and restart"
+ },
+ {
+  "tr": "Otomatik kilit",
+  "en": "Auto lock"
+ },
+ {
+  "tr": "Kullanılmazsa ekranı kilitler. Cüzdan arka planda çalışmaya devam eder.",
+  "en": "Locks the screen when idle. The wallet keeps running in the background."
+ },
+ {
+  "tr": "{n} dakika",
+  "en": "{n} minutes"
+ },
+ {
+  "tr": "1 dakika",
+  "en": "1 minute"
+ },
+ {
+  "tr": "1 saat",
+  "en": "1 hour"
+ },
+ {
+  "tr": "Hakkında",
+  "en": "About"
+ },
+ {
+  "tr": "OrkoWallet – Grin 0.1.0 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap",
+  "en": "OrkoWallet – Grin 0.1.0 · official grin-wallet 5.5.1 and grin 5.5.2 libraries · Tor 0.4.9.16 · Orkoswap"
+ },
+ {
+  "tr": "Ağ değişince açık cüzdan kapanır ve uygulama yeniden başlar.",
+  "en": "The open wallet closes and the app restarts when the network changes."
+ },
+ {
+  "tr": "Uygulama seçtiğin ağ ile yeniden başlayacak.",
+  "en": "The app will restart on the network you picked."
+ },
+ {
+  "tr": "Node havuzu ({net})",
+  "en": "Node pool ({net})"
+ },
+ {
+  "tr": "Cüzdan listedeki sağlıklı ve hızlı node ile başlar. Bir node bozuk ya da yarım yanıt verirse sıradakine kendiliğinden geçer; bu yüzden birden fazla node tutmak iyidir. Yeni eklenen node cüzdan yeniden açılınca kullanılır.",
+  "en": "The wallet starts on the healthy, fast node of the list. If a node gives a bad or cut-off answer it switches to the next by itself, so keeping several nodes is a good idea. A newly added node is used when the wallet is opened again."
+ },
+ {
+  "tr": "Yerleşik",
+  "en": "Built-in"
+ },
+ {
+  "tr": "Eklediğin",
+  "en": "Added by you"
+ },
+ {
+  "tr": "Kullanımda",
+  "en": "In use"
+ },
+ {
+  "tr": "Sil",
+  "en": "Remove"
+ },
+ {
+  "tr": "Kontrol ediliyor…",
+  "en": "Checking…"
+ },
+ {
+  "tr": "Çalışıyor",
+  "en": "Working"
+ },
+ {
+  "tr": "Ulaşılamıyor",
+  "en": "Unreachable"
+ },
+ {
+  "tr": "{ms} ms · blok {h}",
+  "en": "{ms} ms · block {h}"
+ },
+ {
+  "tr": "Node ekle",
+  "en": "Add node"
+ },
+ {
+  "tr": "Ekle",
+  "en": "Add"
+ },
+ {
+  "tr": "https://node-adresin:3413",
+  "en": "https://your-node:3413"
+ },
+ {
+  "tr": "Şimdi kontrol et",
+  "en": "Check now"
+ },
+ {
+  "tr": "Node eklendi",
+  "en": "Node added"
+ },
+ {
+  "tr": "Node silindi",
+  "en": "Node removed"
+ },
+ {
+  "tr": "Node adresi http:// ya da https:// ile başlamalı.",
+  "en": "The node address must start with http:// or https://."
+ },
+ {
+  "tr": "Bu node zaten listede.",
+  "en": "This node is already in the list."
+ },
+ {
+  "tr": "Bu adrese ulaşılamadı: {e}",
+  "en": "This address could not be reached: {e}"
+ },
+ {
+  "tr": "Gömülü node",
+  "en": "Built-in node"
+ },
+ {
+  "tr": "Uygulama açılınca gömülü node'u başlat",
+  "en": "Start the built-in node when the app opens"
+ },
+ {
+  "tr": "Arşiv modu (tüm geçmiş, çok daha fazla disk)",
+  "en": "Archive mode (full history, much more disk)"
+ },
+ {
+  "tr": "Ek eşler (her satıra host:port)",
+  "en": "Extra peers (one host:port per line)"
+ },
+ {
+  "tr": "Yalnızca bu eşlere bağlan (özel test ağı)",
+  "en": "Only connect to these peers (private test network)"
+ },
+ {
+  "tr": "Gömülü node değişiklikleri uygulama yeniden açılınca geçerli olur.",
+  "en": "Built-in node changes apply when the app is started again."
+ },
+ {
+  "tr": "Eş adresi host:port olmalı: {p}",
+  "en": "A peer address must be host:port: {p}"
+ },
+ {
+  "tr": "Node ayarları kaydedildi",
+  "en": "Node settings saved"
+ },
+ {
+  "tr": "Node'lardan okunabilir yanıt alınamadı (hepsi denendi). Birkaç dakika sonra yeniden dene ya da Node ayarları'ndan kendi node'unu ekle.",
+  "en": "No node gave a readable answer (all were tried). Try again in a few minutes or add your own node in Node settings."
+ },
+ {
+  "tr": "Node'a ulaşılamadı. Node panelinden bağlantıyı kontrol et.",
+  "en": "The node could not be reached. Check the connection in the Node panel."
+ },
+ {
+  "tr": "{port} portu kullanımda: bu bilgisayarda başka bir Grin node'u çalışıyor olabilir",
+  "en": "Port {port} is in use: another Grin node may be running on this computer"
+ },
+ {
+  "tr": "Açık cüzdan yok.",
+  "en": "No wallet is open."
+ },
+ {
+  "tr": "hesap adı boş olamaz",
+  "en": "the account name cannot be empty"
+ },
+ {
+  "tr": "Cüzdanı aç",
+  "en": "Open wallet"
+ },
+ {
+  "tr": "node'a ulaşılamadı: {e}",
+  "en": "could not reach the node: {e}"
+ },
+ {
+  "tr": "node hatası: {e}",
+  "en": "node error: {e}"
+ },
+ {
+  "tr": "node beklenmeyen yanıt verdi",
+  "en": "the node gave an unexpected answer"
+ },
+ {
+  "tr": "Node'lar",
+  "en": "Nodes"
+ },
+ {
+  "tr": "Bağlantı",
+  "en": "Connection"
+ },
+ {
+  "tr": "Bunu kullan",
+  "en": "Use this one"
+ },
+ {
+  "tr": "Tercih edilen",
+  "en": "Preferred"
+ },
+ {
+  "tr": "Otomatik seç",
+  "en": "Pick automatically"
+ },
+ {
+  "tr": "Node değiştirildi",
+  "en": "Node switched"
+ },
+ {
+  "tr": "Otomatik seçim açık",
+  "en": "Automatic choice is on"
+ },
+ {
+  "tr": "Bu node listede yok.",
+  "en": "This node is not in the list."
+ },
+ {
+  "tr": "Cüzdan listedeki sağlıklı ve hızlı node ile başlar. Bir node'u seçip \"Bunu kullan\" dersen cüzdan hemen ona geçer; o bozulursa yine havuzdaki diğerine geçilir. Yeni eklenen node cüzdan yeniden açılınca havuza girer.",
+  "en": "The wallet starts on the healthy, fast node of the list. If you pick a node and press \"Use this one\" the wallet switches to it at once; if it breaks it still moves to another node of the pool. A newly added node joins the pool when the wallet is opened again."
+ },
+ {
+  "tr": "Bu cüzdanın node bağlantısı",
+  "en": "This wallet's node connection"
+ },
+ {
+  "tr": "hata olunca diğerine geçer",
+  "en": "switches to another on errors"
+ },
+ {
+  "tr": "başka node'a geçmez",
+  "en": "never switches to another node"
+ },
+ {
+  "tr": "Tek node",
+  "en": "Single node"
+ },
+ {
+  "tr": "Bağlantı türü cüzdan yeniden açılınca geçerli olur.",
+  "en": "The connection type applies when the wallet is opened again."
+ },
+ {
+  "tr": "Önce bir cüzdan aç.",
+  "en": "Open a wallet first."
+ },
+ {
+  "tr": "Gömülü node ayarlarını kaydet",
+  "en": "Save built-in node settings"
+ },
+ {
+  "tr": "{n} sa",
+  "en": "{n} h"
+ },
+ {
+  "tr": "{n} gün",
+  "en": "{n} d"
+ },
+ {
+  "tr": "{ms} ms",
+  "en": "{ms} ms"
+ },
+ {
+  "tr": "Alıcının Grin adresini yaz; ödeme Tor üzerinden doğrudan gider, alıcı imzalar ve işlem zincire iletilir.",
+  "en": "Enter the recipient's Grin address; the payment goes straight over Tor, the recipient signs it and the transaction is posted to the chain."
+ },
+ {
+  "tr": "Alıcı çevrimdışıysa dakikada bir yeniden denenir (en fazla {n} dk); olmazsa işlem başarısız olur ve tutar serbest kalır.",
+  "en": "If the recipient is offline it is retried every minute (up to {n} min); if that fails the transaction fails and the amount is released."
+ },
+ {
+  "tr": "Alıcı çevrimdışıysa işlem başarısız olur ve tutar serbest kalır.",
+  "en": "If the recipient is offline the transaction fails and the amount is released."
+ },
+ {
+  "tr": "Alıcıya {s} sn içinde Tor ile ulaşılamadı; çevrimdışı olabilir.",
+  "en": "The recipient could not be reached over Tor within {s} s; they may be offline."
+ },
+ {
+  "tr": "Yine de gönderirsen dakikada bir yeniden denenir (en fazla {n} dk).",
+  "en": "If you send anyway it is retried every minute (up to {n} min)."
+ },
+ {
+  "tr": "Şimdi gönderirsen işlem başarısız olur.",
+  "en": "If you send now the transaction will fail."
+ },
+ {
+  "tr": "Alıcıya şu an ulaşılamadı.",
+  "en": "The recipient could not be reached right now."
+ },
+ {
+  "tr": "Dakikada bir yeniden denenecek (en fazla {n} dk). Bu pencereyi kapatabilirsin; sonuç İşlemler listesinde görünür. Yeniden deneme için uygulama ve cüzdan açık kalmalı.",
+  "en": "It will be retried every minute (up to {n} min). You can close this window; the result shows in the Transactions list. The app and wallet must stay open for the retries."
+ },
+ {
+  "tr": "Alıcı çevrimdışıysa",
+  "en": "If the recipient is offline"
+ },
+ {
+  "tr": "Dakikada bir yeniden dene",
+  "en": "Retry every minute"
+ },
+ {
+  "tr": "Kaç dakika boyunca",
+  "en": "For how many minutes"
+ },
+ {
+  "tr": "Tor ile gönderirken alıcıya ulaşılamazsa işlem hemen başarısız olmaz: seçtiğin süre boyunca dakikada bir denenir. Süre dolarsa işlem başarısız olur ve tutar serbest kalır. Yeniden deneme yalnızca uygulama ve cüzdan açıkken sürer. Kapatırsan her gönderim ilk denemede başarısız olur.",
+  "en": "When sending over Tor and the recipient cannot be reached, the transaction does not fail at once: it is tried every minute for the time you choose. If the time runs out the transaction fails and the amount is released. Retries only continue while the app and wallet are open. If you turn this off, every payment fails on the first attempt."
+ },
+ {
+  "tr": "Alıcı aranıyor {a}/{b}",
+  "en": "Looking for recipient {a}/{b}"
+ },
+ {
+  "tr": "sonraki deneme {n} sn",
+  "en": "next try in {n} s"
+ },
+ {
+  "tr": "Gönderim başarısız",
+  "en": "Send failed"
+ },
+ {
+  "tr": "Alıcı çevrimiçi oldu, ödeme gönderildi",
+  "en": "The recipient came online, the payment was sent"
+ },
+ {
+  "tr": "Gönderim başarısız: alıcıya ulaşılamadı. Tutar serbest bırakıldı.",
+  "en": "Send failed: the recipient could not be reached. The amount was released."
+ },
+ {
+  "tr": "Alıcıya ulaşılamadı; işlem başarısız oldu, tutar serbest kaldı. Ayarlardan yeniden denemeyi açabilirsin.",
+  "en": "The recipient could not be reached; the transaction failed and the amount was released. You can turn retries on in Settings."
+ },
+ {
+  "tr": "Alıcının çevrimiçi olup olmadığına bakılıyor… {p}% · genelde 10-30 sn, en fazla {s} sn sürer",
+  "en": "Checking whether the recipient is online… {p}% · usually 10-30 s, at most {s} s"
+ },
+ {
+  "tr": "Alıcıya {s} sn içinde Tor ile ulaşılamadı; çevrimdışı olabilir. Yine de gönderebilirsin: ulaşılamazsa Slatepack metni oluşturulur.",
+  "en": "The recipient could not be reached over Tor within {s} s; they may be offline. You can still send: if they cannot be reached a Slatepack text is created."
+ },
+ {
+  "tr": "Tekrar kontrol et",
+  "en": "Check again"
+ },
+ {
+  "tr": "Gönderme yöntemi",
+  "en": "Send method"
+ },
+ {
+  "tr": "Tor ile gönder",
+  "en": "Send over Tor"
+ },
+ {
+  "tr": "Slatepack ile gönder",
+  "en": "Send with Slatepack"
+ },
+ {
+  "tr": "Alıcının Grin adresini yaz; ödeme Tor üzerinden doğrudan gider, alıcı imzalar ve işlem zincire iletilir. Alıcıya ulaşılamazsa otomatik olarak Slatepack'e geçilir.",
+  "en": "Enter the recipient's Grin address; the payment goes straight over Tor, the recipient signs it and the transaction is posted to the chain. If the recipient cannot be reached it switches to Slatepack automatically."
+ },
+ {
+  "tr": "Alıcı çevrimdışıysa ya da Tor kullanamıyorsa: bir Slatepack metni oluşturulur. Onu alıcıya mesajla, e-postayla ya da QR ile ilet; alıcı yanıtı geri verince buraya yapıştırıp tamamlarsın.",
+  "en": "If the recipient is offline or cannot use Tor: a Slatepack text is created. Hand it to the recipient by message, e-mail or QR; when they give the reply back, paste it here to finish."
+ },
+ {
+  "tr": "Alıcının adresi (isteğe bağlı)",
+  "en": "Recipient's address (optional)"
+ },
+ {
+  "tr": "grin1… ile başlar. Adresi yazınca alıcının çevrimiçi olup olmadığı otomatik kontrol edilir.",
+  "en": "Starts with grin1…. Once you type it, the app checks automatically whether the recipient is online."
+ },
+ {
+  "tr": "Yazarsan metin yalnızca o adrese şifrelenir; yazmazsan metni eline geçiren herkes görebilir.",
+  "en": "If you enter one, the text is encrypted for that address only; if you do not, anyone who gets the text can read it."
+ },
+ {
+  "tr": "Slatepack oluştur",
+  "en": "Create Slatepack"
+ },
+ {
+  "tr": "Tor ile göndermek için alıcının adresini yaz.",
+  "en": "Enter the recipient's address to send over Tor."
+ },
+ {
+  "tr": "Tümü",
+  "en": "All"
+ },
+ {
+  "tr": "Gelen",
+  "en": "Incoming"
+ },
+ {
+  "tr": "Giden",
+  "en": "Outgoing"
+ },
+ {
+  "tr": "Bekleyen",
+  "en": "Pending"
+ },
+ {
+  "tr": "Sayfa başına",
+  "en": "Per page"
+ },
+ {
+  "tr": "Önceki sayfa",
+  "en": "Previous page"
+ },
+ {
+  "tr": "Sonraki sayfa",
+  "en": "Next page"
+ },
+ {
+  "tr": "Doğrudan",
+  "en": "Direct"
+ },
+ {
+  "tr": "Özel",
+  "en": "Custom"
+ },
+ {
+  "tr": "Tor köprüleri",
+  "en": "Tor bridges"
+ },
+ {
+  "tr": "Tor ağına bağlan",
+  "en": "Connect to Tor"
+ },
+ {
+  "tr": "Adresi duyur",
+  "en": "Announce the address"
+ },
+ {
+  "tr": "Erişim testi",
+  "en": "Reachability test"
+ },
+ {
+  "tr": "Tor çevrimiçi",
+  "en": "Tor online"
+ },
+ {
+  "tr": "Tor hazır · adres duyuruluyor {p}%",
+  "en": "Tor ready · announcing address {p}%"
+ },
+ {
+  "tr": "Adresin Tor ağına duyuruluyor. Ulaşılabilir olunca burada \"Çevrimiçi\" yazar; o zamana kadar gelen ödeme denemeleri başarısız olabilir.",
+  "en": "Your address is being announced to the Tor network. \"Online\" appears here once it is reachable; payment attempts may fail until then."
+ },
+ {
+  "tr": "Yedekleme",
+  "en": "Backup"
+ },
+ {
+  "tr": "Ekranı açık bırakan birinin senin adına para göndermesini engeller.",
+  "en": "Stops someone at an unlocked screen from sending money in your name."
+ },
+ {
+  "tr": "Yedeklemek için önce bir cüzdan aç.",
+  "en": "Open a wallet first to back it up."
+ },
+ {
+  "tr": "Gönderme",
+  "en": "Sending"
+ },
+ {
+  "tr": "Her gönderimden önce parolayı tekrar iste",
+  "en": "Ask for the password again before every payment"
+ },
+ {
+  "tr": "Hemen yayınla (Dandelion kapalı)",
+  "en": "Broadcast at once (Dandelion off)"
+ },
+ {
+  "tr": "Dandelion, işlemin kaynağını gizlemek için önce rastgele node'lara iletilmesini sağlar. Kapatırsan işlem hızlı yayılır ama gizlilik azalır.",
+  "en": "Dandelion passes a transaction through random nodes first to hide where it came from. Turning it off spreads the transaction faster but reduces privacy."
+ },
+ {
+  "tr": "Değişim çıktısı sayısı",
+  "en": "Number of change outputs"
+ },
+ {
+  "tr": "Girdi seçimi",
+  "en": "Input selection"
+ },
+ {
+  "tr": "En küçükler (yeterli en az çıktı)",
+  "en": "Smallest (fewest outputs that are enough)"
+ },
+ {
+  "tr": "Hepsi (tüm çıktıları birleştir)",
+  "en": "All (combine every output)"
+ },
+ {
+  "tr": "İşlem geçerlilik süresi (blok, 0 = sınırsız)",
+  "en": "Transaction lifetime (blocks, 0 = unlimited)"
+ },
+ {
+  "tr": "Yedek ve dışa aktarma",
+  "en": "Backup and export"
+ },
+ {
+  "tr": "Cüzdanı yedekle",
+  "en": "Back up wallet"
+ },
+ {
+  "tr": "İşlemleri CSV olarak aktar",
+  "en": "Export transactions as CSV"
+ },
+ {
+  "tr": "Yedek kaydedildi: {path}",
+  "en": "Backup saved: {path}"
+ },
+ {
+  "tr": "Dışa aktarıldı: {path}",
+  "en": "Exported: {path}"
+ },
+ {
+  "tr": "Destek",
+  "en": "Support"
+ },
+ {
+  "tr": "Günlük klasörünü aç",
+  "en": "Open the log folder"
+ },
+ {
+  "tr": "Küçült",
+  "en": "Minimize"
+ },
+ {
+  "tr": "Ekranı kapla / geri al",
+  "en": "Maximize / restore"
+ },
+ {
+  "tr": "Cüzdan ekle",
+  "en": "Add a wallet"
+ },
+ {
+  "tr": "Son kullanılan",
+  "en": "Last used"
+ },
+ {
+  "tr": "Cüzdan silindi",
+  "en": "Wallet deleted"
+ },
+ {
+  "tr": "Bu ağda henüz cüzdanın yok. Yeni bir cüzdan oluştur, kurtarma ifadenle geri yükle ya da grin-wallet / Grim cüzdan klasörünü içe aktar. Anahtarların yalnızca bu bilgisayarda durur; ödemeler Tor üzerinden gelir ve gider.",
+  "en": "You have no wallet on this network yet. Create a new wallet, restore one with your recovery phrase, or import a grin-wallet / Grim folder. Your keys stay on this computer only; payments come and go over Tor."
+ },
+ {
+  "tr": "Sıfırdan oluştur, 24 kelimelik kurtarma ifadeni al.",
+  "en": "Create from scratch and get your 24-word recovery phrase."
+ },
+ {
+  "tr": "Kurtarma ifadenle eski cüzdanını geri getir.",
+  "en": "Bring your old wallet back with your recovery phrase."
+ },
+ {
+  "tr": "grin-wallet ya da Grim klasörünü kopyala.",
+  "en": "Copy a grin-wallet or Grim folder."
+ },
+ {
+  "tr": "Çok fazla hatalı deneme. {n} sn sonra yeniden dene.",
+  "en": "Too many wrong attempts. Try again in {n} s."
+ },
+ {
+  "tr": "Yanıt ayrıca gönderene Tor ile iletilmeye çalışılıyor; ulaşırsa işlem kendiliğinden tamamlanır. Ulaşamazsa bu metni gönderene ver.",
+  "en": "The reply is also being sent to the sender over Tor; if it gets through the payment completes by itself. If not, give this text to the sender."
+ },
+ {
+  "tr": "Bu metni gönderene ver; o da işlemi tamamlar.",
+  "en": "Give this text to the sender; they will finish the payment."
+ },
+ {
+  "tr": "Cüzdan",
+  "en": "Wallet"
+ },
+ {
+  "tr": "Node",
+  "en": "Node"
+ },
+ {
+  "tr": "Önce açık cüzdanı kapat.",
+  "en": "Close the open wallet first."
+ },
+ {
+  "tr": "geçersiz cüzdan",
+  "en": "invalid wallet"
+ },
+ {
+  "tr": "Bu klasörde zaten bir cüzdan var.",
+  "en": "There is already a wallet in this folder."
+ },
+ {
+  "tr": "Bu klasörde bir Grin cüzdanı bulunamadı (wallet_data\\wallet.seed yok).",
+  "en": "No Grin wallet was found in this folder (wallet_data\\wallet.seed is missing)."
+ },
+ {
+  "tr": "Kopyalanamadı: {e}",
+  "en": "Could not copy: {e}"
+ },
+ {
+  "tr": "Beklenmeyen bir hata oluştu (ayrıntılar log dosyasında).",
+  "en": "An unexpected error occurred (details in the log file)."
+ },
+ {
+  "tr": "İşlem yarıda kaldı",
+  "en": "The operation was interrupted"
+ },
+ {
+  "tr": "Başlatılamadı: {e}",
+  "en": "Could not start: {e}"
+ }
+]
