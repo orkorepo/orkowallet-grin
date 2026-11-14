@@ -65,7 +65,7 @@ The Turkish source text is the key; `app/ui/i18n.js` holds English, and `app/ui/
 
 ## Code signing policy
 
-Release installers are built from this repository by the public GitHub Actions workflow in `.github/workflows/build.yml`. Code signing is not active yet: we have applied for free signing for open-source projects through [SignPath Foundation](https://signpath.org/), and until it is approved the installer is unsigned and Windows SmartScreen may warn. Always compare the SHA-256 on the release page with your download.
+Release installers are built from this repository by the public GitHub Actions workflow in `.github/workflows/build.yml`. Code signing is not active yet: we plan to use the free signing for open-source projects offered by [SignPath Foundation](https://signpath.org/); until that is approved the installer is unsigned and Windows SmartScreen may warn. Always compare the SHA-256 on the release page with your download.
 
 - Only maintainers of this repository can approve a release for signing.
 - The wallet does not collect or send telemetry; network access is limited to the Grin nodes you choose and Tor.
