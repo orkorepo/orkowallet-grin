@@ -16,7 +16,7 @@ Orkoswap is a community-driven project that puts privacy first. We build the too
 
 ## Download
 
-Get the Windows installer (`OrkoWallet-Grin_0.1.1_x64-setup.exe`) from the [Releases](../../releases) page. It installs per user and needs no administrator rights. Check the SHA-256 listed in the release notes before running it.
+Get the Windows installer (`OrkoWallet.-.Grin_0.1.1_x64-setup.exe`) from the [Releases](../../releases) page. It installs per user and needs no administrator rights. Check the SHA-256 listed in the release notes before running it.
 
 ### Install with winget (planned)
 
