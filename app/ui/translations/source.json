@@ -1896,6 +1896,10 @@
   "en": "Open a wallet first to send a donation."
  },
  {
+  "tr": "Adres uzun süredir ulaşılamıyor. Bilgisayarın saatini eşitle; olmazsa aşağıdan Snowflake köprüsünü seç ve “Uygula”ya bas.",
+  "en": "The address has been unreachable for a while. Sync your computer clock; if that does not help, pick the Snowflake bridge below and press “Apply”."
+ },
+ {
   "tr": "Gönderilebilir bakiye yok.",
   "en": "There is no balance to send."
  }

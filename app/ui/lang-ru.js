@@ -476,4 +476,5 @@ const LANG_RU = {
   "Bağış yap": "Пожертвовать",
   "Bağış yalnızca Mainnet üzerinde gönderilebilir.": "Пожертвования можно отправлять только в Mainnet.",
   "Bağış göndermek için önce bir cüzdan aç.": "Сначала откройте кошелёк, чтобы сделать пожертвование.",
+  "Adres uzun süredir ulaşılamıyor. Bilgisayarın saatini eşitle; olmazsa aşağıdan Snowflake köprüsünü seç ve “Uygula”ya bas.": "Адрес давно недоступен. Синхронизируйте часы компьютера; если не поможет, выберите ниже мост Snowflake и нажмите «Применить».",
 };

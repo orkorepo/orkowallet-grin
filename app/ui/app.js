@@ -698,8 +698,9 @@ function torView(x) {
   const p = x.overall;
   if (x.reachable) return { state: 'ready', chip: t('Çevrimiçi'), text: t('Tor çevrimiçi'), note: t('Adresin Tor ağında çevrimiçi: ödemeler doğrudan gelebilir.'), progress: true, p: 100, stage: 3 };
   if (x.stage === 1) return { state: 'starting', chip: `${p}%`, text: t('Tor bağlanıyor {p}%', { p }), note: t('Tor ağına bağlanılıyor; birkaç saniye sürer.'), progress: true, p, stage: 1 };
+  const slow = Number(x.ready_for) > 150;
   return { state: 'publishing', chip: `${p}%`, text: t('Tor hazır · adres duyuruluyor {p}%', { p }),
-    note: t('Adresin Tor ağına duyuruluyor. Ulaşılabilir olunca burada "Çevrimiçi" yazar; o zamana kadar gelen ödeme denemeleri başarısız olabilir.'), progress: true, p, stage: 2 };
+    note: slow ? t('Adres uzun süredir ulaşılamıyor. Bilgisayarın saatini eşitle; olmazsa aşağıdan Snowflake köprüsünü seç ve “Uygula”ya bas.') : t('Adresin Tor ağına duyuruluyor. Ulaşılabilir olunca burada "Çevrimiçi" yazar; o zamana kadar gelen ödeme denemeleri başarısız olabilir.'), progress: true, p, stage: 2 };
 }
 async function pollTor() {
   try { state.tor = await invoke('tor_status'); } catch { return; }

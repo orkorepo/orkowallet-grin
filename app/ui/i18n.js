@@ -521,6 +521,7 @@ const EN = {
   "Bağış yap": "Donate",
   "Bağış yalnızca Mainnet üzerinde gönderilebilir.": "Donations can only be sent on Mainnet.",
   "Bağış göndermek için önce bir cüzdan aç.": "Open a wallet first to send a donation.",
+  "Adres uzun süredir ulaşılamıyor. Bilgisayarın saatini eşitle; olmazsa aşağıdan Snowflake köprüsünü seç ve “Uygula”ya bas.": "The address has been unreachable for a while. Sync your computer clock; if that does not help, pick the Snowflake bridge below and press “Apply”.",
   'Gönderilebilir bakiye yok.': 'There is no balance to send.',
 };
 

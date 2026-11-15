@@ -476,4 +476,5 @@ const LANG_DE = {
   "Bağış yap": "Spenden",
   "Bağış yalnızca Mainnet üzerinde gönderilebilir.": "Spenden können nur im Mainnet gesendet werden.",
   "Bağış göndermek için önce bir cüzdan aç.": "Öffnen Sie zuerst eine Wallet, um zu spenden.",
+  "Adres uzun süredir ulaşılamıyor. Bilgisayarın saatini eşitle; olmazsa aşağıdan Snowflake köprüsünü seç ve “Uygula”ya bas.": "Die Adresse ist seit einiger Zeit nicht erreichbar. Gleichen Sie die Uhr Ihres Computers ab; wenn das nicht hilft, wählen Sie unten die Snowflake-Brücke und klicken Sie auf „Anwenden“.",
 };

@@ -476,4 +476,5 @@ const LANG_FR = {
   "Bağış yap": "Faire un don",
   "Bağış yalnızca Mainnet üzerinde gönderilebilir.": "Les dons ne peuvent être envoyés que sur le Mainnet.",
   "Bağış göndermek için önce bir cüzdan aç.": "Ouvrez d’abord un portefeuille pour faire un don.",
+  "Adres uzun süredir ulaşılamıyor. Bilgisayarın saatini eşitle; olmazsa aşağıdan Snowflake köprüsünü seç ve “Uygula”ya bas.": "L’adresse est injoignable depuis un moment. Synchronisez l’horloge de votre ordinateur ; sinon, choisissez le pont Snowflake ci-dessous et cliquez sur « Appliquer ».",
 };

@@ -1809,7 +1809,21 @@ fn remote_poller(state: Arc<AppState>) {
 // ------------------------------------------------------------------ main
 
 fn main() {
-    tauri::Builder::default()
+    let mut builder = tauri::Builder::default();
+    // One copy only: a second launch would start a second Tor on the same wallet folder and fail
+    // ("another Tor process is running with the same data directory"). It focuses the first window
+    // instead. Portable/test copies (ORKOWALLET_DATA) are separate on purpose and skip this.
+    if std::env::var_os("ORKOWALLET_DATA").is_none() {
+        builder = builder.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            use tauri::Manager;
+            if let Some(w) = app.get_webview_window("main") {
+                let _ = w.unminimize();
+                let _ = w.show();
+                let _ = w.set_focus();
+            }
+        }));
+    }
+    builder
         .setup(|app| {
             // Portable / test mode: ORKOWALLET_DATA moves wallets, settings, node data and the
             // browser profile to one folder, so a second copy never touches the normal one.

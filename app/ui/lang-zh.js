@@ -476,4 +476,5 @@ const LANG_ZH = {
   "Bağış yap": "捐赠",
   "Bağış yalnızca Mainnet üzerinde gönderilebilir.": "捐赠只能在主网上发送。",
   "Bağış göndermek için önce bir cüzdan aç.": "请先打开一个钱包再捐赠。",
+  "Adres uzun süredir ulaşılamıyor. Bilgisayarın saatini eşitle; olmazsa aşağıdan Snowflake köprüsünü seç ve “Uygula”ya bas.": "该地址已经有一段时间无法访问。请同步电脑时钟；如果没有改善，请在下方选择 Snowflake 网桥并点击“应用”。",
 };
