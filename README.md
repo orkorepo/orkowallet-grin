@@ -44,8 +44,6 @@ It is meant to be easy for people who are not experts: a clear first-run flow, p
 
 ## Features
 
-Items marked are in the main branch but not in the 0.1.1 installer; they ship with 0.1.2.
-
 **Privacy and networking**
 
 - Tor built in (official Tor 0.4.9, obfs4, Snowflake and webtunnel bridges). Pay a Grin address directly over Tor.
