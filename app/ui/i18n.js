@@ -534,6 +534,11 @@ const EN = {
   "Cüzdan bulunamadı.": "Wallet not found.",
   "Silinemedi: {e}": "Could not delete: {e}",
   "Cüzdan dosyaları hâlâ kullanımda; birkaç saniye sonra tekrar dene.": "The wallet files are still in use; try again in a few seconds.",
+  "Onarım": "Repair",
+  "Bağlantıyı onar": "Repair the connection",
+  "Tor bağlantısı kurulamıyorsa ya da adresin çevrimiçi görünmüyorsa bunu dene: Tor'un kayıtlı durumu (seçtiği giriş röleleri ve önbellek) silinir ve uygulama yeniden başlar. Cüzdanların, kurtarma ifaden ve bakiyen etkilenmez.": "If Tor cannot connect or your address does not show as online, try this: Tor's saved state (the entry relays it picked and its cache) is deleted and the app restarts. Your wallets, recovery phrase and balance are not affected.",
+  "Bağlantıyı yeniden kur ve yeniden başlat": "Reset the connection and restart",
+  "Uygulama yeniden başlatılıyor…": "Restarting the app…",
   'Gönderilebilir bakiye yok.': 'There is no balance to send.',
 };
 

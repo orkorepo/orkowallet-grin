@@ -489,4 +489,9 @@ const LANG_FR = {
   "Cüzdan bulunamadı.": "Portefeuille introuvable.",
   "Silinemedi: {e}": "Suppression impossible : {e}",
   "Cüzdan dosyaları hâlâ kullanımda; birkaç saniye sonra tekrar dene.": "Les fichiers du portefeuille sont encore utilisés ; réessayez dans quelques secondes.",
+  "Onarım": "Réparation",
+  "Bağlantıyı onar": "Réparer la connexion",
+  "Tor bağlantısı kurulamıyorsa ya da adresin çevrimiçi görünmüyorsa bunu dene: Tor'un kayıtlı durumu (seçtiği giriş röleleri ve önbellek) silinir ve uygulama yeniden başlar. Cüzdanların, kurtarma ifaden ve bakiyen etkilenmez.": "Si Tor n’arrive pas à se connecter ou si votre adresse n’apparaît pas en ligne, essayez ceci : l’état enregistré de Tor (les relais d’entrée choisis et le cache) est supprimé et l’application redémarre. Vos portefeuilles, votre phrase de récupération et votre solde ne sont pas affectés.",
+  "Bağlantıyı yeniden kur ve yeniden başlat": "Rétablir la connexion et redémarrer",
+  "Uygulama yeniden başlatılıyor…": "Redémarrage de l’application…",
 };

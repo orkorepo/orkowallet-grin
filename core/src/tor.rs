@@ -55,7 +55,7 @@ pub struct TorLaunch<'a> {
 }
 
 pub struct BundledTor {
-    child: Child,
+    child: Mutex<Child>,
     socks: SocketAddr,
     status: Arc<Mutex<TorStatus>>,
 }
@@ -79,6 +79,42 @@ pub fn glog(level: log::Level, msg: &str) {
 
 fn free_port() -> Result<u16> {
     Ok(TcpListener::bind("127.0.0.1:0")?.local_addr()?.port())
+}
+
+/// Forget what tor saved between runs (chosen entry relays, cached consensus). Hidden-service keys are
+/// not in here, so the onion address stays the same. A damaged or unlucky state (the same bad entry
+/// relays picked again and again) is the usual reason tor stays slow or unreachable on one machine.
+pub fn wipe_state(tor_dir: &Path) -> Result<()> {
+    let d = tor_dir.join("data");
+    for _ in 0..15 {
+        if !d.exists() || std::fs::remove_dir_all(&d).is_ok() {
+            return Ok(());
+        }
+        std::thread::sleep(Duration::from_millis(200));
+    }
+    bail!("could not remove {}", d.display())
+}
+
+/// Stop a leftover tor.exe that still uses this torrc (a copy that was left behind by a crash or by an
+/// earlier start). Two tors on one data folder make the new one quit with "another Tor process is
+/// running with the same data directory".
+#[cfg(windows)]
+fn kill_orphans(torrc: &Path) {
+    use std::os::windows::process::CommandExt;
+    let needle = torrc.to_string_lossy().replace('\'', "''");
+    let script = format!(
+        r#"Get-CimInstance Win32_Process -Filter "Name='tor.exe'" | Where-Object {{ $_.CommandLine -and $_.CommandLine.Contains('{needle}') }} | ForEach-Object {{ Stop-Process -Id $_.ProcessId -Force }}"#
+    );
+    let r = Command::new("powershell")
+        .args(["-NoProfile", "-NonInteractive", "-Command", &script])
+        .creation_flags(0x0800_0000)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status();
+    if r.is_ok() {
+        glog(log::Level::Info, "tor: checked for a leftover tor process on this data folder");
+    }
 }
 
 impl BundledTor {
@@ -125,6 +161,10 @@ impl BundledTor {
         }
         let torrc = l.data_dir.join("torrc");
         std::fs::write(&torrc, rc)?;
+        #[cfg(windows)]
+        if l.data_dir.join("data").join("lock").exists() {
+            kill_orphans(&torrc);
+        }
 
         let mut cmd = Command::new(&exe);
         cmd.arg("-f").arg(&torrc).arg("--defaults-torrc").arg(l.data_dir.join("torrc-defaults-none"));
@@ -167,7 +207,7 @@ impl BundledTor {
                 *s = TorStatus::Failed("tor stopped".into());
             }
         })?;
-        Ok(BundledTor { child, socks, status })
+        Ok(BundledTor { child: Mutex::new(child), socks, status })
     }
 
     pub fn status(&self) -> TorStatus {
@@ -195,10 +235,18 @@ impl BundledTor {
     }
 }
 
+impl BundledTor {
+    /// Stop tor now, even while other threads still hold a reference to this value.
+    pub fn stop(&self) {
+        let mut c = self.child.lock().unwrap();
+        let _ = c.kill();
+        let _ = c.wait();
+    }
+}
+
 impl Drop for BundledTor {
     fn drop(&mut self) {
-        let _ = self.child.kill();
-        let _ = self.child.wait();
+        self.stop();
     }
 }
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Settings → Repair: reset the Tor connection (forgets Tor's saved state) and restart the app; wallets and balances are not touched
+- Tor restarts from a clean state on its own once if the wallet address stays unreachable for four minutes; a hint appears on the Tor card after about two and a half minutes
+- A leftover tor.exe on the same data folder is stopped before Tor starts
+- Only one copy of the app can run; a second launch brings the first window to the front
+- Unfinished Slatepack exchanges can be continued from the transaction list: the text can be copied again and the recipient's reply pasted to finish
+- A wallet can be deleted from the wallet list without opening it (confirm with the wallet name)
+- Publisher shown in the file properties is now "Orko"
+
 ## 0.1.1
 
 - New wallets can be created with a 12- or 24-word recovery phrase (restore already accepted 12 to 24 words)

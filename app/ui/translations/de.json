@@ -486,5 +486,10 @@
  "Açık cüzdan silinemez. Önce çıkış yap.": "Eine geöffnete Wallet kann nicht gelöscht werden. Melden Sie sich zuerst ab.",
  "Cüzdan bulunamadı.": "Wallet nicht gefunden.",
  "Silinemedi: {e}": "Löschen fehlgeschlagen: {e}",
- "Cüzdan dosyaları hâlâ kullanımda; birkaç saniye sonra tekrar dene.": "Die Wallet-Dateien sind noch in Gebrauch; versuchen Sie es in ein paar Sekunden erneut."
+ "Cüzdan dosyaları hâlâ kullanımda; birkaç saniye sonra tekrar dene.": "Die Wallet-Dateien sind noch in Gebrauch; versuchen Sie es in ein paar Sekunden erneut.",
+ "Onarım": "Reparatur",
+ "Bağlantıyı onar": "Verbindung reparieren",
+ "Tor bağlantısı kurulamıyorsa ya da adresin çevrimiçi görünmüyorsa bunu dene: Tor'un kayıtlı durumu (seçtiği giriş röleleri ve önbellek) silinir ve uygulama yeniden başlar. Cüzdanların, kurtarma ifaden ve bakiyen etkilenmez.": "Wenn Tor keine Verbindung herstellt oder Ihre Adresse nicht als online angezeigt wird, versuchen Sie dies: Der gespeicherte Zustand von Tor (die gewählten Eingangsrelays und der Cache) wird gelöscht und die App startet neu. Ihre Wallets, Ihre Wiederherstellungsphrase und Ihr Guthaben bleiben unberührt.",
+ "Bağlantıyı yeniden kur ve yeniden başlat": "Verbindung neu aufbauen und neu starten",
+ "Uygulama yeniden başlatılıyor…": "App wird neu gestartet …"
 }

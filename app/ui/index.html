@@ -637,6 +637,7 @@
           <button type="button" role="tab" data-stab="security">Güvenlik</button>
           <button type="button" role="tab" data-stab="sending">Gönderme</button>
           <button type="button" role="tab" data-stab="backup">Yedekleme</button>
+          <button type="button" role="tab" data-stab="repair">Onarım</button>
           <button type="button" role="tab" data-stab="about">Hakkında</button>
         </nav>
         <div class="spanes">
@@ -723,6 +724,14 @@
               <p class="hint" id="set-backup-note"></p>
             </fieldset>
             <p class="muted" id="set-backup-none">Yedeklemek için önce bir cüzdan aç.</p>
+          </div>
+
+          <div class="spane" data-spane="repair" hidden>
+            <fieldset>
+              <legend>Bağlantıyı onar</legend>
+              <p class="hint hint-top">Tor bağlantısı kurulamıyorsa ya da adresin çevrimiçi görünmüyorsa bunu dene: Tor'un kayıtlı durumu (seçtiği giriş röleleri ve önbellek) silinir ve uygulama yeniden başlar. Cüzdanların, kurtarma ifaden ve bakiyen etkilenmez.</p>
+              <div class="row"><button class="btn btn-primary" type="button" id="set-repair">Bağlantıyı yeniden kur ve yeniden başlat</button></div>
+            </fieldset>
           </div>
 
           <div class="spane" data-spane="about" hidden>

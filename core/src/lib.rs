@@ -262,6 +262,11 @@ pub fn select_network(network: Network) {
     set_chain(network);
 }
 
+/// Forget tor's saved state of a wallet folder that is not open.
+pub fn wipe_tor_state_in(wallet_dir: &Path) -> Result<()> {
+    tor::wipe_state(&wallet_dir.join("tor").join("bundled"))
+}
+
 /// True when `dir` already holds a wallet (ours or one made by grin-wallet / Grim).
 pub fn wallet_exists(dir: &Path) -> bool {
     dir.join("wallet_data").join("wallet.seed").exists()
@@ -477,7 +482,9 @@ impl Wallet {
             apis.stop();
             let _ = handle.join();
         }
-        *self.bundled_tor.lock().unwrap() = None; // drop kills the tor child
+        if let Some(t) = self.bundled_tor.lock().unwrap().take() {
+            t.stop(); // explicit: a background check may still hold a reference
+        }
         true
     }
 
@@ -810,6 +817,38 @@ impl Wallet {
 
     /// Apply new bridge lines (empty = direct) by restarting the bundled tor. The onion address
     /// stays the same; it needs ~2 minutes to be findable again.
+    /// Stop tor and forget its saved state (entry relays, cached consensus); the onion keys are kept.
+    pub fn wipe_tor_state(&self) -> Result<()> {
+        // The slot stays locked while the folder is removed: send, ping and the reachability check call
+        // `bundled()`, which would otherwise start a new tor on the same folder at once.
+        let mut slot = self.bundled_tor.lock().unwrap();
+        if let Some(t) = slot.take() {
+            t.stop(); // explicit: a background check may still hold a reference
+        }
+        tor::wipe_state(&self.settings.dir.join("tor").join("bundled"))
+    }
+
+    /// Wipe tor's saved state and start it again (with the onion service when this wallet listens).
+    pub fn reset_tor(&self) -> Result<()> {
+        let TorMode::Bundled(bundle) = &self.settings.tor else {
+            bail!("the integrated Arti engine has no saved state to reset");
+        };
+        let bridges = self.bridges.lock().unwrap().clone();
+        let hs = if self.listening() {
+            Some((self.write_onion_keys()?, self.settings.listen_port))
+        } else {
+            None
+        };
+        let dir = self.settings.dir.join("tor").join("bundled");
+        let mut slot = self.bundled_tor.lock().unwrap();
+        if let Some(t) = slot.take() {
+            t.stop();
+        }
+        tor::wipe_state(&dir)?;
+        *slot = Some(Arc::new(BundledTor::start(TorLaunch { bundle, data_dir: &dir, hidden_service: hs, bridges: &bridges })?));
+        Ok(())
+    }
+
     pub fn restart_tor(&self, bridges: Vec<String>) -> Result<()> {
         *self.bridges.lock().unwrap() = bridges;
         let TorMode::Bundled(bundle) = &self.settings.tor else {

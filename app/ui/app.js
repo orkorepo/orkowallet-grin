@@ -1258,6 +1258,12 @@ function selectSettingsTab(name) {
 }
 document.querySelectorAll('.snav [data-stab]').forEach((b) => b.addEventListener('click', () => selectSettingsTab(b.dataset.stab)));
 
+// ---- repair: forget tor's saved state and restart
+$('set-repair').addEventListener('click', (e) => busy(e.currentTarget, async () => {
+  try { toast(t('Uygulama yeniden başlatılıyor…')); await invoke('repair_restart'); }
+  catch (x) { toast(E(x)); }
+}));
+
 $('set-retry').addEventListener('change', () => { $('set-retry-min').disabled = !$('set-retry').checked; });
 
 // ---- backup, export, support

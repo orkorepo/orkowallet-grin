@@ -1948,6 +1948,26 @@
   "en": "The wallet files are still in use; try again in a few seconds."
  },
  {
+  "tr": "Onarım",
+  "en": "Repair"
+ },
+ {
+  "tr": "Bağlantıyı onar",
+  "en": "Repair the connection"
+ },
+ {
+  "tr": "Tor bağlantısı kurulamıyorsa ya da adresin çevrimiçi görünmüyorsa bunu dene: Tor'un kayıtlı durumu (seçtiği giriş röleleri ve önbellek) silinir ve uygulama yeniden başlar. Cüzdanların, kurtarma ifaden ve bakiyen etkilenmez.",
+  "en": "If Tor cannot connect or your address does not show as online, try this: Tor's saved state (the entry relays it picked and its cache) is deleted and the app restarts. Your wallets, recovery phrase and balance are not affected."
+ },
+ {
+  "tr": "Bağlantıyı yeniden kur ve yeniden başlat",
+  "en": "Reset the connection and restart"
+ },
+ {
+  "tr": "Uygulama yeniden başlatılıyor…",
+  "en": "Restarting the app…"
+ },
+ {
   "tr": "Gönderilebilir bakiye yok.",
   "en": "There is no balance to send."
  }

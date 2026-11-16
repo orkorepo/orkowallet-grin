@@ -486,5 +486,10 @@
  "Açık cüzdan silinemez. Önce çıkış yap.": "无法删除已打开的钱包。请先退出登录。",
  "Cüzdan bulunamadı.": "未找到钱包。",
  "Silinemedi: {e}": "无法删除：{e}",
- "Cüzdan dosyaları hâlâ kullanımda; birkaç saniye sonra tekrar dene.": "钱包文件仍在使用中；请几秒后重试。"
+ "Cüzdan dosyaları hâlâ kullanımda; birkaç saniye sonra tekrar dene.": "钱包文件仍在使用中；请几秒后重试。",
+ "Onarım": "修复",
+ "Bağlantıyı onar": "修复连接",
+ "Tor bağlantısı kurulamıyorsa ya da adresin çevrimiçi görünmüyorsa bunu dene: Tor'un kayıtlı durumu (seçtiği giriş röleleri ve önbellek) silinir ve uygulama yeniden başlar. Cüzdanların, kurtarma ifaden ve bakiyen etkilenmez.": "如果 Tor 无法连接，或您的地址没有显示为在线，请尝试此操作：将删除 Tor 保存的状态（已选择的入口中继和缓存），应用会重新启动。您的钱包、助记词和余额不受影响。",
+ "Bağlantıyı yeniden kur ve yeniden başlat": "重建连接并重新启动",
+ "Uygulama yeniden başlatılıyor…": "正在重新启动应用…"
 }

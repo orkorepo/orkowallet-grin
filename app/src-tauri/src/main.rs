@@ -499,6 +499,36 @@ fn switch_network(app: tauri::AppHandle, state: St<'_>, network: String) -> Resu
     Ok(())
 }
 
+/// "Repair": forget tor's saved state of every wallet (chosen entry relays, cached consensus) and restart
+/// the app. Wallets, recovery phrases and balances are not touched. Users whose tor would not connect
+/// report that a fresh start of the connection fixes it.
+#[tauri::command]
+async fn repair_restart(app: tauri::AppHandle, state: St<'_>) -> Result<(), String> {
+    let open_w = state.open.read().unwrap().as_ref().map(|o| o.wallet.clone());
+    let wallets_root = state.root.join("wallets");
+    blocking(move || {
+        if let Some(w) = &open_w {
+            w.shutdown();
+            if let Err(e) = w.wipe_tor_state() {
+                orko_grin_core::tor::glog(log::Level::Warn, &format!("repair: open wallet: {e}"));
+            }
+        }
+        // Every wallet of every network; the open one is already done and its folder is skipped below
+        // only by failing quietly, as tor is no longer running there.
+        for net in std::fs::read_dir(&wallets_root).into_iter().flatten().flatten() {
+            for w in std::fs::read_dir(net.path()).into_iter().flatten().flatten() {
+                if let Err(e) = orko_grin_core::wipe_tor_state_in(&w.path()) {
+                    orko_grin_core::tor::glog(log::Level::Warn, &format!("repair: {e}"));
+                }
+            }
+        }
+        Ok(())
+    })
+    .await?;
+    graceful_restart(&app);
+    Ok(())
+}
+
 // ------------------------------------------------------------------ wallets
 
 async fn open_with(
@@ -1289,6 +1319,10 @@ fn reach_watcher(state: Arc<AppState>, ow: Arc<OpenWallet>) {
     use std::sync::atomic::Ordering::Relaxed;
     std::thread::spawn(move || {
         let mut fails = 0u32;
+        // Tor is up but the onion address never answers: after a few minutes start tor again from a clean
+        // state (new entry relays), once per session. The hint on the Tor card covers what is left.
+        let mut stuck_since: Option<Instant> = None;
+        let mut healed = false;
         loop {
             let open_still = state.open.read().unwrap().as_ref().map(|o| Arc::ptr_eq(&o.wallet, &ow.wallet)).unwrap_or(false);
             if !open_still {
@@ -1298,12 +1332,23 @@ fn reach_watcher(state: Arc<AppState>, ow: Arc<OpenWallet>) {
             let pause = if matches!(ow.wallet.tor_status(), Some(TorStatus::Ready)) {
                 if ow.wallet.self_check(25).is_ok() {
                     fails = 0;
+                    stuck_since = None;
                     state.reachable.store(true, Relaxed);
                     90
                 } else {
                     fails += 1;
                     if fails >= 2 {
                         state.reachable.store(false, Relaxed);
+                    }
+                    let since = *stuck_since.get_or_insert_with(Instant::now);
+                    if !healed && since.elapsed() > Duration::from_secs(240) {
+                        healed = true;
+                        stuck_since = None;
+                        orko_grin_core::tor::glog(log::Level::Warn, "tor: address unreachable for 4 min, restarting tor from a clean state");
+                        *state.tor_ready_at.lock().unwrap() = None;
+                        if let Err(e) = ow.wallet.reset_tor() {
+                            orko_grin_core::tor::glog(log::Level::Warn, &format!("tor: clean restart failed: {e}"));
+                        }
                     }
                     8
                 }
@@ -2022,6 +2067,7 @@ fn main() {
             wallet_update,
             wallet_delete,
             wallet_remove,
+            repair_restart,
             saved_slatepack,
             change_password,
             show_phrase,

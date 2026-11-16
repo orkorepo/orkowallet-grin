@@ -489,4 +489,9 @@ const LANG_RU = {
   "Cüzdan bulunamadı.": "Кошелёк не найден.",
   "Silinemedi: {e}": "Не удалось удалить: {e}",
   "Cüzdan dosyaları hâlâ kullanımda; birkaç saniye sonra tekrar dene.": "Файлы кошелька ещё используются; повторите попытку через несколько секунд.",
+  "Onarım": "Восстановление",
+  "Bağlantıyı onar": "Восстановить соединение",
+  "Tor bağlantısı kurulamıyorsa ya da adresin çevrimiçi görünmüyorsa bunu dene: Tor'un kayıtlı durumu (seçtiği giriş röleleri ve önbellek) silinir ve uygulama yeniden başlar. Cüzdanların, kurtarma ifaden ve bakiyen etkilenmez.": "Если Tor не подключается или ваш адрес не отображается как онлайн, попробуйте это: сохранённое состояние Tor (выбранные входные ретрансляторы и кэш) будет удалено, и приложение перезапустится. Ваши кошельки, фраза восстановления и баланс не затрагиваются.",
+  "Bağlantıyı yeniden kur ve yeniden başlat": "Пересоздать соединение и перезапустить",
+  "Uygulama yeniden başlatılıyor…": "Перезапуск приложения…",
 };
