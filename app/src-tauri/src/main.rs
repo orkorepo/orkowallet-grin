@@ -874,6 +874,57 @@ fn set_protected(window: tauri::WebviewWindow, on: bool) {
 
 /// Delete the open wallet after checking its password. Returns true if the app had to restart
 /// (only when the wallet cannot be closed inside the process; the folder is then removed on start).
+/// Remove a wallet that is NOT open, straight from the wallet list. No password is asked (it may be
+/// forgotten); the screen asks the user to type the wallet name instead. The money is only recoverable
+/// with the recovery phrase afterwards.
+#[tauri::command]
+async fn wallet_remove(state: St<'_>, id: String) -> Result<(), String> {
+    if state.open.read().unwrap().as_ref().is_some_and(|o| o.meta.id == id) {
+        return Err("Açık cüzdan silinemez. Önce çıkış yap.".into());
+    }
+    let dir = state.wallet_dir(&id)?;
+    if !dir.exists() {
+        return Err("Cüzdan bulunamadı.".into());
+    }
+    {
+        let mut s = state.settings.lock().unwrap();
+        let net = s.network.clone();
+        if s.last_wallet.get(&net) == Some(&id) {
+            s.last_wallet.remove(&net);
+        }
+    }
+    // A wallet that was just closed can hold its database files for a few seconds (Tor and background
+    // threads are still winding down). The seed goes first: without it the wallet is gone for good and
+    // no longer listed. The rest is removed right away when possible, otherwise on the next start.
+    let d = dir.clone();
+    let all_gone = blocking(move || {
+        let seed = d.join("wallet_data").join("wallet.seed");
+        for _ in 0..25 {
+            let _ = std::fs::remove_file(&seed);
+            if !seed.exists() {
+                break;
+            }
+            std::thread::sleep(Duration::from_millis(200));
+        }
+        if seed.exists() {
+            anyhow::bail!("Cüzdan dosyaları hâlâ kullanımda; birkaç saniye sonra tekrar dene.");
+        }
+        for _ in 0..15 {
+            if std::fs::remove_dir_all(&d).is_ok() || !d.exists() {
+                return Ok(true);
+            }
+            std::thread::sleep(Duration::from_millis(200));
+        }
+        Ok(false)
+    })
+    .await?;
+    if !all_gone {
+        state.settings.lock().unwrap().pending_delete.push(dir.to_string_lossy().into_owned());
+    }
+    state.save_settings()?;
+    Ok(())
+}
+
 #[tauri::command]
 async fn wallet_delete(app: tauri::AppHandle, state: St<'_>, password: String) -> Result<bool, String> {
     state.throttle()?;
@@ -1091,8 +1142,45 @@ async fn repost(state: St<'_>, slate_id: String) -> Result<(), String> {
     blocking(move || w.repost(&slate_id)).await
 }
 
+/// Slatepack texts of unfinished transactions are kept next to the wallet so a closed dialog is not the
+/// end of the exchange: the transaction can be opened again from the list. They hold no secrets (a
+/// slatepack is meant to be handed to the other side), and are removed when the transaction is cancelled.
+fn slatepack_file(state: &AppState, wallet_id: &str, slate_id: &str) -> Option<PathBuf> {
+    if slate_id.is_empty() || !slate_id.chars().all(|c| c.is_ascii_alphanumeric() || c == '-') {
+        return None;
+    }
+    Some(state.wallet_dir(wallet_id).ok()?.join("slatepacks").join(format!("{slate_id}.txt")))
+}
+fn save_slatepack(state: &AppState, wallet_id: &str, slate_id: &str, text: &str) {
+    if let Some(p) = slatepack_file(state, wallet_id, slate_id) {
+        if let Some(dir) = p.parent() {
+            let _ = std::fs::create_dir_all(dir);
+        }
+        let _ = std::fs::write(p, text);
+    }
+}
+
+#[derive(Serialize)]
+struct SavedSlatepack {
+    message: String,
+    qr: String,
+}
+
+/// The Slatepack text saved for an unfinished transaction, if there is one.
+#[tauri::command]
+fn saved_slatepack(state: St<'_>, slate_id: String) -> Result<Option<SavedSlatepack>, String> {
+    let o = state.open()?;
+    let Some(p) = slatepack_file(&state, &o.meta.id, &slate_id) else { return Ok(None) };
+    Ok(std::fs::read_to_string(p).ok().filter(|m| !m.trim().is_empty()).map(|m| SavedSlatepack { qr: qr_svg(&m), message: m }))
+}
+
 #[tauri::command]
 async fn cancel_tx(state: St<'_>, slate_id: String) -> Result<(), String> {
+    if let Ok(o) = state.open() {
+        if let Some(p) = slatepack_file(&state, &o.meta.id, &slate_id) {
+            let _ = std::fs::remove_file(p);
+        }
+    }
     set_job(&state, &slate_id, |j| {
         if j.state == "retrying" {
             j.state = "cancelled".into();
@@ -1324,14 +1412,17 @@ async fn send(state: St<'_>, amount: String, address: String, password: Option<S
                 tor_error: String::new(),
                 retry_minutes: 0,
             },
-            SendOutcome::Slatepack { tx_slate_id, message, tor_error } => SendDto {
+            SendOutcome::Slatepack { tx_slate_id, message, tor_error } => {
+                save_slatepack(&st, &o.meta.id, &tx_slate_id, &message);
+                SendDto {
                 kind: "slatepack".into(),
                 slate_id: tx_slate_id,
                 qr: qr_svg(&message),
                 message,
                 tor_error: tor_error.unwrap_or_default(),
                 retry_minutes: 0,
-            },
+                }
+            }
             SendOutcome::Unreached { tx_slate_id, error, pending } => {
                 if cfg.retry {
                     spawn_send_job(st, o.clone(), tx_slate_id.clone(), pending, cfg.retry_minutes);
@@ -1434,8 +1525,12 @@ struct ProcessDto {
 /// the sender gave an address the reply is also pushed to them over Tor in the background.
 #[tauri::command]
 async fn process_slatepack(state: St<'_>, text: String) -> Result<ProcessDto, String> {
-    let w = state.wallet()?;
+    let o = state.open()?;
+    let w = o.wallet.clone();
+    let wid = o.meta.id.clone();
+    let st = state.inner().clone();
     blocking(move || {
+        let sid = w.slatepack_id(&text).ok();
         let (outcome, pending) = w.process_slatepack(&text)?;
         let auto_return = pending.is_some();
         if let Some(p) = pending {
@@ -1450,6 +1545,9 @@ async fn process_slatepack(state: St<'_>, text: String) -> Result<ProcessDto, St
         Ok(match outcome {
             ProcessOutcome::Received(ReceiveOutcome::ReturnedOverTor) => none("returned"),
             ProcessOutcome::Received(ReceiveOutcome::Slatepack(m)) => {
+                if let Some(id) = &sid {
+                    save_slatepack(&st, &wid, id, &m);
+                }
                 ProcessDto { kind: "reply".into(), qr: qr_svg(&m), message: m, auto_return }
             }
             ProcessOutcome::Finalized { .. } => none("finalized"),
@@ -1923,6 +2021,8 @@ fn main() {
             win_close,
             wallet_update,
             wallet_delete,
+            wallet_remove,
+            saved_slatepack,
             change_password,
             show_phrase,
             accounts,

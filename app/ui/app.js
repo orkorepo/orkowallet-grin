@@ -129,10 +129,34 @@ function renderWallets() {
     if (w.id === s.last_wallet && s.wallets.length > 1) li.append(el('span', 'chip', t('Son kullanılan')));
     const b = el('button', 'btn btn-primary', t('Aç')); b.type = 'button';
     b.addEventListener('click', () => askUnlock(w));
-    li.append(b); ul.append(li);
+    const rm = el('button', 'btn danger-text', t('Sil')); rm.type = 'button'; rm.title = t('Cüzdanı sil');
+    rm.addEventListener('click', () => askRemove(w));
+    li.append(rm, b); ul.append(li);
   });
   show('wallets');
 }
+// Delete a wallet from the list without opening it (needed when the password is forgotten): the user
+// confirms by ticking the box and typing the wallet's name.
+function askRemove(w) {
+  state.removeW = w;
+  $('wr-text').textContent = t('{name} bu bilgisayardan silinecek. Kurtarma ifaden yanında değilse içindeki para kaybolur. Bu işlem geri alınamaz.', { name: `“${w.name}”` });
+  $('wr-ok').checked = false; $('wr-submit').disabled = true; $('wr-name').value = ''; err('wr-error');
+  $('dlg-wremove').showModal();
+}
+$('wr-ok').addEventListener('change', (e) => { $('wr-submit').disabled = !e.target.checked; });
+$('wr-form').addEventListener('submit', async (e) => {
+  e.preventDefault(); err('wr-error');
+  const w = state.removeW; if (!w) return;
+  if ($('wr-name').value.trim() !== w.name.trim()) return err('wr-error', t('Cüzdanın adı tutmuyor.'));
+  await busy($('wr-submit'), async () => {
+    try {
+      await invoke('wallet_remove', { id: w.id });
+      state.removeW = null; $('dlg-wremove').close();
+      state.status = await invoke('status'); renderWallets(); toast(t('Cüzdan silindi'));
+    } catch (x) { err('wr-error', E(x)); }
+  });
+});
+
 function askUnlock(w) {
   state.unlockId = w.id;
   $('ul-title').textContent = t('“{name}” cüzdanını aç', { name: w.name });
@@ -525,7 +549,42 @@ $('tx-list').addEventListener('click', (e) => {
   $('tx-repost').hidden = !(x.finalized && !x.confirmed && !x.cancelled && x.has_stored_tx);
   $('tx-cancel').hidden = x.confirmed || x.cancelled || !x.slate_id;
   err('tx-error');
+  showTxSlatepack(x);
   $('dlg-tx').showModal();
+});
+
+// An unfinished Slatepack exchange can be continued from the transaction: the text to hand over is shown
+// again, and for our own payment there is a box for the recipient's reply.
+async function showTxSlatepack(x) {
+  const open = txOpen;
+  ['tx-sp', 'tx-sp-saved', 'tx-sp-reply'].forEach((id) => { $(id).hidden = true; });
+  $('tx-sp-in').value = ''; err('tx-sp-error'); $('tx-sp-qr').hidden = true;
+  if (x.confirmed || x.cancelled || !x.slate_id) return;
+  const awaitingReply = !x.incoming && !x.finalized;   // our payment, the recipient has not answered yet
+  const awaitingSender = x.incoming && !x.finalized;   // we signed, the sender still has to finish it
+  if (!awaitingReply && !awaitingSender) return;
+  let saved = null;
+  try { saved = await invoke('saved_slatepack', { slateId: x.slate_id }); } catch { /* optional */ }
+  if (txOpen !== open) return;
+  if (saved) {
+    $('tx-sp-out').value = saved.message; $('tx-sp-qr').innerHTML = saved.qr;
+    $('tx-sp-saved-l').textContent = t(awaitingReply ? 'Alıcıya ilettiğin Slatepack metni' : 'Gönderene vereceğin yanıt');
+    $('tx-sp-saved').hidden = false;
+  }
+  $('tx-sp-reply').hidden = !awaitingReply;
+  $('tx-sp').hidden = !(saved || awaitingReply);
+}
+$('tx-sp-finalize').addEventListener('click', async () => {
+  err('tx-sp-error');
+  const text = $('tx-sp-in').value.trim();
+  if (!text) return err('tx-sp-error', t('Alıcının yanıtını yapıştır.'));
+  await busy($('tx-sp-finalize'), async () => {
+    try {
+      const r = await invoke('process_slatepack', { text });
+      if (r.kind !== 'finalized') return err('tx-sp-error', t('Bu metin bu gönderimin yanıtı değil.'));
+      $('dlg-tx').close(); toast(t('İşlem tamamlandı ve zincire iletildi.')); refresh();
+    } catch (x) { err('tx-sp-error', E(x)); }
+  });
 });
 $('tx-proof-btn').addEventListener('click', async (e) => {
   await busy(e.currentTarget, async () => {

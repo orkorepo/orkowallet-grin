@@ -434,6 +434,7 @@
           <div class="row"><button class="btn" type="button" data-copy="sp-out">Kopyala</button><button class="btn" type="button" data-qr-toggle="sp-qr">QR</button></div>
           <div class="qr" id="sp-qr" hidden></div>
         </div>
+        <p class="hint">Bu pencereyi kapatırsan İşlemler listesinde bu işleme tıklayarak kaldığın yerden devam edebilirsin.</p>
         <p><strong>2.</strong> <span>Alıcının sana geri verdiği yanıtı yapıştır (alıcı Tor kullanıyorsa bu adım kendiliğinden tamamlanır):</span></p>
         <textarea id="sp-reply" class="mono" rows="4" spellcheck="false" placeholder="BEGINSLATEPACK. …"></textarea>
         <p class="error" id="sp-error" role="alert"></p>
@@ -472,6 +473,7 @@
         <div class="result ok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <div><strong>İmzalandı.</strong> <span>Ödemenin tamamlanması için bu yanıtı gönderene geri ver.</span></div></div>
         <p class="callout" id="pp-reply-hint"></p>
+        <p class="hint">Bu pencereyi kapatırsan İşlemler listesinde bu işleme tıklayarak kaldığın yerden devam edebilirsin.</p>
         <div class="sp-box">
           <textarea id="pp-out" class="mono" rows="5" readonly></textarea>
           <div class="row"><button class="btn" type="button" data-copy="pp-out">Kopyala</button><button class="btn" type="button" data-qr-toggle="pp-qr">QR</button></div>
@@ -492,6 +494,23 @@
       <div class="sp-box" id="tx-proof-box" hidden>
         <textarea id="tx-proof" class="mono" rows="6" readonly></textarea>
         <div class="row"><button class="btn" type="button" data-copy="tx-proof">Kanıtı kopyala</button></div>
+      </div>
+      <div id="tx-sp" hidden>
+        <p class="callout" id="tx-sp-why">Bu işlem Slatepack ile tamamlanıyor</p>
+        <div id="tx-sp-saved" hidden>
+          <p><strong id="tx-sp-saved-l"></strong></p>
+          <div class="sp-box">
+            <textarea id="tx-sp-out" class="mono" rows="4" readonly></textarea>
+            <div class="row"><button class="btn" type="button" data-copy="tx-sp-out">Kopyala</button><button class="btn" type="button" data-qr-toggle="tx-sp-qr">QR</button></div>
+            <div class="qr" id="tx-sp-qr" hidden></div>
+          </div>
+        </div>
+        <div id="tx-sp-reply" hidden>
+          <p><strong>Alıcının geri verdiği yanıtı buraya yapıştır:</strong></p>
+          <textarea id="tx-sp-in" class="mono" rows="4" spellcheck="false" placeholder="BEGINSLATEPACK. …"></textarea>
+          <p class="error" id="tx-sp-error" role="alert"></p>
+          <div class="row"><button class="btn btn-primary" type="button" id="tx-sp-finalize">Tamamla ve gönder</button></div>
+        </div>
       </div>
       <p class="error" id="tx-error" role="alert"></p>
       <div class="row">
@@ -523,6 +542,17 @@
         <button class="btn btn-primary" type="submit" id="ph-submit">Göster</button>
       </div>
       <ol class="words" id="ph-words" hidden></ol>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-wremove" aria-labelledby="wr-title">
+    <form class="dlg" id="wr-form" novalidate>
+      <div class="dlg-head"><h2 id="wr-title">Cüzdanı sil</h2><button class="icon-btn" type="button" data-close aria-label="Kapat">✕</button></div>
+      <p class="callout warn" id="wr-text"></p>
+      <label class="check"><input type="checkbox" id="wr-ok"> Kurtarma ifadem yanımda / bu cüzdandaki parayı kaybetmeyi kabul ediyorum.</label>
+      <label class="field"><span id="wr-name-l">Silmek için cüzdanın adını yaz:</span> <input id="wr-name" autocomplete="off" spellcheck="false"></label>
+      <p class="error" id="wr-error" role="alert"></p>
+      <button class="btn danger-fill" type="submit" id="wr-submit" disabled>Kalıcı olarak sil</button>
     </form>
   </dialog>
 

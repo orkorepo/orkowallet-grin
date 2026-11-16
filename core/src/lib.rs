@@ -662,6 +662,11 @@ impl Wallet {
         Ok(())
     }
 
+    /// The transaction id a Slatepack text belongs to (an initial slate and its reply share it).
+    pub fn slatepack_id(&self, text: &str) -> Result<String> {
+        Ok(self.read_slatepack(text)?.0.id.to_string())
+    }
+
     fn read_slatepack(&self, text: &str) -> Result<(Slate, Option<SlatepackAddress>)> {
         let slate = self
             .owner

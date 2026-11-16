@@ -474,5 +474,17 @@
  "Bağış yap": "捐赠",
  "Bağış yalnızca Mainnet üzerinde gönderilebilir.": "捐赠只能在主网上发送。",
  "Bağış göndermek için önce bir cüzdan aç.": "请先打开一个钱包再捐赠。",
- "Adres uzun süredir ulaşılamıyor. Bilgisayarın saatini eşitle; olmazsa aşağıdan Snowflake köprüsünü seç ve “Uygula”ya bas.": "该地址已经有一段时间无法访问。请同步电脑时钟；如果没有改善，请在下方选择 Snowflake 网桥并点击“应用”。"
+ "Adres uzun süredir ulaşılamıyor. Bilgisayarın saatini eşitle; olmazsa aşağıdan Snowflake köprüsünü seç ve “Uygula”ya bas.": "该地址已经有一段时间无法访问。请同步电脑时钟；如果没有改善，请在下方选择 Snowflake 网桥并点击“应用”。",
+ "Bu işlem Slatepack ile tamamlanıyor": "此交易正通过 Slatepack 完成",
+ "Alıcıya ilettiğin Slatepack metni": "您交给收款方的 Slatepack 文本",
+ "Gönderene vereceğin yanıt": "您需要交还给发送方的回复",
+ "Alıcının geri verdiği yanıtı buraya yapıştır:": "请在此粘贴收款方交还的回复：",
+ "İşlem tamamlandı ve zincire iletildi.": "交易已完成并发送到区块链。",
+ "Bu pencereyi kapatırsan İşlemler listesinde bu işleme tıklayarak kaldığın yerden devam edebilirsin.": "关闭此窗口后，您可以在交易列表中点击这笔交易继续操作。",
+ "Silmek için cüzdanın adını yaz:": "要删除，请输入钱包名称：",
+ "Cüzdanın adı tutmuyor.": "钱包名称不匹配。",
+ "Açık cüzdan silinemez. Önce çıkış yap.": "无法删除已打开的钱包。请先退出登录。",
+ "Cüzdan bulunamadı.": "未找到钱包。",
+ "Silinemedi: {e}": "无法删除：{e}",
+ "Cüzdan dosyaları hâlâ kullanımda; birkaç saniye sonra tekrar dene.": "钱包文件仍在使用中；请几秒后重试。"
 }

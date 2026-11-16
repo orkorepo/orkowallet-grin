@@ -1900,6 +1900,54 @@
   "en": "The address has been unreachable for a while. Sync your computer clock; if that does not help, pick the Snowflake bridge below and press “Apply”."
  },
  {
+  "tr": "Bu işlem Slatepack ile tamamlanıyor",
+  "en": "This transaction is being completed with Slatepack"
+ },
+ {
+  "tr": "Alıcıya ilettiğin Slatepack metni",
+  "en": "The Slatepack text you gave the recipient"
+ },
+ {
+  "tr": "Gönderene vereceğin yanıt",
+  "en": "The reply you give back to the sender"
+ },
+ {
+  "tr": "Alıcının geri verdiği yanıtı buraya yapıştır:",
+  "en": "Paste the reply the recipient gave back here:"
+ },
+ {
+  "tr": "İşlem tamamlandı ve zincire iletildi.",
+  "en": "The transaction is complete and was sent to the chain."
+ },
+ {
+  "tr": "Bu pencereyi kapatırsan İşlemler listesinde bu işleme tıklayarak kaldığın yerden devam edebilirsin.",
+  "en": "If you close this window you can continue from the Transactions list by clicking this transaction."
+ },
+ {
+  "tr": "Silmek için cüzdanın adını yaz:",
+  "en": "To delete, type the wallet name:"
+ },
+ {
+  "tr": "Cüzdanın adı tutmuyor.",
+  "en": "The wallet name does not match."
+ },
+ {
+  "tr": "Açık cüzdan silinemez. Önce çıkış yap.",
+  "en": "An open wallet cannot be deleted. Log out first."
+ },
+ {
+  "tr": "Cüzdan bulunamadı.",
+  "en": "Wallet not found."
+ },
+ {
+  "tr": "Silinemedi: {e}",
+  "en": "Could not delete: {e}"
+ },
+ {
+  "tr": "Cüzdan dosyaları hâlâ kullanımda; birkaç saniye sonra tekrar dene.",
+  "en": "The wallet files are still in use; try again in a few seconds."
+ },
+ {
   "tr": "Gönderilebilir bakiye yok.",
   "en": "There is no balance to send."
  }

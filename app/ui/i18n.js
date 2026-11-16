@@ -522,6 +522,18 @@ const EN = {
   "Bağış yalnızca Mainnet üzerinde gönderilebilir.": "Donations can only be sent on Mainnet.",
   "Bağış göndermek için önce bir cüzdan aç.": "Open a wallet first to send a donation.",
   "Adres uzun süredir ulaşılamıyor. Bilgisayarın saatini eşitle; olmazsa aşağıdan Snowflake köprüsünü seç ve “Uygula”ya bas.": "The address has been unreachable for a while. Sync your computer clock; if that does not help, pick the Snowflake bridge below and press “Apply”.",
+  "Bu işlem Slatepack ile tamamlanıyor": "This transaction is being completed with Slatepack",
+  "Alıcıya ilettiğin Slatepack metni": "The Slatepack text you gave the recipient",
+  "Gönderene vereceğin yanıt": "The reply you give back to the sender",
+  "Alıcının geri verdiği yanıtı buraya yapıştır:": "Paste the reply the recipient gave back here:",
+  "İşlem tamamlandı ve zincire iletildi.": "The transaction is complete and was sent to the chain.",
+  "Bu pencereyi kapatırsan İşlemler listesinde bu işleme tıklayarak kaldığın yerden devam edebilirsin.": "If you close this window you can continue from the Transactions list by clicking this transaction.",
+  "Silmek için cüzdanın adını yaz:": "To delete, type the wallet name:",
+  "Cüzdanın adı tutmuyor.": "The wallet name does not match.",
+  "Açık cüzdan silinemez. Önce çıkış yap.": "An open wallet cannot be deleted. Log out first.",
+  "Cüzdan bulunamadı.": "Wallet not found.",
+  "Silinemedi: {e}": "Could not delete: {e}",
+  "Cüzdan dosyaları hâlâ kullanımda; birkaç saniye sonra tekrar dene.": "The wallet files are still in use; try again in a few seconds.",
   'Gönderilebilir bakiye yok.': 'There is no balance to send.',
 };
 
