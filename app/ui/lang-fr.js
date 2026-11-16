@@ -316,7 +316,7 @@ const LANG_FR = {
   "1 dakika": "1 minute",
   "1 saat": "1 heure",
   "Hakkında": "À propos",
-  "OrkoWallet – Grin 0.1.1 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.1.1 · bibliothèques officielles grin-wallet 5.5.1 et grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
+  "OrkoWallet – Grin 0.1.2 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.1.2 · bibliothèques officielles grin-wallet 5.5.1 et grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
   "Ağ değişince açık cüzdan kapanır ve uygulama yeniden başlar.": "En changeant de réseau, le portefeuille ouvert se ferme et l’application redémarre.",
   "Uygulama seçtiğin ağ ile yeniden başlayacak.": "L’application redémarrera sur le réseau choisi.",
   "Node havuzu ({net})": "Pool de nœuds ({net})",

@@ -354,7 +354,7 @@ const EN = {
   '1 dakika': '1 minute',
   '1 saat': '1 hour',
   'Hakkında': 'About',
-  'OrkoWallet – Grin 0.1.1 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap': 'OrkoWallet – Grin 0.1.1 · official grin-wallet 5.5.1 and grin 5.5.2 libraries · Tor 0.4.9.16 · Orkoswap',
+  'OrkoWallet – Grin 0.1.2 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap': 'OrkoWallet – Grin 0.1.2 · official grin-wallet 5.5.1 and grin 5.5.2 libraries · Tor 0.4.9.16 · Orkoswap',
   'Ağ değişince açık cüzdan kapanır ve uygulama yeniden başlar.': 'The open wallet closes and the app restarts when the network changes.',
   'Uygulama seçtiğin ağ ile yeniden başlayacak.': 'The app will restart on the network you picked.',
 

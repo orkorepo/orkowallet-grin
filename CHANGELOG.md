@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.2 – 2026-11-16
 
 - Settings → Repair: reset the Tor connection (forgets Tor's saved state) and restart the app; wallets and balances are not touched
 - Tor restarts from a clean state on its own once if the wallet address stays unreachable for four minutes; a hint appears on the Tor card after about two and a half minutes

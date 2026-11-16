@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <a href="../../releases"><img alt="Version" src="https://img.shields.io/badge/version-0.1.1-2a5fef.svg"></a>
+  <a href="../../releases"><img alt="Version" src="https://img.shields.io/badge/version-0.1.2-2a5fef.svg"></a>
   <a href="LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/license-Apache--2.0-blue.svg"></a>
   <img alt="Platform: Windows" src="https://img.shields.io/badge/platform-Windows-lightgrey.svg">
   <img alt="Languages: 6" src="https://img.shields.io/badge/languages-6-36c9b0.svg">
@@ -44,14 +44,14 @@ It is meant to be easy for people who are not experts: a clear first-run flow, p
 
 ## Features
 
-Items marked *(next release)* are in the main branch but not in the 0.1.1 installer yet.
+Items marked are in the main branch but not in the 0.1.1 installer; they ship with 0.1.2.
 
 **Privacy and networking**
 
 - Tor built in (official Tor 0.4.9, obfs4, Snowflake and webtunnel bridges). Pay a Grin address directly over Tor.
 - If the recipient is offline the wallet retries on its own (default: every minute for 30 minutes), or you can switch to Slatepack.
 - A pool of public nodes with automatic failover and health ordering, or your own built-in node.
-- *(next release)* A repair option that rebuilds the Tor connection when it will not come up, and an automatic clean restart of Tor when your address stays unreachable.
+- A repair option that rebuilds the Tor connection when it will not come up, and an automatic clean restart of Tor when your address stays unreachable.
 
 **Wallet**
 
@@ -59,15 +59,15 @@ Items marked *(next release)* are in the main branch but not in the 0.1.1 instal
 - Create with a 12- or 24-word recovery phrase; restore from 12 to 24 words; import grin-wallet and Grim folders.
 - **Max** button to send the whole spendable balance, and a setting for how many confirmations (1 to 10) a payment needs before you can spend it.
 - Slatepack send and receive.
-- *(next release)* An unfinished Slatepack exchange is kept: open the transaction later to copy the text again, or paste the reply and finish.
+- An unfinished Slatepack exchange is kept: open the transaction later to copy the text again, or paste the reply and finish.
 - Transaction history with paging, CSV export, payment proofs, wallet backup.
-- *(next release)* Delete a wallet from the list, even if you forgot its password.
+- Delete a wallet from the list, even if you forgot its password.
 
 **Security**
 
 - Screen lock with auto-lock, a brute-force throttle on wrong passwords, and a recovery-phrase screen that is hidden from screen capture.
 - Strict content security policy; the interface loads no remote content.
-- *(next release)* One running copy only, so two instances cannot fight over the same wallet.
+- One running copy only, so two instances cannot fight over the same wallet.
 
 **Comfort**
 
@@ -99,7 +99,7 @@ Items marked *(next release)* are in the main branch but not in the 0.1.1 instal
 2. Compare its SHA-256 with the value in the release notes:
 
    ```powershell
-   Get-FileHash .\OrkoWallet.-.Grin_0.1.1_x64-setup.exe -Algorithm SHA256
+   Get-FileHash .\OrkoWallet.-.Grin_0.1.2_x64-setup.exe -Algorithm SHA256
    ```
 
 3. Run it. It installs for the current user and needs no administrator rights.
@@ -125,13 +125,13 @@ The wallet connected to Tor, but your address cannot be reached from outside yet
 2. Make sure the computer clock is correct (Windows *Settings → Time & language → Date & time → Sync now*). A clock that is off by more than a few minutes breaks Tor.
 3. Turn a VPN off or on and compare.
 4. Pick **Snowflake** (or **obfs4**) in the *Tor connection* card and press **Apply**. This avoids relays that are slow or blocked on your network.
-5. *(next release)* Open **Settings → Repair → Reset the connection and restart**. It deletes Tor's saved state (the entry relays it picked and its cache) and restarts the app. Your wallets, recovery phrase and balance are not touched.
+5. Open **Settings → Repair → Reset the connection and restart**. It deletes Tor's saved state (the entry relays it picked and its cache) and restarts the app. Your wallets, recovery phrase and balance are not touched.
 6. Allow `tor.exe` and OrkoWallet through your firewall or antivirus.
 
-*(next release)* The wallet also restarts Tor from a clean state on its own, once, if the address has been unreachable for four minutes. While your address is not online you can still send payments, and you can receive with Slatepack.
+The wallet also restarts Tor from a clean state on its own, once, if the address has been unreachable for four minutes. While your address is not online you can still send payments, and you can receive with Slatepack.
 
 **"Another Tor process is running with the same data directory".**
-Two copies of the app were started. From the next release only one copy can run: opening it a second time brings the first window to the front. With 0.1.1, close every OrkoWallet and `tor.exe` in Task Manager and start again.
+Two copies of the app were started. Since 0.1.2 only one copy can run: opening it a second time brings the first window to the front. With 0.1.1, close every OrkoWallet and `tor.exe` in Task Manager and start again.
 
 **Logs.** *Settings → About → Open the log folder* opens `orkowallet.log`. Please attach the last lines when you report a problem, and remove anything private first.
 

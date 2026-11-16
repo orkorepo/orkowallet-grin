@@ -314,7 +314,7 @@
  "1 dakika": "1 分钟",
  "1 saat": "1 小时",
  "Hakkında": "关于",
- "OrkoWallet – Grin 0.1.1 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.1.1 · 官方库 grin-wallet 5.5.1 和 grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
+ "OrkoWallet – Grin 0.1.2 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.1.2 · 官方库 grin-wallet 5.5.1 和 grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
  "Ağ değişince açık cüzdan kapanır ve uygulama yeniden başlar.": "切换网络时，已打开的钱包会关闭，应用会重启。",
  "Uygulama seçtiğin ağ ile yeniden başlayacak.": "应用将以您所选的网络重新启动。",
  "Node havuzu ({net})": "节点池（{net}）",
