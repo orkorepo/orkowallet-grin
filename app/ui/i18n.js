@@ -550,7 +550,7 @@ const EN = {
   'Bu cüzdan zaten listede.': 'This wallet is already in the list.',
   'Cüzdanın anahtar dosyası yedeklenemedi, silme iptal edildi ({e}).': 'The wallet’s key file could not be backed up, deletion cancelled ({e}).',
   'Bağlantı tanısı': 'Connection diagnosis',
-  'Tor\'un neden bağlanmadığını arar: internet, bilgisayar saati, ağının Tor\'a izin verip vermediği ve günlükteki son hatalar. Hiçbir şeyi değiştirmez ve cüzdan verisi göndermez. Yalnızca düğmeye bastığında birkaç genel adrese (1.1.1.1, microsoft.com, grincoin.org ve Tor dizin sunucuları) Tor üzerinden değil doğrudan bağlanır; bu sunucular IP adresini görebilir.': 'Looks for why Tor will not connect: internet, computer clock, whether your network allows Tor, and recent errors in the log. It changes nothing and sends no wallet data. Only when you press the button it connects to a few public addresses (1.1.1.1, microsoft.com, grincoin.org and the Tor directory servers) directly, not through Tor; those servers can see your IP address.',
+  'Tor\'un neden bağlanmadığını arar: internet, bilgisayar saati, ağının Tor\'a izin verip vermediği ve günlükteki son hatalar. Hiçbir şeyi değiştirmez ve cüzdan verisi göndermez.': 'Looks for why Tor will not connect: internet, computer clock, whether your network allows Tor, and recent errors in the log. It changes nothing and sends no wallet data.',
   'Tanıyı çalıştır': 'Run the diagnosis',
   'Sonucu kopyala': 'Copy the result',
   'İnternet bağlantısı var.': 'There is an internet connection.',

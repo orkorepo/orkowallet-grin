@@ -530,5 +530,5 @@ const LANG_ZH = {
   "Tor bağlı; adresin duyurulması 3-5 dakika sürebilir. Biraz bekle.": "Tor 已连接；公布您的地址可能需要 3 到 5 分钟。请稍等。",
   "Aşağıdaki “Bağlantıyı yeniden kur ve yeniden başlat” düğmesini dene.": "请试试下方的“重建连接并重新启动”按钮。",
   "Tor hâlâ bağlanıyor. Bir iki dakika bekleyip tanıyı tekrar çalıştır.": "Tor 仍在连接。请等一两分钟后重新运行诊断。",
-  "Tor'un neden bağlanmadığını arar: internet, bilgisayar saati, ağının Tor'a izin verip vermediği ve günlükteki son hatalar. Hiçbir şeyi değiştirmez ve cüzdan verisi göndermez. Yalnızca düğmeye bastığında birkaç genel adrese (1.1.1.1, microsoft.com, grincoin.org ve Tor dizin sunucuları) Tor üzerinden değil doğrudan bağlanır; bu sunucular IP adresini görebilir.": "查找 Tor 无法连接的原因：网络、电脑时钟、您的网络是否允许 Tor，以及日志中的最近错误。不会更改任何内容，也不会发送钱包数据。仅在您点击按钮时，才会不经 Tor 直接连接几个公共地址（1.1.1.1、microsoft.com、grincoin.org 以及 Tor 目录服务器）；这些服务器可以看到您的 IP 地址。",
+  "Tor'un neden bağlanmadığını arar: internet, bilgisayar saati, ağının Tor'a izin verip vermediği ve günlükteki son hatalar. Hiçbir şeyi değiştirmez ve cüzdan verisi göndermez.": "查找 Tor 无法连接的原因：网络、电脑时钟、您的网络是否允许 Tor，以及日志中的最近错误。不会更改任何内容，也不会发送钱包数据。",
 };

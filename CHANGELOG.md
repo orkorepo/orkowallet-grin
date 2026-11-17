@@ -3,7 +3,7 @@
 ## 0.1.3 – 2026-11-17
 
 - Deleting a wallet is now recoverable: its encrypted key file is kept for 30 days in a "Recently deleted" list on the wallet screen, from where it can be restored (the balance is scanned again) or removed for good. If the key file cannot be copied first, the deletion is cancelled
-- Settings → Repair → Connection diagnosis: checks the internet connection, the computer clock, whether the network lets Tor through, Tor's own state and known problems in the log, then suggests the next step; the result can be copied for a bug report. It changes nothing and sends no wallet data; when you press the button it connects directly (not through Tor) to a few public addresses (1.1.1.1, microsoft.com, grincoin.org and the Tor directory servers), which can see your IP address
+- Settings → Repair → Connection diagnosis: checks the internet connection, the computer clock, whether the network lets Tor through, Tor's own state and known problems in the log, then suggests the next step; the result can be copied for a bug report. It changes nothing and sends no wallet data
 - New texts translated into all six languages
 
 ## 0.1.2 – 2026-11-16
