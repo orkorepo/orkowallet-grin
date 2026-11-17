@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0 – 2026-11-18
+
+- New black-and-yellow look (Grin colours) is now the default. The blue Orko colours stay available under Settings → General → Colour; light and dark themes work with both. The app icon and the logo inside the app follow the new colours
+- Desktop notifications: a payment arrives or is confirmed, your payment is confirmed, and the Tor address stops answering for a minute (and again when it is back). Switch each on or off in Settings → General; "Send a test notification" shows how they look. Amounts are not shown while the wallet is locked. They work while the window is hidden in the tray
+- System tray: the close button hides the window to the tray and the wallet keeps running, receiving and notifying; right-click the tray icon to open or quit. A one-time notice explains it. Can be switched off in Settings → General (then the close button quits as before)
+- Transaction details: an icon next to the kernel opens it in the Grin Scan block explorer (mainnet, default browser)
+- Smaller window: opens at 1180 × 740 and can be made much smaller (down to 480 × 600). Below about 1140 px wide the interface switches to a compact one-column layout with bottom tabs (Wallet, Tor, Node) and touch-sized controls; the window buttons stay. This is also the basis for a phone version
+- New texts translated into all six languages
+
 ## 0.1.3 – 2026-11-17
 
 - Deleting a wallet is now recoverable: its encrypted key file is kept for 30 days in a "Recently deleted" list on the wallet screen, from where it can be restored (the balance is scanned again) or removed for good. If the key file cannot be copied first, the deletion is cancelled

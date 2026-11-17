@@ -16,6 +16,23 @@ const state = {
 // ------------------------------------------------------------------ helpers
 function show(screen) {
   document.querySelectorAll('[data-screen]').forEach((s) => { s.hidden = s.dataset.screen !== screen; });
+  document.body.dataset.view = screen;
+  // Phone layout: a new screen starts on the wallet tab (the Node tab stays where the user put it).
+  if (document.body.dataset.mtab !== 'node') setMobileTab('wallet');
+  $('app').scrollTop = 0;
+}
+
+// Compact layout (<= 1140px): bottom tabs switch between the wallet, the Tor card and the node panel.
+const PHONE = matchMedia('(max-width: 1140px)'); // compact layout: a small desktop window, a tablet or a phone
+if (/Android|iPhone|iPad/i.test(navigator.userAgent)) document.documentElement.dataset.platform = "mobile"; // no window buttons there
+/** Tell the Rust side which language the interface uses (tray menu and desktop notifications are worded there). */
+function reportLang() { invoke("ui_lang", { lang: I18N.lang }).catch(() => {}); }
+function setMobileTab(tab) {
+  document.body.dataset.mtab = tab;
+  document.querySelectorAll('#mnav [data-mtab]').forEach((b) => {
+    if (b.dataset.mtab === tab) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+  });
+  if (tab === 'node') requestAnimationFrame(() => fitAll());
 }
 
 async function busy(btn, fn) {
@@ -39,6 +56,17 @@ async function copy(text) {
 function applyTheme(theme) {
   const dark = theme === 'dark' || (theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+}
+
+/** Colour set: "grin" (black and yellow, default) or "orko" (blue). The logo images follow it. */
+function applyPalette(p) {
+  const palette = p === 'orko' ? 'orko' : 'grin';
+  document.documentElement.dataset.palette = palette;
+  document.querySelectorAll('img[src^="logo-mark"]').forEach((img) => {
+    img.setAttribute('src', palette === 'grin' ? 'logo-mark-grin.svg' : 'logo-mark.svg');
+  });
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = palette === 'grin' ? '#000000' : '#0a0e15';
 }
 
 const fmtNum = (n) => (n || n === 0 ? Number(n).toLocaleString(I18N.locale) : '–');
@@ -89,9 +117,11 @@ async function boot() {
   state.status = await invoke('status');
   const s = state.status;
   setLanguage(s.settings.language);
+  reportLang();
   collectStatic(document.body);
   translateStatic();
   applyTheme(s.settings.theme);
+  applyPalette(s.settings.palette);
   fillAutoLock();
   document.body.classList.remove('loading');
   const chip = $('net-chip');
@@ -419,7 +449,8 @@ function fillAutoLock() {
 
 // ------------------------------------------------------------------ transactions
 const ICON_IN = '<svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const ICON_X = '<svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+const ICON_EXT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const ICON_X ='<svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
 const ICON_OUT ='<svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 // Payments waiting for an offline recipient (retried every minute), by transaction id.
@@ -460,7 +491,8 @@ function txStatus(x) {
 
 // Transaction list: filter chips + pages (page size is remembered).
 // Rows per page = how many rows fit the card (measured), so it follows the window size.
-const txView = { filter: 'all', page: 0, size: 1 };
+const TX_PHONE_PAGE = 8; // on a phone the page scrolls, so the list has a fixed page size
+const txView = { filter: 'all', page: 0, size: PHONE.matches ? TX_PHONE_PAGE : 1 };
 const TX_FILTERS = {
   all: () => true,
   in: (x) => x.incoming && !x.cancelled,
@@ -517,7 +549,7 @@ function renderTxs(list, measured) {
   if (all.length) txInit = true;
   renderPager(rows.length, pages);
   // Measure one row, work out how many fit the card, and draw again once if that differs.
-  if (!measured && slice.length) {
+  if (!measured && slice.length && !PHONE.matches) {
     const rh = ul.firstElementChild.offsetHeight;
     const fit = rh && ul.clientHeight ? Math.max(2, Math.floor(ul.clientHeight / (rh + 1))) : txView.size;
     if (fit !== txView.size) {
@@ -528,7 +560,7 @@ function renderTxs(list, measured) {
   }
 }
 let txResize;
-window.addEventListener('resize', () => { clearTimeout(txResize); txResize = setTimeout(() => { txView.size = 1; txSig = ''; renderTxs(); }, 120); });
+window.addEventListener('resize', () => { clearTimeout(txResize); txResize = setTimeout(() => { txView.size = PHONE.matches ? TX_PHONE_PAGE : 1; txSig = ''; renderTxs(); }, 120); });
 
 function renderPager(total, pages) {
   const pager = $('tx-pager');
@@ -577,6 +609,14 @@ $('tx-list').addEventListener('click', (e) => {
   if (x.ttl_height) add('Geçerlilik (blok)', fmtNum(x.ttl_height));
   add('İşlem kimliği', x.slate_id);
   add('Kernel', x.kernel);
+  if (x.kernel && state.status.network === 'mainnet') { // link to the block explorer, next to the kernel text
+    const dd = kv.lastElementChild;
+    const a = el('button', 'kernel-link'); a.type = 'button';
+    a.title = t('Grin Scan\'de aç'); a.setAttribute('aria-label', t('Grin Scan\'de aç'));
+    a.innerHTML = ICON_EXT;
+    a.addEventListener('click', async () => { try { await invoke('open_kernel', { kernel: x.kernel }); } catch (e) { toast(E(e)); } });
+    dd.append(' ', a);
+  }
   add('Yerel no', x.id);
   $('tx-title').textContent = txTitle(x);
   $('tx-proof-box').hidden = true;
@@ -810,7 +850,10 @@ async function pollTor() {
       li.dataset.s = n < v.stage || (v.stage === 3 && n === 3) ? 'done' : n === v.stage ? 'active' : 'todo';
     });
   }
-}$('tor-pill').addEventListener('click', () => $('tc-addr').scrollIntoView({ behavior: 'smooth', block: 'center' }));
+}$('tor-pill').addEventListener('click', () => {
+  if (PHONE.matches) { setMobileTab('tor'); return; } // phone: the pill opens the Tor tab
+  $('tc-addr').scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
 
 function syncTorForm() {
   const s = state.status.settings;
@@ -1039,6 +1082,7 @@ async function updatePool() {
 }
 /** Frameless window: drag by the top bar, double click to maximize, our own min / max / close. */
 function setupWindow() {
+  document.querySelectorAll('#mnav [data-mtab]').forEach((b) => b.addEventListener('click', () => setMobileTab(b.dataset.mtab)));
   $('win-min').addEventListener('click', () => invoke('win_min'));
   $('win-max').addEventListener('click', () => invoke('win_max'));
   $('win-close').addEventListener('click', () => invoke('win_close'));
@@ -1176,6 +1220,10 @@ function openDialog(name) {
     const s = state.status.settings;
     $('set-lang').value = s.language;
     document.querySelectorAll('input[name="theme"]').forEach((r) => { r.checked = r.value === s.theme; });
+    document.querySelectorAll('input[name="palette"]').forEach((r) => { r.checked = r.value === (s.palette === 'orko' ? 'orko' : 'grin'); });
+    $('set-notify-pay').checked = s.notify_payments !== false;
+    $('set-notify-tor').checked = s.notify_tor !== false;
+    $('set-tray').checked = s.close_to_tray !== false;
     $('set-network').value = s.network;
     $('opt-usernet').hidden = s.network !== 'usernet';
     $('set-net-apply').disabled = true;
@@ -1237,7 +1285,9 @@ $('set-net-apply').addEventListener('click', async () => {
   await invoke('switch_network', { network: $('set-network').value });
 });
 document.querySelectorAll('input[name="theme"]').forEach((r) => r.addEventListener('change', () => applyTheme(r.value)));
-$('dlg-settings').addEventListener('close', () => applyTheme(state.status.settings.theme));
+$('set-notify-test').addEventListener('click', async () => { try { await invoke('notify_test'); } catch (e) { toast(E(e)); } });
+document.querySelectorAll('input[name="palette"]').forEach((r) => r.addEventListener('change', () => applyPalette(r.value)));
+$('dlg-settings').addEventListener('close', () => { applyTheme(state.status.settings.theme); applyPalette(state.status.settings.palette); });
 // Donations go to the project's Grin address; the normal Send dialog opens with it filled in, the amount is up to the user.
 const DONATE_ADDRESS = 'grin1tzlscdyzl0pgns8rw9sl7q9wqptftjez2xsdrszj9se4vmvwj8wqajj4yz';
 $('set-donate-copy').addEventListener('click', () => copy(DONATE_ADDRESS));
@@ -1254,6 +1304,8 @@ $('set-donate').addEventListener('click', () => {
 $('set-save').addEventListener('click', async () => {
   const s = state.status.settings;
   const theme = document.querySelector('input[name="theme"]:checked')?.value || 'system';
+  const palette = document.querySelector('input[name="palette"]:checked')?.value || 'grin';
+  const notifyPayments = $('set-notify-pay').checked, notifyTor = $('set-notify-tor').checked, closeToTray = $('set-tray').checked;
   const language = $('set-lang').value;
   const minutes = Number($('set-autolock').value) || 0;
   try {
@@ -1263,8 +1315,8 @@ $('set-save').addEventListener('click', async () => {
       min_confirmations: Math.min(10, Math.max(1, Number($('set-minconf').value) || 10)),
       retry: $('set-retry').checked, retry_minutes: Math.min(240, Math.max(1, Number($('set-retry-min').value) || 30)),
     };
-    await invoke('save_settings', { theme, language, autoLockMinutes: minutes, node: s.node, send });
-    state.status = await invoke('status'); applyTheme(theme);
+    await invoke('save_settings', { theme, palette, notifyPayments, notifyTor, closeToTray, language, autoLockMinutes: minutes, node: s.node, send });
+    state.status = await invoke('status'); applyTheme(theme); applyPalette(palette);
     if (language !== s.language) applyLanguage(language);
     autoLockMs = minutes * 60000;
     $('dlg-settings').close(); toast(t('Kaydedildi'));
@@ -1274,6 +1326,7 @@ $('set-save').addEventListener('click', async () => {
 /** Switch language without reloading: static text is re-translated, dynamic parts re-rendered. */
 function applyLanguage(pref) {
   setLanguage(pref);
+  reportLang();
   translateStatic();
   fillAutoLock();
   $('set-autolock').value = String(state.status.settings.auto_lock_minutes);

@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/banner.png" alt="OrkoWallet for Grin" width="900">
+</p>
+
 <h1 align="center">OrkoWallet – Grin</h1>
 
 <p align="center">
@@ -6,15 +10,15 @@
 </p>
 
 <p align="center">
-  <a href="../../releases"><img alt="Version" src="https://img.shields.io/badge/version-0.1.3-2a5fef.svg"></a>
+  <a href="../../releases"><img alt="Version" src="https://img.shields.io/badge/version-0.2.0-ffd60a.svg"></a>
   <a href="LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/license-Apache--2.0-blue.svg"></a>
-  <img alt="Platform: Windows" src="https://img.shields.io/badge/platform-Windows-lightgrey.svg">
-  <img alt="Languages: 6" src="https://img.shields.io/badge/languages-6-36c9b0.svg">
+  <img alt="Platform: Windows" src="https://img.shields.io/badge/platform-Windows-black.svg">
+  <img alt="Languages: 6" src="https://img.shields.io/badge/languages-6-ffd60a.svg">
   <a href="../../actions/workflows/build.yml"><img alt="Build" src="../../actions/workflows/build.yml/badge.svg"></a>
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/wallet-dark.png" alt="OrkoWallet – Grin, dark theme" width="880">
+  <img src="docs/screenshots/wallet-dark.png" alt="OrkoWallet – Grin, dark theme" width="900">
 </p>
 
 ---
@@ -61,6 +65,12 @@ It is meant to be easy for people who are not experts: a clear first-run flow, p
 - Transaction history with paging, CSV export, payment proofs, wallet backup.
 - Delete a wallet from the list, even if you forgot its password. The encrypted key file stays for 30 days under "Recently deleted", so a mistake can be undone.
 
+**Stay informed**
+
+- Desktop notifications when a payment arrives or is confirmed, and when your Tor address stops answering (and when it is back). Each one can be switched off in *Settings → General*; amounts are left out while the wallet is locked.
+- The close button hides the window to the system tray instead of quitting, so the wallet keeps receiving and notifying. Right-click the tray icon to quit; this can be switched off.
+- Open a transaction's kernel in the [Grin Scan](https://scan.grin.money) block explorer with one click (mainnet).
+
 **Security**
 
 - Screen lock with auto-lock, a brute-force throttle on wrong passwords, and a recovery-phrase screen that is hidden from screen capture.
@@ -69,7 +79,9 @@ It is meant to be easy for people who are not experts: a clear first-run flow, p
 
 **Comfort**
 
-- Light and dark themes, six languages (Türkçe, English, Deutsch, Français, Русский, 简体中文), and live language switching without a restart.
+- Black-and-yellow Grin look by default, with the Orko blue as a second colour set (*Settings → General → Colour*), each in a light and a dark theme.
+- Six languages (Türkçe, English, Deutsch, Français, Русский, 简体中文), and live language switching without a restart.
+- Opens at a modest size and shrinks to a compact, single-column layout with bottom tabs, so it fits small windows and is ready for phone-sized screens.
 
 ## Screenshots
 
@@ -89,6 +101,18 @@ It is meant to be easy for people who are not experts: a clear first-run flow, p
 | ![Send](docs/screenshots/send.png) | ![Node panel](docs/screenshots/nodes.png) |
 | ![Settings](docs/screenshots/settings.png) | ![Wallets](docs/screenshots/wallets.png) |
 
+### Compact layout
+
+The same wallet in a narrow window or on a phone-sized screen: one column, bottom tabs for Wallet, Tor and Node.
+
+<p>
+  <img src="docs/screenshots/mobile-wallet.png" alt="Compact layout: wallet" width="270">
+  &nbsp;
+  <img src="docs/screenshots/mobile-tor.png" alt="Compact layout: Tor address" width="270">
+</p>
+
+> The screenshots show demo data, not a real wallet.
+
 ## Install
 
 ### Windows installer
@@ -97,7 +121,7 @@ It is meant to be easy for people who are not experts: a clear first-run flow, p
 2. Compare its SHA-256 with the value in the release notes:
 
    ```powershell
-   Get-FileHash .\OrkoWallet.-.Grin_0.1.3_x64-setup.exe -Algorithm SHA256
+   Get-FileHash .\OrkoWallet.-.Grin_0.2.0_x64-setup.exe -Algorithm SHA256
    ```
 
 3. Run it. It installs for the current user and needs no administrator rights.
@@ -163,7 +187,7 @@ Release installers are built by the public workflow in [`.github/workflows/build
 | `core/` | Wallet core: wraps grin-wallet, Tor manager, node pool with failover, integrated node |
 | `app/` | Tauri 2 shell and the user interface (`app/ui`, plain HTML, CSS and JavaScript, no remote content) |
 | `scripts/` | Tor bundle download with checksum and signature verification, translation tooling |
-| `docs/` | Screenshots |
+| `docs/` | Banner, logo and screenshots |
 
 ## Translations
 
@@ -177,7 +201,7 @@ Bug reports, fixes, translations and ideas are welcome. Please read [CONTRIBUTIN
 
 Orkoswap is a community-driven project that puts privacy first. We build the tools we want to use ourselves, we keep them free and open source, and we are not here to chase investors: no pitch decks, no funding rounds, just software that respects the people using it. OrkoWallet is part of that. If it helps you, tell others, report bugs, translate it, or [donate](#donate).
 
-**Planned:** Orkoswap deposits and withdrawals from inside the wallet, and a mobile version.
+**Planned:** Orkoswap deposits and withdrawals from inside the wallet, and an Android version (the interface already has a phone-sized layout).
 
 ## Donate
 

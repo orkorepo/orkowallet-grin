@@ -1,6 +1,7 @@
 // Русский (ru): translation of the OrkoWallet interface. Keys are the Turkish source text.
 'use strict';
 const LANG_RU = {
+  "Tor": "Tor",
   "OrkoWallet – Grin": "OrkoWallet – Grin",
   "Ağ": "Сеть",
   "Ana ağ": "Mainnet",
@@ -315,7 +316,7 @@ const LANG_RU = {
   "1 dakika": "1 минута",
   "1 saat": "1 час",
   "Hakkında": "О программе",
-  "OrkoWallet – Grin 0.1.3 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.1.3 · официальные библиотеки grin-wallet 5.5.1 и grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
+  "OrkoWallet – Grin 0.2.0 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.2.0 · официальные библиотеки grin-wallet 5.5.1 и grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
   "Ağ değişince açık cüzdan kapanır ve uygulama yeniden başlar.": "При смене сети открытый кошелёк закроется, а приложение перезапустится.",
   "Uygulama seçtiğin ağ ile yeniden başlayacak.": "Приложение перезапустится с выбранной сетью.",
   "Node havuzu ({net})": "Пул узлов ({net})",
@@ -531,4 +532,14 @@ const LANG_RU = {
   "Aşağıdaki “Bağlantıyı yeniden kur ve yeniden başlat” düğmesini dene.": "Попробуйте кнопку «Пересоздать соединение и перезапустить» ниже.",
   "Tor hâlâ bağlanıyor. Bir iki dakika bekleyip tanıyı tekrar çalıştır.": "Tor ещё подключается. Подождите минуту-две и запустите диагностику снова.",
   "Tor'un neden bağlanmadığını arar: internet, bilgisayar saati, ağının Tor'a izin verip vermediği ve günlükteki son hatalar. Hiçbir şeyi değiştirmez ve cüzdan verisi göndermez.": "Ищет причину, по которой Tor не подключается: интернет, часы компьютера, разрешает ли сеть Tor и последние ошибки в журнале. Ничего не меняет и не отправляет данные кошелька.",
+  "Renk": "Цвет",
+  "Grin sarısı": "Жёлтый Grin",
+  "Orko mavisi": "Синий Orko",
+  "Grin Scan'de aç": "Открыть в Grin Scan",
+  "Bildirimler": "Уведомления",
+  "Ödeme gelince ya da onaylanınca bildir": "Уведомлять, когда платёж поступил или подтверждён",
+  "Tor bağlantısı kesilince bildir": "Уведомлять, когда пропадает соединение с Tor",
+  "Pencereyi kapatınca sistem tepsisinde çalışmaya devam et": "При закрытии окна продолжать работу в системном трее",
+  "Tepsideyken cüzdan açık kalır, ödeme almaya ve bildirim göndermeye devam eder. Tamamen kapatmak için tepsi simgesine sağ tıkla.": "В трее кошелёк остаётся открытым, продолжает принимать платежи и отправлять уведомления. Чтобы выйти полностью, щёлкните правой кнопкой по значку в трее.",
+  "Bildirimi dene": "Отправить тестовое уведомление",
 };

@@ -1200,6 +1200,46 @@
   "en": "Appearance"
  },
  {
+  "tr": "Renk",
+  "en": "Colour"
+ },
+ {
+  "tr": "Grin sarısı",
+  "en": "Grin yellow"
+ },
+ {
+  "tr": "Orko mavisi",
+  "en": "Orko blue"
+ },
+ {
+  "tr": "Bildirimler",
+  "en": "Notifications"
+ },
+ {
+  "tr": "Ödeme gelince ya da onaylanınca bildir",
+  "en": "Notify me when a payment arrives or is confirmed"
+ },
+ {
+  "tr": "Tor bağlantısı kesilince bildir",
+  "en": "Notify me when the Tor connection drops"
+ },
+ {
+  "tr": "Pencereyi kapatınca sistem tepsisinde çalışmaya devam et",
+  "en": "Keep running in the system tray when the window is closed"
+ },
+ {
+  "tr": "Tepsideyken cüzdan açık kalır, ödeme almaya ve bildirim göndermeye devam eder. Tamamen kapatmak için tepsi simgesine sağ tıkla.",
+  "en": "While in the tray the wallet stays open and keeps receiving payments and sending notifications. To quit completely, right-click the tray icon."
+ },
+ {
+  "tr": "Bildirimi dene",
+  "en": "Send a test notification"
+ },
+ {
+  "tr": "Grin Scan'de aç",
+  "en": "Open in Grin Scan"
+ },
+ {
   "tr": "Sistem",
   "en": "System"
  },
@@ -1256,8 +1296,8 @@
   "en": "About"
  },
  {
-  "tr": "OrkoWallet – Grin 0.1.3 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap",
-  "en": "OrkoWallet – Grin 0.1.3 · official grin-wallet 5.5.1 and grin 5.5.2 libraries · Tor 0.4.9.16 · Orkoswap"
+  "tr": "OrkoWallet – Grin 0.2.0 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap",
+  "en": "OrkoWallet – Grin 0.2.0 · official grin-wallet 5.5.1 and grin 5.5.2 libraries · Tor 0.4.9.16 · Orkoswap"
  },
  {
   "tr": "Ağ değişince açık cüzdan kapanır ve uygulama yeniden başlar.",
@@ -1806,6 +1846,10 @@
  {
   "tr": "Node",
   "en": "Node"
+ },
+ {
+  "tr": "Tor",
+  "en": "Tor"
  },
  {
   "tr": "Önce açık cüzdanı kapat.",

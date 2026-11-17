@@ -89,6 +89,16 @@ struct AppSettings {
     network: String,
     /// "system" | "dark" | "light"
     theme: String,
+    /// Colour set: "grin" (black and yellow, the default) | "orko" (blue).
+    palette: String,
+    /// Desktop notification when a payment arrives or gets confirmed.
+    notify_payments: bool,
+    /// Desktop notification when the Tor address stops answering (and when it is back).
+    notify_tor: bool,
+    /// The close button hides the window to the system tray; the wallet keeps running and receiving.
+    close_to_tray: bool,
+    /// The one-time "still running in the tray" notice was shown.
+    tray_hint_shown: bool,
     /// "bundled" | "arti"
     tor: String,
     /// "none" | "obfs4" | "snowflake" | "custom"
@@ -115,6 +125,11 @@ impl Default for AppSettings {
         AppSettings {
             network: "mainnet".into(),
             theme: "system".into(),
+            palette: "grin".into(),
+            notify_payments: true,
+            notify_tor: true,
+            close_to_tray: true,
+            tray_hint_shown: false,
             tor: "bundled".into(),
             bridges: "none".into(),
             custom_bridges: String::new(),
@@ -222,6 +237,8 @@ struct AppState {
     jobs_active: std::sync::atomic::AtomicUsize,
     /// Consecutive wrong passwords and when the last one happened (slows brute forcing).
     guard: Mutex<(u32, Instant)>,
+    /// Interface language as reported by the UI (tray menu and notifications are worded here).
+    ui_lang: Mutex<String>,
 }
 
 #[derive(Default, Clone, Serialize)]
@@ -466,10 +483,22 @@ fn status(state: St<'_>) -> Status {
 
 /// Theme, language, auto lock, integrated-node options. Network, Tor and node list have their own commands.
 #[tauri::command]
-fn save_settings(state: St<'_>, theme: String, language: String, auto_lock_minutes: u32, node: serde_json::Value, send: serde_json::Value) -> Result<(), String> {
+fn save_settings(state: St<'_>, theme: String, palette: Option<String>, notify_payments: Option<bool>, notify_tor: Option<bool>, close_to_tray: Option<bool>, language: String, auto_lock_minutes: u32, node: serde_json::Value, send: serde_json::Value) -> Result<(), String> {
     {
         let mut s = state.settings.lock().unwrap();
         s.theme = theme;
+        if let Some(p) = palette {
+            s.palette = if p == "orko" { "orko".into() } else { "grin".into() };
+        }
+        if let Some(b) = notify_payments {
+            s.notify_payments = b;
+        }
+        if let Some(b) = notify_tor {
+            s.notify_tor = b;
+        }
+        if let Some(b) = close_to_tray {
+            s.close_to_tray = b;
+        }
         s.language = if ["auto", "tr", "en", "de", "fr", "ru", "zh"].contains(&language.as_str()) { language } else { "auto".into() };
         s.auto_lock_minutes = auto_lock_minutes.min(24 * 60);
         if let Ok(n) = serde_json::from_value::<NodeCfg>(node) {
@@ -847,7 +876,9 @@ fn win_drag(w: tauri::WebviewWindow) {
 }
 #[tauri::command]
 fn win_close(app: tauri::AppHandle) {
-    app.exit(0); // RunEvent::Exit stops the integrated node cleanly
+    if !hide_to_tray(&app) {
+        app.exit(0); // RunEvent::Exit stops the integrated node cleanly
+    }
 }
 #[tauri::command]
 fn wallet_update(state: St<'_>, id: String, name: String, connection: String, custom_url: String) -> Result<bool, String> {
@@ -1926,6 +1957,28 @@ fn open_data_folder(state: St<'_>) {
     let _ = &state;
 }
 
+/// Open a transaction kernel in the Grin Scan block explorer (mainnet only), in the default browser.
+/// Only a kernel excerpt (hex) is accepted, so the address that is opened is always
+/// `https://scan.grin.money/kernel/<hex>` and nothing the UI sends can change the host or add arguments.
+#[tauri::command]
+fn open_kernel(state: St<'_>, kernel: String) -> Result<(), String> {
+    if state.settings.lock().unwrap().network != "mainnet" {
+        return Err("Kernel explorer is only available on mainnet".into());
+    }
+    let k = kernel.trim();
+    if k.len() < 8 || k.len() > 130 || !k.chars().all(|c| c.is_ascii_hexdigit()) {
+        return Err("Not a kernel".into());
+    }
+    let url = format!("https://scan.grin.money/kernel/{}", k.to_ascii_lowercase());
+    #[cfg(windows)]
+    {
+        std::process::Command::new("explorer").arg(&url).spawn().map_err(|e| e.to_string())?;
+    }
+    #[cfg(not(windows))]
+    let _ = url;
+    Ok(())
+}
+
 // ------------------------------------------------------------------ node pool
 
 fn is_http_url(u: &str) -> bool {
@@ -2095,6 +2148,306 @@ fn remote_poller(state: Arc<AppState>) {
     });
 }
 
+// ------------------------------------------------------------------ tray and desktop notifications
+
+/// Wording of the tray menu and the desktop notifications. The UI reports its language (`ui_lang`);
+/// order: tr, en, de, fr, ru, zh. An unknown language falls back to English.
+fn say(lang: &str, key: &str) -> &'static str {
+    let row: [&'static str; 6] = match key {
+        "tray_show" => ["OrkoWallet'i aç", "Open OrkoWallet", "OrkoWallet öffnen", "Ouvrir OrkoWallet", "Открыть OrkoWallet", "打开 OrkoWallet"],
+        "tray_quit" => ["Çık", "Quit", "Beenden", "Quitter", "Выход", "退出"],
+        "tray_tip" => [
+            "OrkoWallet – Grin çalışıyor",
+            "OrkoWallet – Grin is running",
+            "OrkoWallet – Grin läuft",
+            "OrkoWallet – Grin est actif",
+            "OrkoWallet – Grin работает",
+            "OrkoWallet – Grin 正在运行",
+        ],
+        "hint_title" => [
+            "OrkoWallet arka planda çalışıyor",
+            "OrkoWallet keeps running",
+            "OrkoWallet läuft im Hintergrund weiter",
+            "OrkoWallet reste actif en arrière-plan",
+            "OrkoWallet продолжает работать в фоне",
+            "OrkoWallet 在后台继续运行",
+        ],
+        "hint_body" => [
+            "Sistem tepsisindeki simgeden açabilir ya da tamamen kapatabilirsin.",
+            "Open it from the tray icon, or quit it there.",
+            "Öffne es über das Tray-Symbol oder beende es dort.",
+            "Ouvrez-le depuis l'icône de la zone de notification, ou quittez-le depuis là.",
+            "Откройте его через значок в трее или завершите работу там.",
+            "可从托盘图标打开，或在那里退出。",
+        ],
+        "tor_lost_title" => ["Tor bağlantısı kesildi", "Tor connection lost", "Tor-Verbindung unterbrochen", "Connexion Tor perdue", "Соединение с Tor потеряно", "Tor 连接已断开"],
+        "tor_lost_body" => [
+            "Adresin şu an ödeme alamıyor. Cüzdan yeniden bağlanmayı deniyor.",
+            "Your address cannot receive payments right now. The wallet is trying to reconnect.",
+            "Deine Adresse kann gerade keine Zahlungen empfangen. Die Wallet versucht, sich neu zu verbinden.",
+            "Votre adresse ne peut pas recevoir de paiements pour le moment. Le portefeuille tente de se reconnecter.",
+            "Сейчас адрес не может принимать платежи. Кошелёк пытается переподключиться.",
+            "您的地址目前无法收款。钱包正在尝试重新连接。",
+        ],
+        "tor_back_title" => ["Tor bağlantısı yeniden kuruldu", "Tor connection restored", "Tor-Verbindung wiederhergestellt", "Connexion Tor rétablie", "Соединение с Tor восстановлено", "Tor 连接已恢复"],
+        "tor_back_body" => [
+            "Adresin yeniden ödeme alabilir.",
+            "Your address can receive payments again.",
+            "Deine Adresse kann wieder Zahlungen empfangen.",
+            "Votre adresse peut de nouveau recevoir des paiements.",
+            "Адрес снова может принимать платежи.",
+            "您的地址可以再次收款。",
+        ],
+        "pay_in_title" => ["Ödeme alındı", "Payment received", "Zahlung erhalten", "Paiement reçu", "Платёж получен", "收到付款"],
+        "pay_pending" => ["onay bekliyor", "waiting for confirmation", "wartet auf Bestätigung", "en attente de confirmation", "ожидает подтверждения", "等待确认"],
+        "pay_conf_title" => ["Ödeme onaylandı", "Payment confirmed", "Zahlung bestätigt", "Paiement confirmé", "Платёж подтверждён", "付款已确认"],
+        "sent_conf_title" => [
+            "Gönderdiğin ödeme onaylandı",
+            "Your payment was confirmed",
+            "Deine Zahlung wurde bestätigt",
+            "Votre paiement a été confirmé",
+            "Ваш платёж подтверждён",
+            "您的付款已确认",
+        ],
+        "locked_body" => [
+            "Tutar, cüzdan kilitliyken gösterilmez.",
+            "The amount is hidden while the wallet is locked.",
+            "Der Betrag wird bei gesperrter Wallet nicht angezeigt.",
+            "Le montant est masqué tant que le portefeuille est verrouillé.",
+            "Сумма скрыта, пока кошелёк заблокирован.",
+            "钱包锁定时不显示金额。",
+        ],
+        "many_title" => ["Yeni işlemler var", "New transactions", "Neue Transaktionen", "Nouvelles transactions", "Новые транзакции", "有新的交易"],
+        "many_body" => [
+            "Cüzdanda yeni işlemler görüldü. Ayrıntılar için uygulamayı aç.",
+            "New activity in your wallet. Open the app for details.",
+            "Neue Aktivität in deiner Wallet. Öffne die App für Details.",
+            "Nouvelle activité dans votre portefeuille. Ouvrez l'application pour les détails.",
+            "В кошельке новая активность. Откройте приложение, чтобы узнать подробности.",
+            "钱包中有新活动。打开应用查看详情。",
+        ],
+        "test_title" => ["Bildirimler çalışıyor", "Notifications work", "Benachrichtigungen funktionieren", "Les notifications fonctionnent", "Уведомления работают", "通知正常"],
+        "test_body" => [
+            "Ödeme ve Tor durumu bildirimlerini böyle göreceksin.",
+            "This is how payment and Tor status notifications will look.",
+            "So sehen Zahlungs- und Tor-Benachrichtigungen aus.",
+            "Voici à quoi ressembleront les notifications de paiement et d'état de Tor.",
+            "Так будут выглядеть уведомления о платежах и состоянии Tor.",
+            "付款和 Tor 状态通知将以这种方式显示。",
+        ],
+        _ => ["", "", "", "", "", ""],
+    };
+    let i = match lang {
+        "tr" => 0,
+        "de" => 2,
+        "fr" => 3,
+        "ru" => 4,
+        "zh" => 5,
+        _ => 1,
+    };
+    row[i]
+}
+
+/// The tray menu entries, kept so their text follows the interface language.
+struct TrayItems {
+    show: tauri::menu::MenuItem<tauri::Wry>,
+    quit: tauri::menu::MenuItem<tauri::Wry>,
+}
+
+fn show_main(app: &tauri::AppHandle) {
+    if let Some(w) = app.get_webview_window("main") {
+        let _ = w.unminimize();
+        let _ = w.show();
+        let _ = w.set_focus();
+    }
+}
+
+fn toast(app: &tauri::AppHandle, title: &str, body: &str) {
+    use tauri_plugin_notification::NotificationExt;
+    if let Err(e) = app.notification().builder().title(title).body(body).show() {
+        log::warn!("notification failed: {e}");
+    }
+}
+
+fn lang_of(state: &AppState) -> String {
+    state.ui_lang.lock().unwrap().clone()
+}
+
+/// The close button / Alt+F4: hide to the tray when that is on and the tray icon exists (otherwise the
+/// window would be gone with no way back). Returns false when the app should really close.
+fn hide_to_tray(app: &tauri::AppHandle) -> bool {
+    let Some(st) = app.try_state::<Arc<AppState>>() else { return false };
+    if app.try_state::<TrayItems>().is_none() || !st.settings.lock().unwrap().close_to_tray {
+        return false;
+    }
+    if let Some(w) = app.get_webview_window("main") {
+        let _ = w.hide();
+    }
+    let first = {
+        let mut s = st.settings.lock().unwrap();
+        let first = !s.tray_hint_shown;
+        s.tray_hint_shown = true;
+        first
+    };
+    if first {
+        let _ = st.save_settings();
+        let l = lang_of(&st);
+        toast(app, say(&l, "hint_title"), say(&l, "hint_body"));
+    }
+    true
+}
+
+/// The UI tells the Rust side its language: tray menu and tooltip follow it.
+#[tauri::command]
+fn ui_lang(app: tauri::AppHandle, state: St<'_>, lang: String) {
+    *state.ui_lang.lock().unwrap() = lang.clone();
+    if let Some(t) = app.try_state::<TrayItems>() {
+        let _ = t.show.set_text(say(&lang, "tray_show"));
+        let _ = t.quit.set_text(say(&lang, "tray_quit"));
+    }
+    if let Some(tray) = app.tray_by_id("main") {
+        let _ = tray.set_tooltip(Some(say(&lang, "tray_tip")));
+    }
+}
+
+#[tauri::command]
+fn notify_test(app: tauri::AppHandle, state: St<'_>) {
+    let l = lang_of(&state);
+    toast(&app, say(&l, "test_title"), say(&l, "test_body"));
+}
+
+fn build_tray(app: &mut tauri::App) -> tauri::Result<()> {
+    use tauri::menu::{Menu, MenuItem};
+    use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
+    let show = MenuItem::with_id(app, "show", say("en", "tray_show"), true, None::<&str>)?;
+    let quit = MenuItem::with_id(app, "quit", say("en", "tray_quit"), true, None::<&str>)?;
+    let menu = Menu::with_items(app, &[&show, &quit])?;
+    let mut tb = TrayIconBuilder::with_id("main")
+        .tooltip(say("en", "tray_tip"))
+        .menu(&menu)
+        .show_menu_on_left_click(false)
+        .on_menu_event(|app, ev| match ev.id.as_ref() {
+            "show" => show_main(app),
+            "quit" => app.exit(0), // RunEvent::Exit stops the integrated node cleanly
+            _ => {}
+        })
+        .on_tray_icon_event(|tray, ev| {
+            if let TrayIconEvent::Click { button: MouseButton::Left, button_state: MouseButtonState::Up, .. } = ev {
+                show_main(tray.app_handle());
+            }
+        });
+    if let Some(icon) = app.default_window_icon() {
+        tb = tb.icon(icon.clone());
+    }
+    tb.build(app)?;
+    app.manage(TrayItems { show, quit });
+    Ok(())
+}
+
+/// Watches the open wallet for things worth a desktop notification: a payment that arrives or gets
+/// confirmed, and the Tor address going down or coming back. It runs here, not in the page, so it keeps
+/// working while the window is hidden in the tray. Amounts are left out while the wallet is locked.
+fn notifier(app: tauri::AppHandle, state: Arc<AppState>) {
+    use std::sync::atomic::Ordering::Relaxed;
+    std::thread::spawn(move || {
+        let mut wid = String::new();
+        let mut seen: Option<HashMap<u32, bool>> = None; // transaction id -> confirmed
+        let mut was_ok = false;
+        let mut down_since: Option<Instant> = None;
+        let mut told_down = false;
+        let mut last_refresh = Instant::now();
+        loop {
+            std::thread::sleep(Duration::from_secs(10));
+            let Some(ow) = state.open.read().unwrap().clone() else {
+                seen = None;
+                wid.clear();
+                was_ok = false;
+                down_since = None;
+                told_down = false;
+                continue;
+            };
+            if ow.meta.id != wid {
+                wid = ow.meta.id.clone();
+                seen = None;
+                was_ok = false;
+                down_since = None;
+                told_down = false;
+                last_refresh = Instant::now();
+            }
+            let (want_pay, want_tor, min_conf) = {
+                let s = state.settings.lock().unwrap();
+                (s.notify_payments, s.notify_tor, s.send.min_confirmations.clamp(1, 10))
+            };
+            let l = lang_of(&state);
+
+            // Tor: gone for a minute = tell once; back = tell once. A short restart stays silent.
+            let ok = matches!(ow.wallet.tor_status(), Some(TorStatus::Ready)) && state.reachable.load(Relaxed);
+            if ok {
+                if told_down && want_tor {
+                    toast(&app, say(&l, "tor_back_title"), say(&l, "tor_back_body"));
+                }
+                told_down = false;
+                down_since = None;
+                was_ok = true;
+            } else if was_ok {
+                let t0 = *down_since.get_or_insert_with(Instant::now);
+                if !told_down && t0.elapsed() >= Duration::from_secs(60) {
+                    told_down = true;
+                    if want_tor {
+                        toast(&app, say(&l, "tor_lost_title"), say(&l, "tor_lost_body"));
+                    }
+                }
+            }
+
+            // With the window hidden the page does not refresh the wallet from the node, so do it here.
+            let scanning = state.scan.lock().unwrap().active;
+            let window_idle = app
+                .get_webview_window("main")
+                .map(|w| !w.is_visible().unwrap_or(true) || w.is_minimized().unwrap_or(false))
+                .unwrap_or(true);
+            if window_idle && !scanning && last_refresh.elapsed() >= Duration::from_secs(60) {
+                last_refresh = Instant::now();
+                let _ = ow.wallet.balance(min_conf);
+            }
+
+            // Payments.
+            let Ok(list) = ow.wallet.transactions(false) else { continue };
+            let list: Vec<TxDto> = list.into_iter().map(tx_dto).collect();
+            let now: HashMap<u32, bool> = list.iter().map(|t| (t.id, t.confirmed)).collect();
+            if let Some(prev) = &seen {
+                if want_pay && !scanning {
+                    let mut events: Vec<(&'static str, String, String)> = Vec::new();
+                    let locked = state.locked.load(Relaxed);
+                    for t in list.iter().filter(|t| !t.cancelled) {
+                        let amount = if locked { say(&l, "locked_body").to_string() } else { format!("{}{} ツ", if t.incoming { "+" } else { "−" }, t.amount) };
+                        match prev.get(&t.id) {
+                            None if t.incoming => events.push((
+                                "pay_in_title",
+                                say(&l, "pay_in_title").to_string(),
+                                if locked { amount } else { format!("{amount} · {}", say(&l, "pay_pending")) },
+                            )),
+                            Some(false) if t.confirmed => events.push((
+                                if t.incoming { "pay_conf_title" } else { "sent_conf_title" },
+                                say(&l, if t.incoming { "pay_conf_title" } else { "sent_conf_title" }).to_string(),
+                                amount,
+                            )),
+                            _ => {}
+                        }
+                    }
+                    if events.len() > 3 {
+                        toast(&app, say(&l, "many_title"), say(&l, "many_body"));
+                    } else {
+                        for (_, title, body) in events {
+                            toast(&app, &title, &body);
+                        }
+                    }
+                }
+            }
+            seen = Some(now);
+        }
+    });
+}
+
 // ------------------------------------------------------------------ main
 
 fn main() {
@@ -2113,6 +2466,15 @@ fn main() {
         }));
     }
     builder
+        .plugin(tauri_plugin_notification::init())
+        .on_window_event(|window, event| {
+            // Alt+F4 and the system close: hide to the tray when that is switched on.
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                if window.label() == "main" && hide_to_tray(window.app_handle()) {
+                    api.prevent_close();
+                }
+            }
+        })
         .setup(|app| {
             // Portable / test mode: ORKOWALLET_DATA moves wallets, settings, node data and the
             // browser profile to one folder, so a second copy never touches the normal one.
@@ -2125,8 +2487,8 @@ fn main() {
             {
                 let mut w = tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::App("index.html".into()))
                     .title("OrkoWallet – Grin")
-                    .inner_size(1280.0, 800.0)
-                    .min_inner_size(1180.0, 720.0)
+                    .inner_size(1180.0, 740.0)
+                    .min_inner_size(480.0, 600.0)
                     .decorations(false)
                     .shadow(true)
                     .center();
@@ -2191,11 +2553,16 @@ fn main() {
                 jobs_stop: std::sync::atomic::AtomicBool::new(false),
                 jobs_active: std::sync::atomic::AtomicUsize::new(0),
                 guard: Mutex::new((0, Instant::now())),
+                ui_lang: Mutex::new("en".into()),
             });
             let _ = state.save_settings();
             probe_poller(state.clone());
             remote_poller(state.clone());
-            app.manage(state);
+            app.manage(state.clone());
+            if let Err(e) = build_tray(app) {
+                log::warn!("tray icon unavailable: {e}"); // the close button then really closes
+            }
+            notifier(app.handle().clone(), state);
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -2211,6 +2578,8 @@ fn main() {
             win_max,
             win_drag,
             win_close,
+            ui_lang,
+            notify_test,
             wallet_update,
             wallet_delete,
             wallet_remove,
@@ -2245,6 +2614,7 @@ fn main() {
             export_transactions,
             backup_wallet,
             open_data_folder,
+            open_kernel,
             set_locked,
             set_protected,
             nodes_list,

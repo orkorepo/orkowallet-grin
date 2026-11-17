@@ -1,6 +1,7 @@
 // Français (fr): translation of the OrkoWallet interface. Keys are the Turkish source text.
 'use strict';
 const LANG_FR = {
+  "Tor": "Tor",
   "OrkoWallet – Grin": "OrkoWallet – Grin",
   "Ağ": "Réseau",
   "Ana ağ": "Mainnet",
@@ -315,7 +316,7 @@ const LANG_FR = {
   "1 dakika": "1 minute",
   "1 saat": "1 heure",
   "Hakkında": "À propos",
-  "OrkoWallet – Grin 0.1.3 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.1.3 · bibliothèques officielles grin-wallet 5.5.1 et grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
+  "OrkoWallet – Grin 0.2.0 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.2.0 · bibliothèques officielles grin-wallet 5.5.1 et grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
   "Ağ değişince açık cüzdan kapanır ve uygulama yeniden başlar.": "En changeant de réseau, le portefeuille ouvert se ferme et l’application redémarre.",
   "Uygulama seçtiğin ağ ile yeniden başlayacak.": "L’application redémarrera sur le réseau choisi.",
   "Node havuzu ({net})": "Pool de nœuds ({net})",
@@ -531,4 +532,14 @@ const LANG_FR = {
   "Aşağıdaki “Bağlantıyı yeniden kur ve yeniden başlat” düğmesini dene.": "Essayez le bouton « Rétablir la connexion et redémarrer » ci-dessous.",
   "Tor hâlâ bağlanıyor. Bir iki dakika bekleyip tanıyı tekrar çalıştır.": "Tor se connecte encore. Patientez une ou deux minutes, puis relancez le diagnostic.",
   "Tor'un neden bağlanmadığını arar: internet, bilgisayar saati, ağının Tor'a izin verip vermediği ve günlükteki son hatalar. Hiçbir şeyi değiştirmez ve cüzdan verisi göndermez.": "Cherche pourquoi Tor ne se connecte pas : Internet, horloge de l’ordinateur, si votre réseau autorise Tor, et les dernières erreurs du journal. Rien n’est modifié et aucune donnée du portefeuille n’est envoyée.",
+  "Renk": "Couleur",
+  "Grin sarısı": "Jaune Grin",
+  "Orko mavisi": "Bleu Orko",
+  "Grin Scan'de aç": "Ouvrir dans Grin Scan",
+  "Bildirimler": "Notifications",
+  "Ödeme gelince ya da onaylanınca bildir": "Me notifier quand un paiement arrive ou est confirmé",
+  "Tor bağlantısı kesilince bildir": "Me notifier quand la connexion Tor est perdue",
+  "Pencereyi kapatınca sistem tepsisinde çalışmaya devam et": "Continuer en arrière-plan dans la zone de notification à la fermeture de la fenêtre",
+  "Tepsideyken cüzdan açık kalır, ödeme almaya ve bildirim göndermeye devam eder. Tamamen kapatmak için tepsi simgesine sağ tıkla.": "Dans la zone de notification, le portefeuille reste ouvert, continue de recevoir des paiements et d’envoyer des notifications. Pour quitter complètement, faites un clic droit sur l’icône.",
+  "Bildirimi dene": "Envoyer une notification de test",
 };
