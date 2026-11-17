@@ -109,6 +109,11 @@
           </div>
           <p class="muted wl2-intro" id="wl-empty" hidden>Bu ağda henüz cüzdanın yok. Yeni bir cüzdan oluştur, kurtarma ifadenle geri yükle ya da grin-wallet / Grim cüzdan klasörünü içe aktar. Anahtarların yalnızca bu bilgisayarda durur; ödemeler Tor üzerinden gelir ve gider.</p>
           <ul class="wl2-list" id="wl-list"></ul>
+          <div id="wl-trash" hidden>
+            <h3 class="wl2-sub">Son silinenler</h3>
+            <p class="muted">Silinen cüzdanın şifreli anahtar dosyası 30 gün saklanır. Geri alırsan bakiye yeniden taranır.</p>
+            <ul class="wl2-list" id="wl-trash-list"></ul>
+          </div>
           <h3 class="wl2-sub">Cüzdan ekle</h3>
           <div class="wl2-tiles">
             <button class="tile" type="button" data-form="create">
@@ -728,6 +733,16 @@
 
           <div class="spane" data-spane="repair" hidden>
             <fieldset>
+              <legend>Bağlantı tanısı</legend>
+              <p class="hint hint-top">Tor'un neden bağlanmadığını arar: internet, bilgisayar saati, ağının Tor'a izin verip vermediği ve günlükteki son hatalar. Hiçbir şeyi değiştirmez ve cüzdan verisi göndermez. Yalnızca düğmeye bastığında birkaç genel adrese (1.1.1.1, microsoft.com, grincoin.org ve Tor dizin sunucuları) Tor üzerinden değil doğrudan bağlanır; bu sunucular IP adresini görebilir.</p>
+              <div class="row">
+                <button class="btn btn-primary" type="button" id="set-diag">Tanıyı çalıştır</button>
+                <button class="btn" type="button" id="set-diag-copy" hidden>Sonucu kopyala</button>
+              </div>
+              <ul class="diag" id="diag-list" aria-live="polite"></ul>
+              <p class="callout" id="diag-advice" hidden></p>
+            </fieldset>
+            <fieldset>
               <legend>Bağlantıyı onar</legend>
               <p class="hint hint-top">Tor bağlantısı kurulamıyorsa ya da adresin çevrimiçi görünmüyorsa bunu dene: Tor'un kayıtlı durumu (seçtiği giriş röleleri ve önbellek) silinir ve uygulama yeniden başlar. Cüzdanların, kurtarma ifaden ve bakiyen etkilenmez.</p>
               <div class="row"><button class="btn btn-primary" type="button" id="set-repair">Bağlantıyı yeniden kur ve yeniden başlat</button></div>
@@ -737,7 +752,7 @@
           <div class="spane" data-spane="about" hidden>
             <fieldset>
               <legend>Hakkında</legend>
-              <p class="hint hint-top">OrkoWallet – Grin 0.1.2 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap</p>
+              <p class="hint hint-top">OrkoWallet – Grin 0.1.3 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap</p>
             </fieldset>
             <fieldset>
               <legend>Bağış</legend>

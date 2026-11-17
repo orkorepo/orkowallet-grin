@@ -9,6 +9,7 @@
 //! calling thread, so every function here that can touch Tor must run on a plain OS thread, never
 //! inside a tokio runtime (in Tauri: `spawn_blocking` or `std::thread`).
 
+pub mod diag;
 pub mod node;
 pub mod pool;
 pub mod remote;

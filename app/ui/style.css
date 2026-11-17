@@ -600,3 +600,12 @@ li.enter { animation: slidein .55s cubic-bezier(.2, .8, .2, 1); }
 .pager-size .dd { display: inline-block; }
 .pager-size .dd-btn { padding: 3px 8px; width: auto; }
 .tc-engine .dd { flex: 1; }
+
+/* connection diagnosis (Settings → Repair) */
+.diag { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 6px; }
+.diag li { display: flex; gap: 10px; align-items: flex-start; font-size: var(--fs-sm); line-height: 1.45; }
+.diag-mark { flex: none; width: 20px; height: 20px; border-radius: 50%; display: inline-grid; place-items: center; font-weight: 700; font-size: 12px; margin-top: 1px; }
+.diag-ok .diag-mark { background: var(--ok-soft); color: var(--ok); }
+.diag-warn .diag-mark { background: var(--warn-soft); color: var(--warn); }
+.diag-fail .diag-mark { background: var(--bad-soft); color: var(--bad); }
+#diag-advice { margin-top: 12px; }

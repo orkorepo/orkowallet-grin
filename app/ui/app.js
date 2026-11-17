@@ -134,12 +134,47 @@ function renderWallets() {
     li.append(rm, b); ul.append(li);
   });
   show('wallets');
+  loadTrash();
+}
+// Recently deleted wallets (kept 30 days): restore or remove for good.
+async function loadTrash() {
+  let items = [];
+  try { items = await invoke('trash_list'); } catch (_) { /* older backend */ }
+  $('wl-trash').hidden = !items.length;
+  const ul = $('wl-trash-list'); ul.replaceChildren();
+  items.forEach((it) => {
+    const li = el('li', 'wrow');
+    const av = el('span', 'avatar', (it.name.trim()[0] || '?').toUpperCase()); av.style.setProperty('--h', hue(it.name));
+    const mid = el('div', 'wmid'); mid.append(el('div', 'wname', it.name));
+    mid.append(el('div', 'wmeta', t('{n} gün kaldı', { n: it.days_left })));
+    li.append(av, mid);
+    const del = el('button', 'btn danger-text', t('Kalıcı olarak sil')); del.type = 'button';
+    let armed = 0;
+    del.addEventListener('click', async () => {
+      if (!armed) { // second click within 4 s confirms
+        armed = setTimeout(() => { armed = 0; del.textContent = t('Kalıcı olarak sil'); }, 4000);
+        del.textContent = t('Emin misin? Tekrar tıkla'); return;
+      }
+      clearTimeout(armed);
+      try { await invoke('trash_purge', { id: it.id }); loadTrash(); } catch (x) { toast(E(x)); }
+    });
+    const back = el('button', 'btn btn-primary', t('Geri al')); back.type = 'button';
+    back.addEventListener('click', async () => {
+      await busy(back, async () => {
+        try {
+          await invoke('trash_restore', { id: it.id });
+          state.status = await invoke('status'); renderWallets(); toast(t('Cüzdan geri alındı. Açınca bakiye yeniden taranır.'));
+        } catch (x) { toast(E(x)); }
+      });
+    });
+    li.append(del, back); ul.append(li);
+  });
 }
 // Delete a wallet from the list without opening it (needed when the password is forgotten): the user
 // confirms by ticking the box and typing the wallet's name.
 function askRemove(w) {
   state.removeW = w;
-  $('wr-text').textContent = t('{name} bu bilgisayardan silinecek. Kurtarma ifaden yanında değilse içindeki para kaybolur. Bu işlem geri alınamaz.', { name: `“${w.name}”` });
+  $('wr-text').textContent = t('{name} listeden kaldırılacak. Şifreli anahtar dosyası 30 gün saklanır ve “Son silinenler” bölümünden geri alınabilir. Kurtarma ifaden yoksa bu süreden sonra içindeki para kaybolur.', { name: `“${w.name}”` });
   $('wr-ok').checked = false; $('wr-submit').disabled = true; $('wr-name').value = ''; err('wr-error');
   $('dlg-wremove').showModal();
 }
@@ -1167,7 +1202,7 @@ function openDialog(name) {
   if (name === 'password') { ['pw-old', 'pw-new', 'pw-new2'].forEach((id) => { $(id).value = ''; }); err('pw-error'); return $('dlg-password').showModal(); }
   if (name === 'phrase') { $('ph-pass').value = ''; err('ph-error'); return $('dlg-phrase').showModal(); }
   if (name === 'delete') {
-    $('del-text').textContent = t('{name} bu bilgisayardan silinecek. Kurtarma ifaden yanında değilse içindeki para kaybolur. Bu işlem geri alınamaz.', { name: `“${state.open.name}”` });
+    $('del-text').textContent = t('{name} listeden kaldırılacak. Şifreli anahtar dosyası 30 gün saklanır ve “Son silinenler” bölümünden geri alınabilir. Kurtarma ifaden yoksa bu süreden sonra içindeki para kaybolur.', { name: `“${state.open.name}”` });
     $('del-ok').checked = false; $('del-submit').disabled = true;
     $('del-pass').value = ''; err('del-error'); return $('dlg-delete').showModal();
   }
@@ -1257,6 +1292,57 @@ function selectSettingsTab(name) {
   document.querySelectorAll('[data-spane]').forEach((p) => { p.hidden = p.dataset.spane !== name; });
 }
 document.querySelectorAll('.snav [data-stab]').forEach((b) => b.addEventListener('click', () => selectSettingsTab(b.dataset.stab)));
+
+// ---- connection diagnosis: facts come from the backend, the wording lives here (so it is translated)
+function diagRows(r) {
+  const rows = []; // [level, text]  level: ok | warn | fail
+  rows.push(r.internet ? ['ok', t('İnternet bağlantısı var.')] : ['fail', t('İnternet bağlantısı yok ya da engelleniyor.')]);
+  if (r.internet) {
+    if (r.skew === null || r.skew === undefined) rows.push(['warn', t('Saat doğrulanamadı.')]);
+    else if (Math.abs(r.skew) > 300) rows.push(['fail', t('Bilgisayar saatin yaklaşık {n} dakika farklı. Tor bu yüzden bağlanamaz.', { n: Math.round(Math.abs(r.skew) / 60) })]);
+    else rows.push(['ok', t('Bilgisayar saati doğru (fark {n} sn).', { n: Math.abs(r.skew) })]);
+    if (r.reach_ok > 0) rows.push(['ok', t('Tor ağına doğrudan ulaşılabiliyor ({ok}/{total}).', { ok: r.reach_ok, total: r.reach_total })]);
+    else if (r.bridges !== 'none') rows.push(['warn', t('Doğrudan ulaşım yok ama köprü kullanıyorsun.')]);
+    else rows.push(['fail', t('Tor ağına doğrudan ulaşılamıyor (0/{total}). Ağın Tor\'u engelliyor olabilir.', { total: r.reach_total })]);
+  }
+  if (r.tor_state === 'off') rows.push(['warn', t('Tor çalışmıyor. Tor durumu için önce bir cüzdan aç.')]);
+  else if (r.tor_state === 'starting') rows.push(['warn', t('Tor bağlanıyor (%{p}).', { p: r.tor_percent })]);
+  else if (r.tor_state === 'failed') rows.push(['fail', t('Tor başlatılamadı: {msg}', { msg: E(r.tor_message || '') })]);
+  else if (r.tor_reachable) rows.push(['ok', t('Tor çevrimiçi; adresin dışarıdan erişilebilir.')]);
+  else rows.push(['warn', t('Tor bağlı ama adresin henüz dışarıdan erişilebilir değil ({n} sn).', { n: r.tor_ready_for })]);
+  const HINT = {
+    clock: 'Günlükte saat hatası var.',
+    tls: 'Günlükte şifreleme (TLS) hataları var; bir antivirüs, proxy ya da VPN trafiği bozuyor olabilir.',
+    unreach: 'Günlükte “ağa ulaşılamıyor” hataları var; güvenlik duvarı ya da IPv6/VPN ayarı olabilir.',
+    stuck: 'Günlükte Tor\'un açılışta takıldığı kayıtlar var.',
+  };
+  (r.hints || []).forEach((h) => HINT[h] && rows.push(['warn', t(HINT[h])]));
+  return rows;
+}
+const DIAG_ADVICE = {
+  internet: 'Önce internet bağlantını düzelt, sonra tanıyı tekrar çalıştır.',
+  clock: 'Windows Ayarlar → Zaman ve dil → Tarih ve saat → “Şimdi eşitle” düğmesine bas, sonra uygulamayı yeniden başlat.',
+  bridge: 'Ağın Tor\'u engelliyor gibi görünüyor. Cüzdan açıkken Tor kartında Snowflake ya da obfs4 köprüsünü seç ve Uygula\'ya bas.',
+  ok: 'Her şey yolunda görünüyor.',
+  connecting: 'Tor hâlâ bağlanıyor. Bir iki dakika bekleyip tanıyı tekrar çalıştır.',
+  wait: 'Tor bağlı; adresin duyurulması 3-5 dakika sürebilir. Biraz bekle.',
+  repair: 'Aşağıdaki “Bağlantıyı yeniden kur ve yeniden başlat” düğmesini dene.',
+};
+$('set-diag').addEventListener('click', (e) => busy(e.currentTarget, async () => {
+  const ul = $('diag-list'); ul.replaceChildren(); $('diag-advice').hidden = true; $('set-diag-copy').hidden = true;
+  try {
+    const r = await invoke('tor_diagnose');
+    const rows = diagRows(r);
+    const mark = { ok: '✓', warn: '!', fail: '✗' };
+    rows.forEach(([lv, text]) => { const li = el('li', `diag-${lv}`); li.append(el('span', 'diag-mark', mark[lv]), el('span', '', text)); ul.append(li); });
+    const adv = $('diag-advice'); adv.textContent = t(DIAG_ADVICE[r.advice] || DIAG_ADVICE.repair); adv.hidden = false;
+    state.diagReport = rows.map(([lv, text]) => `[${mark[lv]}] ${text}`).concat('', adv.textContent).join('\n');
+    $('set-diag-copy').hidden = false;
+  } catch (x) { toast(E(x)); }
+}));
+$('set-diag-copy').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText('OrkoWallet diagnosis\n' + (state.diagReport || '')); toast(t('Kopyalandı')); } catch (x) { toast(E(x)); }
+});
 
 // ---- repair: forget tor's saved state and restart
 $('set-repair').addEventListener('click', (e) => busy(e.currentTarget, async () => {

@@ -902,6 +902,104 @@ fn set_protected(window: tauri::WebviewWindow, on: bool) {
     let _ = window.set_content_protected(on);
 }
 
+// ------------------------------------------------------------------ recoverable delete
+// Deleting a wallet keeps its encrypted seed and name in <data>/trash/<network>/<id> for 30 days, so a
+// mistake can be undone from the wallet list. Only the small seed and meta files are kept (the chain
+// data is rebuilt by a scan), and the copy must succeed before anything is removed.
+const TRASH_DAYS: u64 = 30;
+
+fn now_secs() -> u64 {
+    std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0)
+}
+
+fn trash_wallet(root: &Path, net: &str, id: &str, dir: &Path) -> Result<(), String> {
+    let seed = dir.join("wallet_data").join("wallet.seed");
+    if !seed.exists() {
+        return Ok(()); // nothing worth keeping
+    }
+    let t = root.join("trash").join(net).join(id);
+    let _ = std::fs::remove_dir_all(&t);
+    std::fs::create_dir_all(t.join("wallet_data")).map_err(|e| e.to_string())?;
+    std::fs::copy(&seed, t.join("wallet_data").join("wallet.seed")).map_err(|e| format!("Cüzdanın anahtar dosyası yedeklenemedi, silme iptal edildi ({e})."))?;
+    let _ = std::fs::copy(dir.join("meta.json"), t.join("meta.json"));
+    std::fs::write(t.join("deleted_at"), now_secs().to_string()).map_err(|e| e.to_string())
+}
+
+fn trash_deleted_at(p: &Path) -> u64 {
+    std::fs::read_to_string(p.join("deleted_at")).ok().and_then(|t| t.trim().parse().ok()).unwrap_or(0)
+}
+
+/// Remove trash entries older than TRASH_DAYS (run at start).
+fn trash_purge_old(root: &Path) {
+    let limit = TRASH_DAYS * 86400;
+    let Ok(nets) = std::fs::read_dir(root.join("trash")) else { return };
+    for n in nets.filter_map(|e| e.ok()) {
+        let Ok(items) = std::fs::read_dir(n.path()) else { continue };
+        for it in items.filter_map(|e| e.ok()) {
+            if now_secs().saturating_sub(trash_deleted_at(&it.path())) > limit {
+                let _ = std::fs::remove_dir_all(it.path());
+            }
+        }
+    }
+}
+
+#[tauri::command]
+fn trash_list(state: St<'_>) -> Vec<serde_json::Value> {
+    let net = state.net();
+    let mut v: Vec<(u64, serde_json::Value)> = std::fs::read_dir(state.root.join("trash").join(&net))
+        .map(|rd| {
+            rd.filter_map(|e| e.ok())
+                .filter(|e| e.path().join("wallet_data").join("wallet.seed").exists())
+                .map(|e| {
+                    let p = e.path();
+                    let meta: WalletMeta = std::fs::read_to_string(p.join("meta.json"))
+                        .ok()
+                        .and_then(|t| serde_json::from_str(&t).ok())
+                        .unwrap_or_default();
+                    let at = trash_deleted_at(&p);
+                    let left = (TRASH_DAYS * 86400).saturating_sub(now_secs().saturating_sub(at)) / 86400;
+                    let name = if meta.name.is_empty() { e.file_name().to_string_lossy().into_owned() } else { meta.name };
+                    (at, serde_json::json!({ "id": e.file_name().to_string_lossy(), "name": name, "deleted_at": at, "days_left": left }))
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+    v.sort_by(|a, b| b.0.cmp(&a.0));
+    v.into_iter().map(|x| x.1).collect()
+}
+
+#[tauri::command]
+fn trash_restore(state: St<'_>, id: String) -> Result<(), String> {
+    let t = state.root.join("trash").join(state.net()).join(&id);
+    let dir = state.wallet_dir(&id)?; // also validates the id
+    let seed = t.join("wallet_data").join("wallet.seed");
+    if !seed.exists() {
+        return Err("Silinen cüzdan bulunamadı.".into());
+    }
+    if dir.join("wallet_data").join("wallet.seed").exists() {
+        return Err("Bu cüzdan zaten listede.".into());
+    }
+    std::fs::create_dir_all(dir.join("wallet_data")).map_err(|e| e.to_string())?;
+    std::fs::copy(&seed, dir.join("wallet_data").join("wallet.seed")).map_err(|e| e.to_string())?;
+    let _ = std::fs::copy(t.join("meta.json"), dir.join("meta.json"));
+    // The balance is found again by a chain scan when the wallet is opened.
+    let mut m = state.read_meta(&id)?;
+    if m.name.is_empty() {
+        m.name = id.clone();
+    }
+    m.scan_pending = Some((0, false));
+    state.write_meta(&m)?;
+    let _ = std::fs::remove_dir_all(&t);
+    Ok(())
+}
+
+#[tauri::command]
+fn trash_purge(state: St<'_>, id: String) -> Result<(), String> {
+    state.wallet_dir(&id)?; // validates the id
+    let _ = std::fs::remove_dir_all(state.root.join("trash").join(state.net()).join(&id));
+    Ok(())
+}
+
 /// Delete the open wallet after checking its password. Returns true if the app had to restart
 /// (only when the wallet cannot be closed inside the process; the folder is then removed on start).
 /// Remove a wallet that is NOT open, straight from the wallet list. No password is asked (it may be
@@ -916,6 +1014,7 @@ async fn wallet_remove(state: St<'_>, id: String) -> Result<(), String> {
     if !dir.exists() {
         return Err("Cüzdan bulunamadı.".into());
     }
+    trash_wallet(&state.root, &state.net(), &id, &dir)?;
     {
         let mut s = state.settings.lock().unwrap();
         let net = s.network.clone();
@@ -969,6 +1068,7 @@ async fn wallet_delete(app: tauri::AppHandle, state: St<'_>, password: String) -
     .await;
     state.attempt(r)?;
     let dir = state.wallet_dir(&id)?;
+    trash_wallet(&state.root, &state.net(), &id, &dir)?;
     {
         let mut s = state.settings.lock().unwrap();
         let net = s.network.clone();
@@ -1285,6 +1385,52 @@ fn tor_status(state: St<'_>) -> TorDto {
         engine: set.tor.clone(),
         bridges: set.bridges.clone(),
     }
+}
+
+/// Connection diagnostics for the Repair tab. Returns plain facts and ids; the interface words them.
+#[tauri::command]
+async fn tor_diagnose(state: St<'_>) -> Result<serde_json::Value, String> {
+    let tor = tor_status(state.clone());
+    let log_path = state.root.join("orkowallet.log");
+    let (net, skew, reach, hints) = blocking(move || {
+        let net = orko_grin_core::diag::internet_ok();
+        let skew = if net { orko_grin_core::diag::clock_skew_secs() } else { None };
+        let reach = if net { orko_grin_core::diag::tor_direct_reach() } else { (0, 0) };
+        let bytes = std::fs::read(&log_path).unwrap_or_default();
+        let tail = &bytes[bytes.len().saturating_sub(400_000)..];
+        let hints = orko_grin_core::diag::log_hints(&String::from_utf8_lossy(tail));
+        Ok((net, skew, reach, hints))
+    })
+    .await?;
+    let advice = if !net {
+        "internet"
+    } else if skew.is_some_and(|s| s.abs() > 300) {
+        "clock"
+    } else if tor.bridges == "none" && reach.0 == 0 {
+        "bridge"
+    } else if tor.state == "ready" && tor.reachable {
+        "ok"
+    } else if tor.state == "ready" && tor.ready_for < 300 {
+        "wait"
+    } else if tor.state == "starting" && !hints.contains(&"stuck") {
+        "connecting"
+    } else {
+        "repair"
+    };
+    Ok(serde_json::json!({
+        "internet": net,
+        "skew": skew,
+        "reach_ok": reach.0,
+        "reach_total": reach.1,
+        "tor_state": tor.state,
+        "tor_percent": tor.percent,
+        "tor_reachable": tor.reachable,
+        "tor_ready_for": tor.ready_for,
+        "tor_message": tor.message,
+        "bridges": tor.bridges,
+        "hints": hints,
+        "advice": advice,
+    }))
 }
 
 /// Save bridge settings and apply them at once (restarts the bundled tor).
@@ -1993,6 +2139,7 @@ fn main() {
                 .ok()
                 .and_then(|t| serde_json::from_str(&t).ok())
                 .unwrap_or_default();
+            trash_purge_old(&root);
             // Wallets deleted last session (their folders were locked then).
             for p in std::mem::take(&mut settings.pending_delete) {
                 let p = PathBuf::from(p);
@@ -2067,6 +2214,10 @@ fn main() {
             wallet_update,
             wallet_delete,
             wallet_remove,
+            tor_diagnose,
+            trash_list,
+            trash_restore,
+            trash_purge,
             repair_restart,
             saved_slatepack,
             change_password,

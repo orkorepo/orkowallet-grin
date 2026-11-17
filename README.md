@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <a href="../../releases"><img alt="Version" src="https://img.shields.io/badge/version-0.1.2-2a5fef.svg"></a>
+  <a href="../../releases"><img alt="Version" src="https://img.shields.io/badge/version-0.1.3-2a5fef.svg"></a>
   <a href="LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/license-Apache--2.0-blue.svg"></a>
   <img alt="Platform: Windows" src="https://img.shields.io/badge/platform-Windows-lightgrey.svg">
   <img alt="Languages: 6" src="https://img.shields.io/badge/languages-6-36c9b0.svg">
@@ -49,7 +49,7 @@ It is meant to be easy for people who are not experts: a clear first-run flow, p
 - Tor built in (official Tor 0.4.9, obfs4, Snowflake and webtunnel bridges). Pay a Grin address directly over Tor.
 - If the recipient is offline the wallet retries on its own (default: every minute for 30 minutes), or you can switch to Slatepack.
 - A pool of public nodes with automatic failover and health ordering, or your own built-in node.
-- A repair option that rebuilds the Tor connection when it will not come up, and an automatic clean restart of Tor when your address stays unreachable.
+- A connection diagnosis that finds out why Tor will not connect (internet, clock, blocked network, log), and a repair option that rebuilds the Tor connection when it will not come up, and an automatic clean restart of Tor when your address stays unreachable.
 
 **Wallet**
 
@@ -59,7 +59,7 @@ It is meant to be easy for people who are not experts: a clear first-run flow, p
 - Slatepack send and receive.
 - An unfinished Slatepack exchange is kept: open the transaction later to copy the text again, or paste the reply and finish.
 - Transaction history with paging, CSV export, payment proofs, wallet backup.
-- Delete a wallet from the list, even if you forgot its password.
+- Delete a wallet from the list, even if you forgot its password. The encrypted key file stays for 30 days under "Recently deleted", so a mistake can be undone.
 
 **Security**
 
@@ -97,7 +97,7 @@ It is meant to be easy for people who are not experts: a clear first-run flow, p
 2. Compare its SHA-256 with the value in the release notes:
 
    ```powershell
-   Get-FileHash .\OrkoWallet.-.Grin_0.1.2_x64-setup.exe -Algorithm SHA256
+   Get-FileHash .\OrkoWallet.-.Grin_0.1.3_x64-setup.exe -Algorithm SHA256
    ```
 
 3. Run it. It installs for the current user and needs no administrator rights.
@@ -119,12 +119,13 @@ winget install Orkoswap.OrkoWalletGrin
 **The Tor card stays at about 90% and never says "Online".**
 The wallet connected to Tor, but your address cannot be reached from outside yet. In order:
 
-1. Wait a few minutes; the first announcement can take 3 to 5 minutes.
-2. Make sure the computer clock is correct (Windows *Settings → Time & language → Date & time → Sync now*). A clock that is off by more than a few minutes breaks Tor.
-3. Turn a VPN off or on and compare.
-4. Pick **Snowflake** (or **obfs4**) in the *Tor connection* card and press **Apply**. This avoids relays that are slow or blocked on your network.
-5. Open **Settings → Repair → Reset the connection and restart**. It deletes Tor's saved state (the entry relays it picked and its cache) and restarts the app. Your wallets, recovery phrase and balance are not touched.
-6. Allow `tor.exe` and OrkoWallet through your firewall or antivirus.
+1. Open **Settings → Repair → Run the diagnosis**. It checks your internet, the computer clock, whether your network blocks Tor and the Tor log, and tells you what to try next.
+2. Wait a few minutes; the first announcement can take 3 to 5 minutes.
+3. Make sure the computer clock is correct (Windows *Settings → Time & language → Date & time → Sync now*). A clock that is off by more than a few minutes breaks Tor.
+4. Turn a VPN off or on and compare.
+5. Pick **Snowflake** (or **obfs4**) in the *Tor connection* card and press **Apply**. This avoids relays that are slow or blocked on your network.
+6. Open **Settings → Repair → Reset the connection and restart**. It deletes Tor's saved state (the entry relays it picked and its cache) and restarts the app. Your wallets, recovery phrase and balance are not touched.
+7. Allow `tor.exe` and OrkoWallet through your firewall or antivirus.
 
 The wallet also restarts Tor from a clean state on its own, once, if the address has been unreachable for four minutes. While your address is not online you can still send payments, and you can receive with Slatepack.
 
