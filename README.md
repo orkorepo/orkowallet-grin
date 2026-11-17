@@ -101,6 +101,18 @@ It is meant to be easy for people who are not experts: a clear first-run flow, p
 | ![Send](docs/screenshots/send.png) | ![Node panel](docs/screenshots/nodes.png) |
 | ![Settings](docs/screenshots/settings.png) | ![Wallets](docs/screenshots/wallets.png) |
 
+### Two colour sets
+
+The default is the black-and-yellow Grin look. Prefer the blue Orko colours? Pick them under *Settings → General → Colour*; the change shows at once and is remembered. Both sets come in a light and a dark theme.
+
+<img src="docs/screenshots/settings-colour-orko.png" alt="Settings, Colour: Grin yellow or Orko blue" width="880">
+
+| Orko blue, dark | Orko blue, light |
+|---|---|
+| ![Wallet, Orko blue, dark](docs/screenshots/wallet-orko-dark.png) | ![Wallet, Orko blue, light](docs/screenshots/wallet-orko.png) |
+
+![Send, Orko blue, dark](docs/screenshots/send-orko-dark.png)
+
 ### Compact layout
 
 The same wallet in a narrow window or on a phone-sized screen: one column, bottom tabs for Wallet, Tor and Node.
