@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0 – 2026-11-20
+
+- **Android app (first release).** The same wallet now runs on Android phones (arm64, Android 7 and newer) as a signed APK on the Releases page. Tor is built in (the official Tor Expert Bundle for Android), so sending and receiving over Tor works the same way as on the desktop
+- Android keeps receiving in the background: while a wallet is open a small ongoing notification ("OrkoWallet is running") keeps the app and its Tor address alive, also with the screen off and in Android's deep sleep. The Back button sends the app to the background instead of closing it. Logging out of the wallet stops the service. Payment and Tor notifications work on Android; Android asks for the notification permission the first time you open a wallet
+- **Recovery phrase in Settings → Backup.** A new "Recovery phrase" box shows the words after you type your password, with a clear warning (write it on paper, no screenshots, anyone who knows it can take the money). The window is hidden from screen capture while the words are visible; on Android the screen is protected against screenshots and screen recording at that moment. It is also still available under Wallet settings → Security
+- Fixed: the cards in Wallet settings (and other panels) could be wider than the window when the window was made smaller, so a button or a drop-down was cut off or the page scrolled sideways. They now always fit, on the desktop at any window size and on phones
+- Tor on the desktop is more robust while the window sits in the system tray: tor is started again by itself if it stops, it is restarted with fresh circuits when the computer wakes from sleep, the clean restart of an unreachable address can now repeat (at most every 15 minutes) instead of once per session, and Windows is asked not to put the wallet and its Tor into power-saving ("efficiency") mode
+- The "keep running in the system tray" option is hidden on phones, where it has no meaning
+- New texts translated into all six languages
+
 ## 0.2.0 – 2026-11-18
 
 - New black-and-yellow look (Grin colours) is now the default. The blue Orko colours stay available under Settings → General → Colour; light and dark themes work with both. The app icon and the logo inside the app follow the new colours

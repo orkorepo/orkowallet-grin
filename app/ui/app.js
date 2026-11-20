@@ -302,7 +302,7 @@ $('wf').addEventListener('submit', async (e) => {
 });
 
 function showWords() {
-  invoke('set_protected', { on: true });
+  protect(true);
   const grid = $('words-grid'); grid.replaceChildren();
   state.createdWords.forEach((w) => grid.append(el('li', '', w)));
   $('words-ok').checked = false; $('words-next').disabled = true;
@@ -329,14 +329,28 @@ $('words-verify').addEventListener('submit', async (e) => {
   bad.forEach((i) => i.setAttribute('aria-invalid', 'true'));
   if (bad.length) return err('verify-error', t('Bazı kelimeler tutmuyor. Kâğıdı kontrol et.'));
   state.createdWords = []; $('words-grid').replaceChildren();
-  invoke('set_protected', { on: false });
+  protect(false);
   state.status = await invoke('status'); enterWallet();
 });
 
 // ------------------------------------------------------------------ open wallet
 let walletTimers = [];
+/** Keep secrets out of screenshots and screen recordings (desktop window flag, Android FLAG_SECURE). */
+function protect(on) {
+  invoke('set_protected', { on });
+  try { if (window.OrkoAndroid) window.OrkoAndroid.setSecure(on); } catch { /* not on Android */ }
+}
+/** Android: while a wallet is open a foreground service keeps the app (and its Tor address) alive in the background. */
+function androidKeepAlive(on) {
+  try {
+    if (!window.OrkoAndroid) return;
+    if (on) window.OrkoAndroid.serviceOn(t('OrkoWallet çalışıyor'), t('Tor üzerinden ödeme alabilmen için açık tutuluyor. Durdurmak için cüzdandan çıkış yap.'));
+    else window.OrkoAndroid.serviceOff();
+  } catch { /* not on Android */ }
+}
 function enterWallet() {
   state.open = state.status.open_wallet;
+  androidKeepAlive(true);
   ['wallet-label', 'tor-pill', 'btn-lock', 'btn-logout'].forEach((id) => { $(id).hidden = false; });
   $('ws-name').textContent = state.open.name;
   fillWalletSettings();
@@ -413,6 +427,7 @@ async function logout() {
 /** Back to the wallet list without restarting the app. */
 async function leaveWallet() {
   walletTimers.forEach(clearInterval); walletTimers = [];
+  androidKeepAlive(false);
   locked = false; $('lockscreen').hidden = true; closeDialogs();
   state.open = null; state.overview = null; state.pendingSlate = null;
   state.status = await invoke('status');
@@ -772,13 +787,13 @@ $('ph-form').addEventListener('submit', async (e) => {
     try {
       const words = await invoke('show_phrase', { password: $('ph-pass').value });
       $('ph-pass').value = '';
-      invoke('set_protected', { on: true });
+      protect(true);
       const g = $('ph-words'); g.replaceChildren(); words.forEach((w) => g.append(el('li', '', w)));
-      $('ph-ask').hidden = true; g.hidden = false;
+      $('ph-ask').hidden = true; g.hidden = false; $('ph-after').hidden = false;
     } catch (x) { err('ph-error', E(x)); }
   });
 });
-$('dlg-phrase').addEventListener('close', () => { invoke('set_protected', { on: false }); $('ph-words').replaceChildren(); $('ph-words').hidden = true; $('ph-ask').hidden = false; });
+$('dlg-phrase').addEventListener('close', () => { protect(false); $('ph-words').replaceChildren(); $('ph-words').hidden = true; $('ph-after').hidden = true; $('ph-ask').hidden = false; });
 
 $('del-ok').addEventListener('change', (e) => { $('del-submit').disabled = !e.target.checked; });
 $('del-form').addEventListener('submit', async (e) => {
@@ -1234,7 +1249,7 @@ function openDialog(name) {
     $('set-confirm-pw').checked = s.send.confirm_password; $('set-fluff').checked = s.send.fluff;
     $('set-minconf').value = String(s.send.min_confirmations || 10); $('set-change').value = String(s.send.change_outputs); $('set-strategy').value = s.send.strategy; $('set-ttl').value = s.send.ttl_blocks;
     $('set-retry').checked = s.send.retry; $('set-retry-min').value = s.send.retry_minutes; $('set-retry-min').disabled = !s.send.retry;
-    $('set-backup-box').hidden = !state.open; err('set-backup-note');
+    $('set-backup-box').hidden = !state.open; $('set-phrase-box').hidden = !state.open; err('set-backup-note');
     return $('dlg-settings').showModal();
   }
   if (name === 'node') {

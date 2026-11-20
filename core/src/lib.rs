@@ -850,6 +850,13 @@ impl Wallet {
         Ok(())
     }
 
+    /// Start tor again with the bridges it already uses and the state it already has (circuits are rebuilt, the
+    /// onion address is published again). Used when tor exited by itself or the computer woke from sleep.
+    pub fn restart_tor_same(&self) -> Result<()> {
+        let bridges = self.bridges.lock().unwrap().clone();
+        self.restart_tor(bridges)
+    }
+
     pub fn restart_tor(&self, bridges: Vec<String>) -> Result<()> {
         *self.bridges.lock().unwrap() = bridges;
         let TorMode::Bundled(bundle) = &self.settings.tor else {

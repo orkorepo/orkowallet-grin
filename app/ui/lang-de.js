@@ -316,7 +316,7 @@ const LANG_DE = {
   "1 dakika": "1 Minute",
   "1 saat": "1 Stunde",
   "Hakkında": "Info",
-  "OrkoWallet – Grin 0.2.0 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.2.0 · offizielle Bibliotheken grin-wallet 5.5.1 und grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
+  "OrkoWallet – Grin 0.3.0 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.3.0 · offizielle Bibliotheken grin-wallet 5.5.1 und grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
   "Ağ değişince açık cüzdan kapanır ve uygulama yeniden başlar.": "Beim Netzwerkwechsel wird die geöffnete Wallet geschlossen und die App neu gestartet.",
   "Uygulama seçtiğin ağ ile yeniden başlayacak.": "Die App wird mit dem gewählten Netzwerk neu starten.",
   "Node havuzu ({net})": "Node-Pool ({net})",
@@ -542,4 +542,8 @@ const LANG_DE = {
   "Pencereyi kapatınca sistem tepsisinde çalışmaya devam et": "Beim Schließen des Fensters im Infobereich weiterlaufen",
   "Tepsideyken cüzdan açık kalır, ödeme almaya ve bildirim göndermeye devam eder. Tamamen kapatmak için tepsi simgesine sağ tıkla.": "Im Infobereich bleibt die Wallet geöffnet, empfängt weiter Zahlungen und sendet Benachrichtigungen. Zum vollständigen Beenden klicke mit rechts auf das Symbol.",
   "Bildirimi dene": "Testbenachrichtigung senden",
+  "OrkoWallet çalışıyor": "OrkoWallet läuft",
+  "Tor üzerinden ödeme alabilmen için açık tutuluyor. Durdurmak için cüzdandan çıkış yap.": "Bleibt geöffnet, damit du Zahlungen über Tor empfangen kannst. Zum Beenden aus dem Wallet abmelden.",
+  "Bu kelimeler cüzdanının asıl yedeğidir: cihazın bozulur ya da kaybolursa paranı yalnızca bunlarla geri alırsın. Önce parolanı sorar, sonra kelimeleri gösterir.": "Diese Wörter sind die eigentliche Sicherung deines Wallets: Geht dein Gerät kaputt oder verloren, bekommst du dein Geld nur mit ihnen zurück. Das Wallet fragt zuerst nach deinem Passwort und zeigt dann die Wörter.",
+  "Kelimeleri kâğıda yaz ve güvenli bir yerde sakla. Ekran görüntüsü alma; bulutta ya da telefonda dosya olarak tutma. Kelimeleri bilen herkes paranı alabilir, kaybedersen kimse geri getiremez.": "Schreib die Wörter auf Papier und bewahre sie sicher auf. Mach keinen Screenshot und speichere sie nicht als Datei in der Cloud oder auf dem Handy. Wer die Wörter kennt, kann dein Geld nehmen, und wenn du sie verlierst, kann niemand es zurückholen.",
 };

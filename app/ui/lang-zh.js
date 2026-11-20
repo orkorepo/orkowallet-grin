@@ -316,7 +316,7 @@ const LANG_ZH = {
   "1 dakika": "1 分钟",
   "1 saat": "1 小时",
   "Hakkında": "关于",
-  "OrkoWallet – Grin 0.2.0 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.2.0 · 官方库 grin-wallet 5.5.1 和 grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
+  "OrkoWallet – Grin 0.3.0 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap": "OrkoWallet – Grin 0.3.0 · 官方库 grin-wallet 5.5.1 和 grin 5.5.2 · Tor 0.4.9.16 · Orkoswap",
   "Ağ değişince açık cüzdan kapanır ve uygulama yeniden başlar.": "切换网络时，已打开的钱包会关闭，应用会重启。",
   "Uygulama seçtiğin ağ ile yeniden başlayacak.": "应用将以您所选的网络重新启动。",
   "Node havuzu ({net})": "节点池（{net}）",
@@ -542,4 +542,8 @@ const LANG_ZH = {
   "Pencereyi kapatınca sistem tepsisinde çalışmaya devam et": "关闭窗口后在系统托盘中继续运行",
   "Tepsideyken cüzdan açık kalır, ödeme almaya ve bildirim göndermeye devam eder. Tamamen kapatmak için tepsi simgesine sağ tıkla.": "在托盘中时，钱包保持打开，继续接收付款并发送通知。要完全退出，请右键点击托盘图标。",
   "Bildirimi dene": "发送测试通知",
+  "OrkoWallet çalışıyor": "OrkoWallet 正在运行",
+  "Tor üzerinden ödeme alabilmen için açık tutuluyor. Durdurmak için cüzdandan çıkış yap.": "保持开启，以便你通过 Tor 接收付款。要停止，请退出钱包。",
+  "Bu kelimeler cüzdanının asıl yedeğidir: cihazın bozulur ya da kaybolursa paranı yalnızca bunlarla geri alırsın. Önce parolanı sorar, sonra kelimeleri gösterir.": "这些单词是你钱包真正的备份：如果设备损坏或丢失，只有靠它们才能取回你的资金。钱包会先询问密码，再显示这些单词。",
+  "Kelimeleri kâğıda yaz ve güvenli bir yerde sakla. Ekran görüntüsü alma; bulutta ya da telefonda dosya olarak tutma. Kelimeleri bilen herkes paranı alabilir, kaybedersen kimse geri getiremez.": "把这些单词写在纸上并妥善保管。不要截图，也不要以文件形式存放在云端或手机里。任何知道这些单词的人都能取走你的钱，一旦丢失，谁也无法帮你找回。",
 };

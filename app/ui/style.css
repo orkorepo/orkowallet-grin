@@ -588,7 +588,7 @@ li.enter { animation: slidein .55s cubic-bezier(.2, .8, .2, 1); }
 .dd-btn:hover { border-color: var(--input-hover); }
 .dd-btn:focus-visible, .dd-btn[aria-expanded="true"] { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .dd-btn:disabled { opacity: .55; cursor: default; }
-.dd-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dd-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .dd-chev { flex: none; width: 8px; height: 8px; border-right: 2px solid var(--text-dim); border-bottom: 2px solid var(--text-dim); transform: translateY(-2px) rotate(45deg); transition: transform .15s; }
 .dd-btn[aria-expanded="true"] .dd-chev { transform: translateY(2px) rotate(-135deg); }
 .dd-list { position: fixed; inset: auto; margin: 0; padding: 4px; overflow-y: auto; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--bg-1); color: var(--text); box-shadow: var(--shadow); }
@@ -786,3 +786,10 @@ html[data-platform="mobile"] .winctl { display: none !important; }
 .kernel-link svg { width: 13px; height: 13px; }
 .kernel-link:hover { background: var(--accent-soft); border-color: var(--accent); }
 @media (max-width: 720px) { .kernel-link { width: 32px; height: 32px; vertical-align: -9px; } .kernel-link svg { width: 16px; height: 16px; } }
+
+/* options that only make sense with a desktop window (system tray) */
+[data-platform="mobile"] .desktop-only { display: none; }
+
+/* main.content is a flex row: without min-width:0 the screen (and every card in it) grows to the widest nowrap text,
+   such as a long dropdown label, and the page scrolls sideways or the cards overflow. Applies to every window size. */
+.screen, .wallet-grid, .col-main, .col-side, .tabs-card, .tab, .ws-form, .ws-block, .field, .dd { min-width: 0; max-width: 100%; }

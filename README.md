@@ -5,14 +5,14 @@
 <h1 align="center">OrkoWallet – Grin</h1>
 
 <p align="center">
-  A private, open-source desktop wallet for <a href="https://grin.mw">Grin</a>.<br>
+  A private, open-source wallet for <a href="https://grin.mw">Grin</a> on Windows and Android.<br>
   Tor is built in. No account, no tracking, no middleman.
 </p>
 
 <p align="center">
-  <a href="../../releases"><img alt="Version" src="https://img.shields.io/badge/version-0.2.0-ffd60a.svg"></a>
+  <a href="../../releases"><img alt="Version" src="https://img.shields.io/badge/version-0.3.0-ffd60a.svg"></a>
   <a href="LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/license-Apache--2.0-blue.svg"></a>
-  <img alt="Platform: Windows" src="https://img.shields.io/badge/platform-Windows-black.svg">
+  <img alt="Platform: Windows and Android" src="https://img.shields.io/badge/platform-Windows%20%7C%20Android-black.svg">
   <img alt="Languages: 6" src="https://img.shields.io/badge/languages-6-ffd60a.svg">
   <a href="../../actions/workflows/build.yml"><img alt="Build" src="../../actions/workflows/build.yml/badge.svg"></a>
 </p>
@@ -59,6 +59,7 @@ It is meant to be easy for people who are not experts: a clear first-run flow, p
 
 - Multiple wallets and accounts, mainnet and testnet.
 - Create with a 12- or 24-word recovery phrase; restore from 12 to 24 words; import grin-wallet and Grim folders.
+- **Show your recovery phrase again** under *Settings → Backup*: it asks for your password first, warns you, and hides the words from screenshots and screen recording while they are visible.
 - **Max** button to send the whole spendable balance, and a setting for how many confirmations (1 to 10) a payment needs before you can spend it.
 - Slatepack send and receive.
 - An unfinished Slatepack exchange is kept: open the transaction later to copy the text again, or paste the reply and finish.
@@ -77,11 +78,17 @@ It is meant to be easy for people who are not experts: a clear first-run flow, p
 - Strict content security policy; the interface loads no remote content.
 - One running copy only, so two instances cannot fight over the same wallet.
 
+**Android**
+
+- The same wallet as an Android app (arm64, Android 7 and newer) with Tor built in, so you send and receive over Tor on your phone too.
+- Keeps receiving with the screen off: while a wallet is open a small ongoing notification ("OrkoWallet is running") keeps the app and its Tor address alive, even in Android's deep sleep. The Back button sends the app to the background; logging out of the wallet stops it.
+- Payment and Tor notifications, and a screen that cannot be captured while the recovery phrase is visible.
+
 **Comfort**
 
 - Black-and-yellow Grin look by default, with the Orko blue as a second colour set (*Settings → General → Colour*), each in a light and a dark theme.
 - Six languages (Türkçe, English, Deutsch, Français, Русский, 简体中文), and live language switching without a restart.
-- Opens at a modest size and shrinks to a compact, single-column layout with bottom tabs, so it fits small windows and is ready for phone-sized screens.
+- Opens at a modest size and shrinks to a compact, single-column layout with bottom tabs, so it fits small windows; the Android app uses the same layout.
 
 ## Screenshots
 
@@ -123,7 +130,15 @@ The same wallet in a narrow window or on a phone-sized screen: one column, botto
   <img src="docs/screenshots/mobile-tor.png" alt="Compact layout: Tor address" width="270">
 </p>
 
-> The screenshots show demo data, not a real wallet.
+### Android
+
+<p>
+  <img src="docs/screenshots/android-wallet.png" alt="Android: wallet" width="270">
+  &nbsp;
+  <img src="docs/screenshots/android-backup.png" alt="Android: Settings, Backup, Recovery phrase" width="270">
+</p>
+
+> The screenshots show demo data or an empty test wallet, not a real wallet.
 
 ## Install
 
@@ -133,12 +148,21 @@ The same wallet in a narrow window or on a phone-sized screen: one column, botto
 2. Compare its SHA-256 with the value in the release notes:
 
    ```powershell
-   Get-FileHash .\OrkoWallet.-.Grin_0.2.0_x64-setup.exe -Algorithm SHA256
+   Get-FileHash .\OrkoWallet.-.Grin_0.3.0_x64-setup.exe -Algorithm SHA256
    ```
 
 3. Run it. It installs for the current user and needs no administrator rights.
 
 The installer is **not code-signed yet**, so Windows SmartScreen may show "Windows protected your PC". That only means the file is new and unsigned. If the SHA-256 matches, choose **More info → Run anyway**. See the [code signing policy](#code-signing-policy).
+
+### Android
+
+1. Download `OrkoWallet-<version>-android-arm64.apk` from the [Releases](../../releases) page on your phone.
+2. Compare its SHA-256 with the value in the release notes (on a computer: `Get-FileHash .\OrkoWallet-0.3.0-android-arm64.apk -Algorithm SHA256`, or `sha256sum` on Linux and macOS).
+3. Open the file. Android asks you to allow installing apps from this source (your browser or file manager); allow it for this one install.
+4. When you open a wallet for the first time, allow notifications. The "OrkoWallet is running" notification is what keeps your Tor address online in the background, so please leave it alone.
+
+The APK is signed with the project's own release key (the same key for every release, so updates install over each other). It is **not** in the Google Play Store. Some phone makers (Xiaomi, Samsung, Huawei and others) stop background apps to save battery; if payments only arrive while the app is open, set the battery use of OrkoWallet to *Unrestricted* in the phone's app settings. If you swipe the app away from the recent apps list, Android stops it and the wallet no longer receives until you open it again.
 
 ### winget (planned)
 
@@ -168,13 +192,15 @@ The wallet also restarts Tor from a clean state on its own, once, if the address
 **"Another Tor process is running with the same data directory".**
 Two copies of the app were started. Since 0.1.2 only one copy can run: opening it a second time brings the first window to the front. With 0.1.1, close every OrkoWallet and `tor.exe` in Task Manager and start again.
 
+**Android: payments only arrive while the app is open.** Check that the "OrkoWallet is running" notification is there (allow notifications for the app), that the wallet is open (not logged out) and that the battery use of OrkoWallet is *Unrestricted*. Do not swipe the app away from the recent apps list; use the Back button to leave it running in the background.
+
 **Logs.** *Settings → About → Open the log folder* opens `orkowallet.log`. Please attach the last lines when you report a problem, and remove anything private first.
 
 ## Security and privacy
 
 - Wallet and node code come from the official grin and grin-wallet crates; this project adds the interface, the Tor manager and the node pool.
 - No telemetry. The app talks only to the Grin nodes you choose and, through Tor, to other wallets.
-- Wallet files are encrypted by grin-wallet with your password. The recovery phrase is shown only after you type the password, and the window is hidden from screen capture while it is on screen.
+- Wallet files are encrypted by grin-wallet with your password. The recovery phrase is shown only after you type the password, and the window is hidden from screen capture while it is on screen (on Android the screen is protected against screenshots and screen recording at that moment).
 - Report vulnerabilities privately; see [SECURITY.md](SECURITY.md).
 
 > **This wallet has not had an independent security audit.** Use it with amounts you can afford to lose, and always keep your recovery phrase on paper.
@@ -192,13 +218,28 @@ Use `cargo build --locked` so `Cargo.lock` is honoured. `ORKOWALLET_DATA=<dir>` 
 
 Release installers are built by the public workflow in [`.github/workflows/build.yml`](.github/workflows/build.yml) when a `v*` tag is pushed.
 
+### Android
+
+Requirements: JDK 17, the Android SDK (platform 34 or newer, NDK 26.3), Rust with the Android targets (`rustup target add aarch64-linux-android`), Node.js 20+ and Python 3.
+
+```sh
+python scripts/fetch-tor-android.py         # Tor for Android, SHA-256 checked, into the Android project
+cd app && npm ci
+npx tauri android build --target aarch64 --apk
+# -> app/src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release.apk
+```
+
+Add `--debug` for a debug build. A release build is signed with the key named in `~/.orko-signing/keystore.properties` (or the file in `ORKO_KEYSTORE_PROPS`; it holds `storeFile`, `storePassword`, `keyAlias`, `keyPassword`); without one the APK is unsigned. Building from Windows needs a few extra steps, see [docs/ANDROID.md](docs/ANDROID.md).
+
 ## Project layout
 
 | Path | What |
 |---|---|
 | `core/` | Wallet core: wraps grin-wallet, Tor manager, node pool with failover, integrated node |
 | `app/` | Tauri 2 shell and the user interface (`app/ui`, plain HTML, CSS and JavaScript, no remote content) |
-| `scripts/` | Tor bundle download with checksum and signature verification, translation tooling |
+| `app/src-tauri/gen/android/` | Android project (Gradle, the foreground service `OrkoService.kt`, the activity bridge); the Tor binaries for it are fetched by `scripts/fetch-tor-android.py` |
+| `vendor/patches/` | A one-line fix for the `lmdb-master-sys` build script so it cross-compiles for Android |
+| `scripts/` | Tor bundle download with checksum and signature verification (Windows and Android), translation tooling |
 | `docs/` | Banner, logo and screenshots |
 
 ## Translations
@@ -213,7 +254,7 @@ Bug reports, fixes, translations and ideas are welcome. Please read [CONTRIBUTIN
 
 Orkoswap is a community-driven project that puts privacy first. We build the tools we want to use ourselves, we keep them free and open source, and we are not here to chase investors: no pitch decks, no funding rounds, just software that respects the people using it. OrkoWallet is part of that. If it helps you, tell others, report bugs, translate it, or [donate](#donate).
 
-**Planned:** Orkoswap deposits and withdrawals from inside the wallet, and an Android version (the interface already has a phone-sized layout).
+**Planned:** Orkoswap deposits and withdrawals from inside the wallet.
 
 ## Donate
 
@@ -225,7 +266,7 @@ grin1tzlscdyzl0pgns8rw9sl7q9wqptftjez2xsdrszj9se4vmvwj8wqajj4yz
 
 ## Code signing policy
 
-Release installers are built from this repository by the public GitHub Actions workflow in `.github/workflows/build.yml`. Code signing is not active yet: we plan to use the free signing for open-source projects offered by [SignPath Foundation](https://signpath.org/); until that is approved the installer is unsigned and Windows SmartScreen may warn. Always compare the SHA-256 on the release page with your download.
+Release installers are built from this repository by the public GitHub Actions workflow in `.github/workflows/build.yml`. The Android APK is built on a maintainer's machine from the same sources and signed with the project's release key; its SHA-256 is on the release page. Code signing is not active yet: we plan to use the free signing for open-source projects offered by [SignPath Foundation](https://signpath.org/); until that is approved the installer is unsigned and Windows SmartScreen may warn. Always compare the SHA-256 on the release page with your download.
 
 - Only maintainers of this repository can approve a release for signing.
 - The wallet does not collect or send telemetry; network access is limited to the Grin nodes you choose and Tor.

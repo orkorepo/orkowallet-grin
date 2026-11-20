@@ -1,7 +1,20 @@
 target/
 target-test/
 node_modules/
-vendor/
+# vendor/ holds downloaded Tor bundles (scripts/fetch-tor*.{ps1,py}); only our crate patches are tracked
+vendor/*
+!vendor/patches/
 *.log
 .env
-app/src-tauri/gen/
+app/src-tauri/gen/schemas/
+# Android project: keep the sources, drop build output and the Tor binaries fetched by scripts/fetch-tor-android.py
+app/src-tauri/gen/android/.gradle/
+app/src-tauri/gen/android/build/
+app/src-tauri/gen/android/buildSrc/build/
+app/src-tauri/gen/android/buildSrc/.gradle/
+app/src-tauri/gen/android/app/build/
+app/src-tauri/gen/android/app/tauri.properties
+app/src-tauri/gen/android/app/src/main/assets/
+app/src-tauri/gen/android/app/src/main/jniLibs/
+app/src-tauri/gen/android/app/src/main/torLibs/
+dist/

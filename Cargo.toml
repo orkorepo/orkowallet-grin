@@ -8,3 +8,7 @@ codegen-units = 1
 strip = true
 # A wallet must never wrap silently on arithmetic overflow.
 overflow-checks = true
+
+# lmdb-master-sys 0.2.6 with one build.rs fix: link advapi32 only when the TARGET is Windows.
+[patch.crates-io]
+lmdb-master-sys = { path = "vendor/patches/lmdb-master-sys" }

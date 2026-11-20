@@ -555,6 +555,7 @@
         <button class="btn btn-primary" type="submit" id="ph-submit">Göster</button>
       </div>
       <ol class="words" id="ph-words" hidden></ol>
+      <p class="callout warn" id="ph-after" hidden>Kelimeleri kâğıda yaz ve güvenli bir yerde sakla. Ekran görüntüsü alma; bulutta ya da telefonda dosya olarak tutma. Kelimeleri bilen herkes paranı alabilir, kaybedersen kimse geri getiremez.</p>
     </form>
   </dialog>
 
@@ -682,8 +683,8 @@
               <legend>Bildirimler</legend>
               <label class="check"><input type="checkbox" id="set-notify-pay"> Ödeme gelince ya da onaylanınca bildir</label>
               <label class="check"><input type="checkbox" id="set-notify-tor"> Tor bağlantısı kesilince bildir</label>
-              <label class="check"><input type="checkbox" id="set-tray"> Pencereyi kapatınca sistem tepsisinde çalışmaya devam et</label>
-              <span class="hint">Tepsideyken cüzdan açık kalır, ödeme almaya ve bildirim göndermeye devam eder. Tamamen kapatmak için tepsi simgesine sağ tıkla.</span>
+              <label class="check desktop-only"><input type="checkbox" id="set-tray"> Pencereyi kapatınca sistem tepsisinde çalışmaya devam et</label>
+              <span class="hint desktop-only">Tepsideyken cüzdan açık kalır, ödeme almaya ve bildirim göndermeye devam eder. Tamamen kapatmak için tepsi simgesine sağ tıkla.</span>
               <div class="row"><button class="btn btn-sm" type="button" id="set-notify-test">Bildirimi dene</button></div>
             </fieldset>
             <fieldset>
@@ -741,6 +742,11 @@
           </div>
 
           <div class="spane" data-spane="backup" hidden>
+            <fieldset id="set-phrase-box">
+              <legend>Kurtarma ifadesi</legend>
+              <p class="hint hint-top">Bu kelimeler cüzdanının asıl yedeğidir: cihazın bozulur ya da kaybolursa paranı yalnızca bunlarla geri alırsın. Önce parolanı sorar, sonra kelimeleri gösterir.</p>
+              <div class="row"><button class="btn btn-primary" type="button" data-open="phrase">Kurtarma ifadesini göster</button></div>
+            </fieldset>
             <fieldset id="set-backup-box">
               <legend>Yedek ve dışa aktarma</legend>
               <div class="row">
@@ -773,7 +779,7 @@
           <div class="spane" data-spane="about" hidden>
             <fieldset>
               <legend>Hakkında</legend>
-              <p class="hint hint-top">OrkoWallet – Grin 0.2.0 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap</p>
+              <p class="hint hint-top">OrkoWallet – Grin 0.3.0 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap</p>
             </fieldset>
             <fieldset>
               <legend>Bağış</legend>
