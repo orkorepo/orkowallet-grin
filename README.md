@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="../../releases"><img alt="Version" src="https://img.shields.io/badge/version-0.3.0-ffd60a.svg"></a>
+  <a href="../../releases"><img alt="Version" src="https://img.shields.io/badge/version-0.3.1-ffd60a.svg"></a>
   <a href="LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/license-Apache--2.0-blue.svg"></a>
   <img alt="Platform: Windows and Android" src="https://img.shields.io/badge/platform-Windows%20%7C%20Android-black.svg">
   <img alt="Languages: 6" src="https://img.shields.io/badge/languages-6-ffd60a.svg">
@@ -148,7 +148,7 @@ The same wallet in a narrow window or on a phone-sized screen: one column, botto
 2. Compare its SHA-256 with the value in the release notes:
 
    ```powershell
-   Get-FileHash .\OrkoWallet.-.Grin_0.3.0_x64-setup.exe -Algorithm SHA256
+   Get-FileHash .\OrkoWallet.-.Grin_0.3.1_x64-setup.exe -Algorithm SHA256
    ```
 
 3. Run it. It installs for the current user and needs no administrator rights.
@@ -158,7 +158,7 @@ The installer is **not code-signed yet**, so Windows SmartScreen may show "Windo
 ### Android
 
 1. Download `OrkoWallet-<version>-android-arm64.apk` from the [Releases](../../releases) page on your phone.
-2. Compare its SHA-256 with the value in the release notes (on a computer: `Get-FileHash .\OrkoWallet-0.3.0-android-arm64.apk -Algorithm SHA256`, or `sha256sum` on Linux and macOS).
+2. Compare its SHA-256 with the value in the release notes (on a computer: `Get-FileHash .\OrkoWallet-0.3.1-android-arm64.apk -Algorithm SHA256`, or `sha256sum` on Linux and macOS).
 3. Open the file. Android asks you to allow installing apps from this source (your browser or file manager); allow it for this one install.
 4. When you open a wallet for the first time, allow notifications. The "OrkoWallet is running" notification is what keeps your Tor address online in the background, so please leave it alone.
 

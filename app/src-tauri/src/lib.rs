@@ -95,6 +95,8 @@ struct AppSettings {
     notify_tor: bool,
     /// The close button hides the window to the system tray; the wallet keeps running and receiving.
     close_to_tray: bool,
+    /// The close button asks first: quit completely or minimize (to the tray). Off after "don't ask again".
+    close_ask: bool,
     /// The one-time "still running in the tray" notice was shown.
     tray_hint_shown: bool,
     /// "bundled" | "arti"
@@ -127,6 +129,7 @@ impl Default for AppSettings {
             notify_payments: true,
             notify_tor: true,
             close_to_tray: true,
+            close_ask: true,
             tray_hint_shown: false,
             tor: "bundled".into(),
             bridges: "none".into(),
@@ -481,7 +484,7 @@ fn status(state: St<'_>) -> Status {
 
 /// Theme, language, auto lock, integrated-node options. Network, Tor and node list have their own commands.
 #[tauri::command]
-fn save_settings(state: St<'_>, theme: String, palette: Option<String>, notify_payments: Option<bool>, notify_tor: Option<bool>, close_to_tray: Option<bool>, language: String, auto_lock_minutes: u32, node: serde_json::Value, send: serde_json::Value) -> Result<(), String> {
+fn save_settings(state: St<'_>, theme: String, palette: Option<String>, notify_payments: Option<bool>, notify_tor: Option<bool>, close_to_tray: Option<bool>, close_ask: Option<bool>, language: String, auto_lock_minutes: u32, node: serde_json::Value, send: serde_json::Value) -> Result<(), String> {
     {
         let mut s = state.settings.lock().unwrap();
         s.theme = theme;
@@ -496,6 +499,9 @@ fn save_settings(state: St<'_>, theme: String, palette: Option<String>, notify_p
         }
         if let Some(b) = close_to_tray {
             s.close_to_tray = b;
+        }
+        if let Some(b) = close_ask {
+            s.close_ask = b;
         }
         s.language = if ["auto", "tr", "en", "de", "fr", "ru", "zh"].contains(&language.as_str()) { language } else { "auto".into() };
         s.auto_lock_minutes = auto_lock_minutes.min(24 * 60);
@@ -885,8 +891,26 @@ fn win_drag(w: tauri::WebviewWindow) {
 }
 #[tauri::command]
 fn win_close(app: tauri::AppHandle) {
-    if !hide_to_tray(&app) {
+    if !on_close_request(&app) {
         app.exit(0); // RunEvent::Exit stops the integrated node cleanly
+    }
+}
+
+/// The answer of the "close or minimize" dialog. `remember` stops it from asking again.
+#[tauri::command]
+fn close_choice(app: tauri::AppHandle, state: St<'_>, choice: String, remember: bool) {
+    if remember {
+        {
+            let mut s = state.settings.lock().unwrap();
+            s.close_ask = false;
+            s.close_to_tray = choice != "quit";
+        }
+        let _ = state.save_settings();
+    }
+    if choice == "quit" {
+        app.exit(0);
+    } else {
+        hide_window(&app);
     }
 }
 #[tauri::command]
@@ -2322,6 +2346,56 @@ fn lang_of(state: &AppState) -> String {
 fn hide_to_tray(_app: &tauri::AppHandle) -> bool {
     false
 }
+#[cfg(not(desktop))]
+fn on_close_request(_app: &tauri::AppHandle) -> bool {
+    false
+}
+#[cfg(not(desktop))]
+fn hide_window(_app: &tauri::AppHandle) {}
+
+/// X button / Alt+F4: with "ask" on, the window stays and the UI shows the quit-or-minimize choice.
+/// Returns true when the close must be stopped (hidden to the tray, or the question is on screen).
+#[cfg(desktop)]
+fn on_close_request(app: &tauri::AppHandle) -> bool {
+    use tauri::Emitter;
+    let Some(st) = app.try_state::<Arc<AppState>>() else { return false };
+    if st.settings.lock().unwrap().close_ask {
+        if let Some(w) = app.get_webview_window("main") {
+            let _ = w.show();
+            let _ = w.unminimize();
+            let _ = w.set_focus();
+        }
+        let _ = app.emit("close-ask", ());
+        return true;
+    }
+    hide_to_tray(app)
+}
+
+/// Minimize: to the tray when it exists, otherwise to the taskbar.
+#[cfg(desktop)]
+fn hide_window(app: &tauri::AppHandle) {
+    if app.try_state::<TrayItems>().is_none() {
+        if let Some(w) = app.get_webview_window("main") {
+            let _ = w.minimize();
+        }
+        return;
+    }
+    let Some(st) = app.try_state::<Arc<AppState>>() else { return };
+    if let Some(w) = app.get_webview_window("main") {
+        let _ = w.hide();
+    }
+    let first = {
+        let mut s = st.settings.lock().unwrap();
+        let first = !s.tray_hint_shown;
+        s.tray_hint_shown = true;
+        first
+    };
+    if first {
+        let _ = st.save_settings();
+        let l = lang_of(&st);
+        toast(app, say(&l, "hint_title"), say(&l, "hint_body"));
+    }
+}
 
 #[cfg(desktop)]
 fn hide_to_tray(app: &tauri::AppHandle) -> bool {
@@ -2533,7 +2607,7 @@ pub fn run() {
         .on_window_event(|window, event| {
             // Alt+F4 and the system close: hide to the tray when that is switched on.
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                if window.label() == "main" && hide_to_tray(window.app_handle()) {
+                if window.label() == "main" && on_close_request(window.app_handle()) {
                     api.prevent_close();
                 }
             }
@@ -2642,6 +2716,7 @@ pub fn run() {
             win_max,
             win_drag,
             win_close,
+            close_choice,
             ui_lang,
             notify_test,
             wallet_update,

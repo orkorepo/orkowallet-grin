@@ -793,3 +793,25 @@ html[data-platform="mobile"] .winctl { display: none !important; }
 /* main.content is a flex row: without min-width:0 the screen (and every card in it) grows to the widest nowrap text,
    such as a long dropdown label, and the page scrolls sideways or the cards overflow. Applies to every window size. */
 .screen, .wallet-grid, .col-main, .col-side, .tabs-card, .tab, .ws-form, .ws-block, .field, .dd { min-width: 0; max-width: 100%; }
+
+/* ---- recovery phrase entry: numbered boxes, word-count switch, paste button (import form) */
+.seed-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.seed-count { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 10px; overflow: hidden; margin-right: auto; }
+.seed-count button { background: var(--bg-1); color: var(--text-dim); border: 0; border-right: 1px solid var(--line); padding: 7px 11px; font: inherit; font-weight: 600; cursor: pointer; }
+.seed-count button:last-child { border-right: 0; }
+.seed-count button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+.seed-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.seed-cell { position: relative; display: block; min-width: 0; }
+.seed-cell > i { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-style: normal; font-size: var(--fs-xs); color: var(--text-dim); pointer-events: none; min-width: 1.2em; text-align: right; }
+.seed-cell > input:not([type="checkbox"]):not([type="radio"]) { width: 100%; padding: 9px 6px 9px 2.4em; font-family: var(--mono); font-size: var(--fs-sm); }
+@media (max-width: 640px) { .seed-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; } .seed-cell > input:not([type="checkbox"]):not([type="radio"]) { font-size: 14px; padding: 11px 2px 11px 25px; letter-spacing: -0.2px; }
+  .seed-cell > i { font-size: 10px; left: 6px; } }
+@media (max-width: 380px) { .seed-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* the folder restore makes no sense on a phone */
+[data-platform="mobile"] [data-form="folder"] { display: none !important; }
+
+/* a wallet that is still open in the background (after "Log out") */
+.wrow.live { border-color: color-mix(in srgb, var(--ok) 60%, var(--line)); }
+
+#dlg-close .dlg-actions { display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px; justify-content: flex-end; margin-top: var(--sp-3); }
+#dlg-close .dlg-actions .btn { flex: 1 1 140px; }

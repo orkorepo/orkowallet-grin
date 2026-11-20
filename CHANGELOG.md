@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.1 – 2026-11-20
+
+- **Import = recovery phrase.** "Import" now takes the recovery phrase (it used to take a wallet folder). The words go into numbered boxes (12, 15, 18, 21 or 24), with a **Paste** button that spreads a copied phrase over the boxes by itself (numbers and line breaks are ignored); a **Clear** button empties them
+- **Restore = wallet folder** (desktop only), renamed "Restore from folder". The phone app only has Import, the folder option is gone there
+- **Lock and Log out work differently.** Lock puts the whole app behind the password (the wallet keeps running). Log out no longer locks or closes anything: it takes you to the wallet list while the wallet stays open in the background (Tor and receiving keep working, also the Android service); "Enter" on the list returns to it without a password, "Close" closes it completely. Opening or creating another wallet closes the one waiting in the background. The lock screen has a "Close wallet" link for a forgotten password
+- Auto-lock can now be set to 3, 6 or 12 hours. It also applies while a wallet waits in the background
+- Logging out while a chain scan runs no longer restarts the app
+- Desktop: the Close (X) button now asks whether to quit completely or minimize (to the tray), with a "don't ask again" box; the choice can be changed in Settings → General
+- Android: new app icon (the Orko ghost on black) instead of the placeholder; the Paste button reads the clipboard through Android directly
+- New texts translated into all six languages
+
+
 ## 0.3.0 – 2026-11-20
 
 - **Android app (first release).** The same wallet now runs on Android phones (arm64, Android 7 and newer) as a signed APK on the Releases page. Tor is built in (the official Tor Expert Bundle for Android), so sending and receiving over Tor works the same way as on the desktop

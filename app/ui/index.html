@@ -17,9 +17,9 @@
     <div class="topbar-right">
       <span class="wallet-label" id="wallet-label" hidden><span id="ws-name">–</span> <span class="dim" id="ws-account"></span></span>
       <button class="tor-pill" id="tor-pill" type="button" aria-live="polite" hidden><span class="dot"></span><span id="tor-text">Tor kapalı</span></button>
-      <button class="btn btn-sm" id="btn-lock" type="button" hidden title="Kilitle: ekranı parolaya bağlar, cüzdan çalışmaya devam eder. Çıkış yap: cüzdanı tamamen kapatır.">
+      <button class="btn btn-sm" id="btn-lock" type="button" hidden title="Kilitle: uygulamayı parolaya bağlar, cüzdan arka planda çalışmaya devam eder.">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Kilitle</button>
-      <button class="btn btn-sm" id="btn-logout" type="button" hidden title="Çıkış yapınca cüzdan kapanır ve Tor adresin çevrimdışı olur; ödeme alamazsın.">
+      <button class="btn btn-sm" id="btn-logout" type="button" hidden title="Çıkış yap: kilitlemeden cüzdan listesine döner. Cüzdan arka planda açık kalır ve ödeme almaya devam eder.">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h4M15 8l4 4-4 4M19 12H9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Çıkış yap</button>
       <button class="icon-btn" data-open="settings" type="button" aria-label="Ayarlar" title="Ayarlar">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm8.1-2.6.1-.9-.1-.9 2-1.6-2-3.4-2.4 1a7 7 0 0 0-1.6-.9L15.8 3h-3.6l-.4 2.6c-.6.2-1.1.5-1.6.9l-2.4-1-2 3.4 2 1.6-.1.9.1.9-2 1.6 2 3.4 2.4-1c.5.4 1 .7 1.6.9l.4 2.6h3.6l.4-2.6c.6-.2 1.1-.5 1.6-.9l2.4 1 2-3.4-2-1.6Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
@@ -108,7 +108,7 @@
               <p class="muted" id="wl-net"></p>
             </div>
           </div>
-          <p class="muted wl2-intro" id="wl-empty" hidden>Bu ağda henüz cüzdanın yok. Yeni bir cüzdan oluştur, kurtarma ifadenle geri yükle ya da grin-wallet / Grim cüzdan klasörünü içe aktar. Anahtarların yalnızca bu bilgisayarda durur; ödemeler Tor üzerinden gelir ve gider.</p>
+          <p class="muted wl2-intro" id="wl-empty" hidden>Bu ağda henüz cüzdanın yok. Yeni bir cüzdan oluştur ya da kurtarma ifadenle içe aktar. Anahtarların yalnızca bu cihazda durur; ödemeler Tor üzerinden gelir ve gider.</p>
           <ul class="wl2-list" id="wl-list"></ul>
           <div id="wl-trash" hidden>
             <h3 class="wl2-sub">Son silinenler</h3>
@@ -121,19 +121,19 @@
               <span class="tile-ico"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
               <strong>Yeni cüzdan</strong><span>Sıfırdan oluştur, 24 kelimelik kurtarma ifadeni al.</span>
             </button>
-            <button class="tile" type="button" data-form="restore">
-              <span class="tile-ico"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-              <strong>Geri yükle</strong><span>Kurtarma ifadenle eski cüzdanını geri getir.</span>
-            </button>
-            <button class="tile" type="button" data-form="import">
+            <button class="tile" type="button" data-form="seed">
               <span class="tile-ico"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-              <strong>İçe aktar</strong><span>grin-wallet ya da Grim klasörünü kopyala.</span>
+              <strong>İçe aktar</strong><span>Kurtarma ifadenle eski cüzdanını geri getir.</span>
+            </button>
+            <button class="tile" type="button" data-form="folder">
+              <span class="tile-ico"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span>
+              <strong>Klasörden geri yükle</strong><span>grin-wallet ya da Grim klasörünü kopyala.</span>
             </button>
           </div>
         </div>
       </section>
 
-      <!-- create / restore / import (one form, three modes) -->
+      <!-- create / import (recovery phrase) / restore (folder): one form, three modes -->
       <section class="screen center" data-screen="form" hidden>
         <form class="card narrow" id="wf" novalidate>
           <button class="back link" type="button" data-go="wallets">← Cüzdanlar</button>
@@ -142,10 +142,16 @@
           <label class="field">Cüzdan adı
             <input id="wf-name" maxlength="40" autocomplete="off" placeholder="Örn. Günlük">
           </label>
-          <label class="field" id="wf-words-f" hidden>Kurtarma ifadesi
-            <textarea id="wf-words" rows="4" class="mono" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
-            <span class="hint">Kurtarma ifadesi 12, 15, 18, 21 veya 24 kelime olabilir.</span>
-          </label>
+          <div class="field" id="wf-words-f" hidden>
+            <span id="wf-words-l">Kurtarma ifadesi</span>
+            <div class="seed-bar">
+              <div class="seed-count" id="wf-count" role="group" aria-label="Kelime sayısı"></div>
+              <button class="btn btn-sm" type="button" id="wf-paste">Yapıştır</button>
+              <button class="btn btn-sm" type="button" id="wf-clear">Temizle</button>
+            </div>
+            <div class="seed-grid" id="wf-grid"></div>
+            <span class="hint">Kurtarma ifadesi 12, 15, 18, 21 veya 24 kelime olabilir. “Yapıştır”a basınca kelimeler kutulara kendiliğinden dağılır.</span>
+          </div>
           <label class="field" id="wf-since-f" hidden>Bu cüzdanı ne zaman oluşturdun?
             <select id="wf-since"></select>
             <span class="hint">Cüzdan hemen açılır; eski işlemlerin arkada taranır. Seçtiğin yıldan önce gelen para görünmez, emin değilsen "Bilmiyorum"u seç (sonradan "Cüzdanı onar" ile de taratabilirsin).</span>
@@ -387,7 +393,7 @@
       <label class="field">Parola <input type="password" id="lk-pass" autocomplete="current-password"></label>
       <p class="error" id="lk-error" role="alert"></p>
       <button class="btn btn-primary btn-lg" type="submit" id="lk-submit">Kilidi aç</button>
-      <button class="link" type="button" id="lk-logout">Çıkış yap</button>
+      <button class="link" type="button" id="lk-logout">Cüzdanı kapat</button>
     </form>
   </div>
 
@@ -559,6 +565,18 @@
     </form>
   </dialog>
 
+  <dialog id="dlg-close" aria-labelledby="cl-title">
+    <form class="dlg" id="cl-form" method="dialog" novalidate>
+      <div class="dlg-head"><h2 id="cl-title">Pencereyi kapatıyorsun</h2><button class="icon-btn" type="button" data-close aria-label="Kapat">✕</button></div>
+      <p class="muted">Tamamen kapatırsan Tor adresin çevrimdışı olur ve ödeme alamazsın. Küçültürsen cüzdan arka planda çalışmaya devam eder.</p>
+      <label class="check"><input type="checkbox" id="cl-remember"> Bir daha sorma</label>
+      <div class="dlg-actions">
+        <button class="btn" type="button" id="cl-quit">Tamamen kapat</button>
+        <button class="btn btn-primary" type="button" id="cl-min">Küçült</button>
+      </div>
+    </form>
+  </dialog>
+
   <dialog id="dlg-wremove" aria-labelledby="wr-title">
     <form class="dlg" id="wr-form" novalidate>
       <div class="dlg-head"><h2 id="wr-title">Cüzdanı sil</h2><button class="icon-btn" type="button" data-close aria-label="Kapat">✕</button></div>
@@ -683,8 +701,14 @@
               <legend>Bildirimler</legend>
               <label class="check"><input type="checkbox" id="set-notify-pay"> Ödeme gelince ya da onaylanınca bildir</label>
               <label class="check"><input type="checkbox" id="set-notify-tor"> Tor bağlantısı kesilince bildir</label>
-              <label class="check desktop-only"><input type="checkbox" id="set-tray"> Pencereyi kapatınca sistem tepsisinde çalışmaya devam et</label>
-              <span class="hint desktop-only">Tepsideyken cüzdan açık kalır, ödeme almaya ve bildirim göndermeye devam eder. Tamamen kapatmak için tepsi simgesine sağ tıkla.</span>
+              <label class="field desktop-only">Kapat (X) düğmesine basınca
+                <select id="set-close">
+                  <option value="ask">Ne yapacağımı sor</option>
+                  <option value="tray">Küçült: arka planda çalışmaya devam et</option>
+                  <option value="quit">Tamamen kapat</option>
+                </select>
+              </label>
+              <span class="hint desktop-only">Küçültünce cüzdan açık kalır, ödeme almaya ve bildirim göndermeye devam eder. Tamamen kapatmak için tepsi simgesine sağ tıkla.</span>
               <div class="row"><button class="btn btn-sm" type="button" id="set-notify-test">Bildirimi dene</button></div>
             </fieldset>
             <fieldset>
@@ -779,7 +803,7 @@
           <div class="spane" data-spane="about" hidden>
             <fieldset>
               <legend>Hakkında</legend>
-              <p class="hint hint-top">OrkoWallet – Grin 0.3.0 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap</p>
+              <p class="hint hint-top">OrkoWallet – Grin 0.3.1 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap</p>
             </fieldset>
             <fieldset>
               <legend>Bağış</legend>

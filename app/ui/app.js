@@ -156,12 +156,23 @@ function renderWallets() {
     const created = Number(w.created) ? t('Oluşturuldu {date}', { date: fmtDate(Number(w.created)) }) : t('İçe aktarıldı');
     mid.append(el('div', 'wmeta', `${created} · ${connLabel(w)}`));
     li.append(av, mid);
-    if (w.id === s.last_wallet && s.wallets.length > 1) li.append(el('span', 'chip', t('Son kullanılan')));
-    const b = el('button', 'btn btn-primary', t('Aç')); b.type = 'button';
-    b.addEventListener('click', () => askUnlock(w));
-    const rm = el('button', 'btn danger-text', t('Sil')); rm.type = 'button'; rm.title = t('Cüzdanı sil');
-    rm.addEventListener('click', () => askRemove(w));
-    li.append(rm, b); ul.append(li);
+    const live = !!(s.open_wallet && s.open_wallet.id === w.id); // still open in the background
+    if (live) { li.classList.add('live'); li.append(el('span', 'chip', t('Arka planda açık'))); }
+    else if (w.id === s.last_wallet && s.wallets.length > 1) li.append(el('span', 'chip', t('Son kullanılan')));
+    if (live) {
+      const shut = el('button', 'btn', t('Kapat')); shut.type = 'button'; shut.title = t('Cüzdanı tamamen kapat; Tor adresin çevrimdışı olur.');
+      shut.addEventListener('click', closeWallet);
+      const enter = el('button', 'btn btn-primary', t('Gir')); enter.type = 'button';
+      enter.addEventListener('click', () => enterWallet());
+      li.append(shut, enter);
+    } else {
+      const b = el('button', 'btn btn-primary', t('Aç')); b.type = 'button';
+      b.addEventListener('click', () => askUnlock(w));
+      const rm = el('button', 'btn danger-text', t('Sil')); rm.type = 'button'; rm.title = t('Cüzdanı sil');
+      rm.addEventListener('click', () => askRemove(w));
+      li.append(rm, b);
+    }
+    ul.append(li);
   });
   show('wallets');
   loadTrash();
@@ -233,6 +244,7 @@ $('ul-form').addEventListener('submit', async (e) => {
   e.preventDefault(); err('ul-error');
   await busy($('ul-submit'), async () => {
     try {
+      if (!(await closeOpenFirst())) return;
       await invoke('wallet_open', { id: state.unlockId, password: $('ul-pass').value });
       $('ul-pass').value = ''; $('dlg-unlock').close();
       state.status = await invoke('status'); enterWallet();
@@ -243,26 +255,93 @@ $('ul-form').addEventListener('submit', async (e) => {
 // ------------------------------------------------------------------ create / restore / import
 const FORM = {
   create: { title: 'Yeni cüzdan', desc: 'Bu parola cüzdan dosyanı bu bilgisayarda şifreler. Unutursan cüzdanı yalnızca kurtarma ifadesiyle açabilirsin.', submit: 'Oluştur', hint: '' },
-  restore: { title: 'Cüzdanı geri yükle', desc: 'grin-wallet, Grim ya da bu uygulamadan aldığın kurtarma ifadesi çalışır; adresin aynı kalır.', submit: 'Geri yükle', hint: 'Geri yüklemeden sonra zincir taranır; uzak node ile birkaç dakika sürebilir.' },
-  import: { title: 'Cüzdanı içe aktar', desc: 'grin-wallet ya da Grim cüzdan klasörünü kopyalayarak açar. Parola o cüzdanın mevcut parolasıdır.', submit: 'İçe aktar', hint: '' },
+  // Import = from the recovery phrase (numbered boxes); Restore = from a wallet folder (desktop only).
+  seed: { title: 'Cüzdanı içe aktar', desc: 'grin-wallet, Grim ya da bu uygulamadan aldığın kurtarma ifadesi çalışır; adresin aynı kalır.', submit: 'İçe aktar', hint: 'Geri yüklemeden sonra zincir taranır; uzak node ile birkaç dakika sürebilir.' },
+  folder: { title: 'Klasörden geri yükle', desc: 'grin-wallet ya da Grim cüzdan klasörünü kopyalayarak açar. Parola o cüzdanın mevcut parolasıdır.', submit: 'Geri yükle', hint: '' },
 };
 function openForm(mode) {
+  if (mode === 'folder' && document.documentElement.dataset.platform === 'mobile') mode = 'seed'; // no folder restore on phones
   state.formMode = mode;
   const f = FORM[mode];
   $('wf-title').textContent = t(f.title); $('wf-desc').textContent = t(f.desc);
   $('wf-submit').textContent = t(f.submit); $('wf-hint').textContent = t(f.hint);
-  $('wf-words-f').hidden = mode !== 'restore';
-  $('wf-since-f').hidden = mode !== 'restore';
+  $('wf-words-f').hidden = mode !== 'seed';
+  $('wf-since-f').hidden = mode !== 'seed';
   $('wf-len-f').hidden = mode !== 'create'; $('wf-len').value = '24';
   fillSince($('wf-since'), true);
   $('wf-since').value = 'all';
-  $('wf-path-f').hidden = mode !== 'import';
-  $('wf-pass2-f').hidden = mode === 'import';
-  $('wf-pass-l').textContent = mode === 'import' ? t('Cüzdanın parolası') : t('Parola');
-  ['wf-name', 'wf-words', 'wf-path', 'wf-pass', 'wf-pass2'].forEach((id) => { $(id).value = ''; });
+  $('wf-path-f').hidden = mode !== 'folder';
+  $('wf-pass2-f').hidden = mode === 'folder';
+  $('wf-pass-l').textContent = mode === 'folder' ? t('Cüzdanın parolası') : t('Parola');
+  ['wf-name', 'wf-path', 'wf-pass', 'wf-pass2'].forEach((id) => { $(id).value = ''; });
+  if (mode === 'seed') buildSeedGrid(24, false);
   $('wf-conn').value = 'auto';
   err('wf-error'); closeDialogs(); show('form'); $('wf-name').focus();
 }
+
+// ---- recovery phrase entry: numbered boxes, a word-count switch and a paste button
+const SEED_LENS = [12, 15, 18, 21, 24];
+let seedLen = 24;
+const seedBoxes = () => [...$('wf-grid').querySelectorAll('input')];
+function buildSeedGrid(n, keep) {
+  const old = keep ? seedBoxes().map((i) => i.value) : [];
+  seedLen = n;
+  const grid = $('wf-grid'); grid.replaceChildren();
+  for (let i = 0; i < n; i++) {
+    const cell = el('label', 'seed-cell'); cell.append(el('i', '', String(i + 1)));
+    const inp = el('input'); inp.type = 'text'; inp.value = old[i] || ''; inp.dataset.i = String(i);
+    inp.autocomplete = 'off'; inp.spellcheck = false; inp.autocapitalize = 'off'; inp.setAttribute('autocorrect', 'off');
+    inp.setAttribute('aria-label', t('{n}. kelime', { n: i + 1 }));
+    inp.addEventListener('paste', (e) => {
+      const text = (e.clipboardData || window.clipboardData)?.getData('text') || '';
+      if (/\s/.test(text.trim())) { e.preventDefault(); fillSeed(text, i); }
+    });
+    inp.addEventListener('input', () => {
+      if (/\s/.test(inp.value.trim())) { fillSeed(inp.value, i); return; } // a typed or auto-filled "word word"
+      if (/\s$/.test(inp.value)) { inp.value = inp.value.trim(); seedBoxes()[i + 1]?.focus(); } // space = next box
+      inp.removeAttribute('aria-invalid');
+    });
+    inp.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); const nx = seedBoxes()[i + 1]; if (nx) nx.focus(); else $('wf-pass').focus(); }
+      else if (e.key === 'Backspace' && !inp.value && i > 0) { e.preventDefault(); seedBoxes()[i - 1].focus(); }
+    });
+    cell.append(inp); grid.append(cell);
+  }
+  const bar = $('wf-count'); bar.replaceChildren();
+  SEED_LENS.forEach((k) => {
+    const bt = el('button', '', String(k)); bt.type = 'button'; bt.setAttribute('aria-pressed', String(k === n));
+    bt.title = t('{n} kelime', { n: k });
+    bt.addEventListener('click', () => buildSeedGrid(k, true));
+    bar.append(bt);
+  });
+}
+/** Spread pasted text over the boxes from box `from`. Numbers and punctuation are ignored; a full phrase at box 1 picks the matching length. */
+function fillSeed(text, from) {
+  const words = String(text).toLowerCase().split(/[^a-z]+/).filter(Boolean);
+  if (!words.length) return;
+  err('wf-error');
+  if (from === 0 && words.length > 1 && !SEED_LENS.includes(words.length)) { // not a recovery phrase: leave the boxes alone
+    return err('wf-error', t('Yapıştırdığın metinde {n} kelime var; kurtarma ifadesi 12, 15, 18, 21 ya da 24 kelime olur.', { n: words.length }));
+  }
+  if (from === 0 && words.length > 1 && words.length !== seedLen) buildSeedGrid(words.length, false);
+  const boxes = seedBoxes();
+  words.slice(0, boxes.length - from).forEach((w, k) => { boxes[from + k].value = w; boxes[from + k].removeAttribute('aria-invalid'); });
+  if (words.length > boxes.length - from) {
+    err('wf-error', t('Yapıştırdığın metinde {n} kelime var; kurtarma ifadesi 12, 15, 18, 21 ya da 24 kelime olur.', { n: words.length }));
+  }
+  boxes[Math.min(from + words.length, boxes.length - 1)].focus();
+}
+async function readClipboardText() {
+  try { if (window.OrkoAndroid && window.OrkoAndroid.readClipboard) return String(window.OrkoAndroid.readClipboard() || ''); } catch { /* fall through */ }
+  return navigator.clipboard.readText();
+}
+$('wf-paste').addEventListener('click', async () => {
+  let text = '';
+  try { text = await readClipboardText(); } catch { return toast(t('Panoya erişilemedi; ilk kutuya yapıştır (Ctrl+V ya da uzun basış).')); }
+  if (!/[a-zA-Z]/.test(text)) return toast(t('Panoda kurtarma ifadesi yok.'));
+  fillSeed(text, 0);
+});
+$('wf-clear').addEventListener('click', () => { buildSeedGrid(seedLen, false); err('wf-error'); seedBoxes()[0].focus(); });
 
 /** "Since when" choices for restore / repair: from the start, a year, or (restore only) never. */
 function fillSince(select, withNever) {
@@ -280,23 +359,35 @@ $('wf').addEventListener('submit', async (e) => {
   const mode = state.formMode;
   const name = $('wf-name').value.trim() || t('Cüzdan');
   const password = $('wf-pass').value, connection = $('wf-conn').value;
-  if (mode !== 'import') {
+  let phrase = '';
+  if (mode === 'seed') {
+    const boxes = seedBoxes();
+    const empty = boxes.filter((i) => !i.value.trim());
+    if (empty.length) {
+      empty.forEach((i) => i.setAttribute('aria-invalid', 'true')); empty[0].focus();
+      return err('wf-error', t('Tüm kutuları doldur ({n} / {m}).', { n: boxes.length - empty.length, m: boxes.length }));
+    }
+    phrase = boxes.map((i) => i.value.trim().toLowerCase()).join(' ');
+  }
+  if (mode !== 'folder') {
     if (password.length < 4) return err('wf-error', t('Parola en az 4 karakter olmalı.'));
     if (password !== $('wf-pass2').value) return err('wf-error', t('Parolalar aynı değil.'));
   }
   await busy($('wf-submit'), async () => {
     try {
+      if (!(await closeOpenFirst())) return;
       if (mode === 'create') {
         state.createdWords = await invoke('wallet_create', { name, password, connection, words: Number($('wf-len').value) || 24 });
         showWords();
-      } else if (mode === 'restore') {
-        await invoke('wallet_restore', { name, password, words: $('wf-words').value, connection, since: $('wf-since').value });
+      } else if (mode === 'seed') {
+        await invoke('wallet_restore', { name, password, words: phrase, connection, since: $('wf-since').value });
         state.status = await invoke('status'); enterWallet();
       } else {
         await invoke('wallet_import', { name, path: $('wf-path').value, password, connection });
         state.status = await invoke('status'); enterWallet();
       }
-      ['wf-pass', 'wf-pass2', 'wf-words'].forEach((id) => { $(id).value = ''; });
+      ['wf-pass', 'wf-pass2'].forEach((id) => { $(id).value = ''; });
+      if (mode === 'seed') buildSeedGrid(seedLen, false); // the words do not stay in the page
     } catch (x) { err('wf-error', E(x)); }
   });
 });
@@ -344,7 +435,7 @@ function protect(on) {
 function androidKeepAlive(on) {
   try {
     if (!window.OrkoAndroid) return;
-    if (on) window.OrkoAndroid.serviceOn(t('OrkoWallet çalışıyor'), t('Tor üzerinden ödeme alabilmen için açık tutuluyor. Durdurmak için cüzdandan çıkış yap.'));
+    if (on) window.OrkoAndroid.serviceOn(t('OrkoWallet çalışıyor'), t('Tor üzerinden ödeme alabilmen için açık tutuluyor. Durdurmak için cüzdanı kapat.'));
     else window.OrkoAndroid.serviceOff();
   } catch { /* not on Android */ }
 }
@@ -418,23 +509,44 @@ function lockScreen() {
   $('lockscreen').hidden = false;
   $('lk-pass').focus();
 }
-async function logout() {
+/** Log out: back to the wallet list WITHOUT locking. The wallet stays open in the background (Tor, receiving, the
+ *  Android service keep running); "Gir" on the list returns to it without a password. */
+function logout() {
+  if (!state.open || locked) return;
+  closeDialogs();
+  renderWallets();
+}
+/** Close the wallet completely (Tor address goes offline), then show the list. */
+async function closeWallet() {
   toast(t('Cüzdan kapanıyor…'));
   let restarted;
   try { restarted = await invoke('wallet_close'); } catch (x) { toast(E(x)); return; }
   if (!restarted) leaveWallet(); // true: the app restarts itself (a scan or Arti listener was running)
 }
-/** Back to the wallet list without restarting the app. */
-async function leaveWallet() {
+/** Close a wallet that waits in the background before another one is created or opened. false = the app is restarting. */
+async function closeOpenFirst() {
+  if (!state.status?.open_wallet) return true;
+  const restarted = await invoke('wallet_close');
+  if (restarted) { toast(t('Uygulama yeniden başlıyor…')); return false; }
+  resetOpenState();
+  return true;
+}
+function resetOpenState() {
   walletTimers.forEach(clearInterval); walletTimers = [];
   androidKeepAlive(false);
   locked = false; $('lockscreen').hidden = true; closeDialogs();
   state.open = null; state.overview = null; state.pendingSlate = null;
+  if (state.status) state.status.open_wallet = null;
+}
+/** Back to the wallet list after the wallet was closed completely. */
+async function leaveWallet() {
+  resetOpenState();
   state.status = await invoke('status');
   renderWallets();
-}$('btn-lock').addEventListener('click', lockScreen);
+}
+$('btn-lock').addEventListener('click', lockScreen);
 $('btn-logout').addEventListener('click', logout);
-$('lk-logout').addEventListener('click', logout);
+$('lk-logout').addEventListener('click', closeWallet);
 $('lk-form').addEventListener('submit', async (e) => {
   e.preventDefault(); err('lk-error');
   await busy($('lk-submit'), async () => {
@@ -460,6 +572,7 @@ function fillAutoLock() {
   opt(0, t('Kapalı')); opt(1, t('1 dakika'));
   [5, 10, 15, 30].forEach((n) => opt(n, t('{n} dakika', { n })));
   opt(60, t('1 saat'));
+  [3, 6, 12].forEach((n) => opt(n * 60, t('{n} saat', { n })));
 }
 
 // ------------------------------------------------------------------ transactions
@@ -758,7 +871,7 @@ $('ws-form').addEventListener('submit', async (e) => {
     $('ws-name').textContent = state.open.name;
     if (reconnect) {
       const note = $('ws-note'); note.hidden = false; note.textContent = `${t('Kaydedildi. Yeni node bağlantısı cüzdan yeniden açılınca geçerli olur.')} `;
-      const b = el('button', 'link', t('Şimdi kapat')); b.type = 'button'; b.addEventListener('click', logout); note.append(b);
+      const b = el('button', 'link', t('Şimdi kapat')); b.type = 'button'; b.addEventListener('click', closeWallet); note.append(b);
     } else toast(t('Kaydedildi'));
     refresh();
   } catch (x) { err('ws-error', E(x)); }
@@ -1101,6 +1214,12 @@ function setupWindow() {
   $('win-min').addEventListener('click', () => invoke('win_min'));
   $('win-max').addEventListener('click', () => invoke('win_max'));
   $('win-close').addEventListener('click', () => invoke('win_close'));
+// X button / Alt+F4 with "ask" on: the Rust side keeps the window and sends "close-ask".
+function askClose() { closeDialogs(); $('cl-remember').checked = false; $('dlg-close').showModal(); $('cl-min').focus(); }
+try { window.__TAURI__.event.listen('close-ask', askClose); } catch { /* not on the desktop shell */ }
+const closeChoice = (choice) => { const remember = $('cl-remember').checked; $('dlg-close').close(); invoke('close_choice', { choice, remember }); };
+$('cl-quit').addEventListener('click', () => closeChoice('quit'));
+$('cl-min').addEventListener('click', () => closeChoice('tray'));
   const bar = $('topbar');
   const interactive = 'button, input, select, a, summary';
   bar.addEventListener('mousedown', (e) => { if (e.button === 0 && !e.target.closest(interactive)) invoke('win_drag'); });
@@ -1206,7 +1325,7 @@ $('nd-conn-apply').addEventListener('click', async (e) => {
       state.status = await invoke('status'); state.open = state.status.open_wallet;
       if (reconnect) {
         const note = $('nd-conn-note'); note.hidden = false; note.textContent = `${t('Kaydedildi. Yeni node bağlantısı cüzdan yeniden açılınca geçerli olur.')} `;
-        const b = el('button', 'link', t('Şimdi kapat')); b.type = 'button'; b.addEventListener('click', logout); note.append(b);
+        const b = el('button', 'link', t('Şimdi kapat')); b.type = 'button'; b.addEventListener('click', closeWallet); note.append(b);
       } else toast(t('Kaydedildi'));
       fillWalletSettings();
     } catch (x) { err('nd-conn-error', E(x)); }
@@ -1238,7 +1357,7 @@ function openDialog(name) {
     document.querySelectorAll('input[name="palette"]').forEach((r) => { r.checked = r.value === (s.palette === 'orko' ? 'orko' : 'grin'); });
     $('set-notify-pay').checked = s.notify_payments !== false;
     $('set-notify-tor').checked = s.notify_tor !== false;
-    $('set-tray').checked = s.close_to_tray !== false;
+    $('set-close').value = s.close_ask !== false ? 'ask' : (s.close_to_tray !== false ? 'tray' : 'quit');
     $('set-network').value = s.network;
     $('opt-usernet').hidden = s.network !== 'usernet';
     $('set-net-apply').disabled = true;
@@ -1320,7 +1439,7 @@ $('set-save').addEventListener('click', async () => {
   const s = state.status.settings;
   const theme = document.querySelector('input[name="theme"]:checked')?.value || 'system';
   const palette = document.querySelector('input[name="palette"]:checked')?.value || 'grin';
-  const notifyPayments = $('set-notify-pay').checked, notifyTor = $('set-notify-tor').checked, closeToTray = $('set-tray').checked;
+  const notifyPayments = $('set-notify-pay').checked, notifyTor = $('set-notify-tor').checked, closeMode = $('set-close').value, closeToTray = closeMode !== 'quit', closeAsk = closeMode === 'ask';
   const language = $('set-lang').value;
   const minutes = Number($('set-autolock').value) || 0;
   try {
@@ -1330,7 +1449,7 @@ $('set-save').addEventListener('click', async () => {
       min_confirmations: Math.min(10, Math.max(1, Number($('set-minconf').value) || 10)),
       retry: $('set-retry').checked, retry_minutes: Math.min(240, Math.max(1, Number($('set-retry-min').value) || 30)),
     };
-    await invoke('save_settings', { theme, palette, notifyPayments, notifyTor, closeToTray, language, autoLockMinutes: minutes, node: s.node, send });
+    await invoke('save_settings', { theme, palette, notifyPayments, notifyTor, closeToTray, closeAsk, language, autoLockMinutes: minutes, node: s.node, send });
     state.status = await invoke('status'); applyTheme(theme); applyPalette(palette);
     if (language !== s.language) applyLanguage(language);
     autoLockMs = minutes * 60000;
@@ -1347,7 +1466,8 @@ function applyLanguage(pref) {
   $('set-autolock').value = String(state.status.settings.auto_lock_minutes);
   const chip = $('net-chip');
   chip.textContent = NET_LABEL()[state.status.network] || state.status.network;
-  if (state.open) {
+  const listShown = document.querySelector('[data-screen="wallets"]') && !document.querySelector('[data-screen="wallets"]').hidden;
+  if (state.open && !listShown) {
       fillSince($('rescan-since'), false);
     refresh(); pollTor(); pollScan();
     if (document.querySelector('.tabs [data-tab="accounts"][aria-selected="true"]')) loadAccounts();

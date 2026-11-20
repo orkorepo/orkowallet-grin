@@ -52,6 +52,18 @@
   "en": "Saved"
  },
  {
+  "tr": "Bu kelimeler cüzdanının asıl yedeğidir: cihazın bozulur ya da kaybolursa paranı yalnızca bunlarla geri alırsın. Önce parolanı sorar, sonra kelimeleri gösterir.",
+  "en": "These words are the real backup of your wallet: if your device breaks or is lost, they are the only way to get your money back. The wallet asks for your password first, then shows the words."
+ },
+ {
+  "tr": "Kelimeleri kâğıda yaz ve güvenli bir yerde sakla. Ekran görüntüsü alma; bulutta ya da telefonda dosya olarak tutma. Kelimeleri bilen herkes paranı alabilir, kaybedersen kimse geri getiremez.",
+  "en": "Write the words on paper and keep them somewhere safe. Do not take a screenshot or keep them as a file in the cloud or on your phone. Anyone who knows the words can take your money, and if you lose them nobody can bring it back."
+ },
+ {
+  "tr": "OrkoWallet çalışıyor",
+  "en": "OrkoWallet is running"
+ },
+ {
   "tr": "Kopyala",
   "en": "Copy"
  },
@@ -1176,14 +1188,6 @@
   "en": "The wallet is locked. It keeps running in the background and payments keep arriving."
  },
  {
-  "tr": "Kilitle: ekranı parolaya bağlar, cüzdan çalışmaya devam eder. Çıkış yap: cüzdanı tamamen kapatır.",
-  "en": "Lock: puts the screen behind the password, the wallet keeps running. Log out: closes the wallet completely."
- },
- {
-  "tr": "Çıkış yapınca cüzdan kapanır ve Tor adresin çevrimdışı olur; ödeme alamazsın.",
-  "en": "Logging out closes the wallet and your Tor address goes offline; you cannot receive payments."
- },
- {
   "tr": "Cüzdan kapanıyor…",
   "en": "Closing the wallet…"
  },
@@ -1222,14 +1226,6 @@
  {
   "tr": "Tor bağlantısı kesilince bildir",
   "en": "Notify me when the Tor connection drops"
- },
- {
-  "tr": "Pencereyi kapatınca sistem tepsisinde çalışmaya devam et",
-  "en": "Keep running in the system tray when the window is closed"
- },
- {
-  "tr": "Tepsideyken cüzdan açık kalır, ödeme almaya ve bildirim göndermeye devam eder. Tamamen kapatmak için tepsi simgesine sağ tıkla.",
-  "en": "While in the tray the wallet stays open and keeps receiving payments and sending notifications. To quit completely, right-click the tray icon."
  },
  {
   "tr": "Bildirimi dene",
@@ -1296,8 +1292,8 @@
   "en": "About"
  },
  {
-  "tr": "OrkoWallet – Grin 0.3.0 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap",
-  "en": "OrkoWallet – Grin 0.3.0 · official grin-wallet 5.5.1 and grin 5.5.2 libraries · Tor 0.4.9.16 · Orkoswap"
+  "tr": "OrkoWallet – Grin 0.3.1 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap",
+  "en": "OrkoWallet – Grin 0.3.1 · official grin-wallet 5.5.1 and grin 5.5.2 libraries · Tor 0.4.9.16 · Orkoswap"
  },
  {
   "tr": "Ağ değişince açık cüzdan kapanır ve uygulama yeniden başlar.",
@@ -1812,10 +1808,6 @@
   "en": "Wallet deleted"
  },
  {
-  "tr": "Bu ağda henüz cüzdanın yok. Yeni bir cüzdan oluştur, kurtarma ifadenle geri yükle ya da grin-wallet / Grim cüzdan klasörünü içe aktar. Anahtarların yalnızca bu bilgisayarda durur; ödemeler Tor üzerinden gelir ve gider.",
-  "en": "You have no wallet on this network yet. Create a new wallet, restore one with your recovery phrase, or import a grin-wallet / Grim folder. Your keys stay on this computer only; payments come and go over Tor."
- },
- {
   "tr": "Sıfırdan oluştur, 24 kelimelik kurtarma ifadeni al.",
   "en": "Create from scratch and get your 24-word recovery phrase."
  },
@@ -1890,10 +1882,6 @@
  {
   "tr": "Harcanabilir tüm bakiyeyi gönderir; ağ ücreti bu tutardan düşülür.",
   "en": "Sends the whole spendable balance; the network fee is taken from this amount."
- },
- {
-  "tr": "Kurtarma ifadesi 12, 15, 18, 21 veya 24 kelime olabilir.",
-  "en": "The recovery phrase can have 12, 15, 18, 21 or 24 words."
  },
  {
   "tr": "Gelen bir ödeme bu kadar blok onayı alınca harcanabilir. Grin varsayılanı 10 (~10 dk). 1 onayda harcamak daha hızlıdır, ama zincir yeniden düzenlenirse işlem geçersiz kalabilir.",
@@ -2162,5 +2150,117 @@
  {
   "tr": "Tor hâlâ bağlanıyor. Bir iki dakika bekleyip tanıyı tekrar çalıştır.",
   "en": "Tor is still connecting. Wait a minute or two and run the diagnosis again."
+ },
+ {
+  "tr": "Klasörden geri yükle",
+  "en": "Restore from folder"
+ },
+ {
+  "tr": "Arka planda açık",
+  "en": "Open in background"
+ },
+ {
+  "tr": "Cüzdanı tamamen kapat; Tor adresin çevrimdışı olur.",
+  "en": "Close the wallet completely; your Tor address goes offline."
+ },
+ {
+  "tr": "Gir",
+  "en": "Enter"
+ },
+ {
+  "tr": "Uygulama yeniden başlıyor…",
+  "en": "The app is restarting…"
+ },
+ {
+  "tr": "Yapıştır",
+  "en": "Paste"
+ },
+ {
+  "tr": "Temizle",
+  "en": "Clear"
+ },
+ {
+  "tr": "Kelime sayısı",
+  "en": "Word count"
+ },
+ {
+  "tr": "{n} kelime",
+  "en": "{n} words"
+ },
+ {
+  "tr": "Yapıştırdığın metinde {n} kelime var; kurtarma ifadesi 12, 15, 18, 21 ya da 24 kelime olur.",
+  "en": "The pasted text has {n} words; a recovery phrase has 12, 15, 18, 21 or 24 words."
+ },
+ {
+  "tr": "Panoya erişilemedi; ilk kutuya yapıştır (Ctrl+V ya da uzun basış).",
+  "en": "Could not read the clipboard; paste into the first box (Ctrl+V or long-press)."
+ },
+ {
+  "tr": "Panoda kurtarma ifadesi yok.",
+  "en": "No recovery phrase on the clipboard."
+ },
+ {
+  "tr": "Tüm kutuları doldur ({n} / {m}).",
+  "en": "Fill in all the boxes ({n} / {m})."
+ },
+ {
+  "tr": "{n} saat",
+  "en": "{n} hours"
+ },
+ {
+  "tr": "Cüzdanı kapat",
+  "en": "Close wallet"
+ },
+ {
+  "tr": "Kurtarma ifadesi 12, 15, 18, 21 veya 24 kelime olabilir. “Yapıştır”a basınca kelimeler kutulara kendiliğinden dağılır.",
+  "en": "The recovery phrase can have 12, 15, 18, 21 or 24 words. “Paste” spreads the words over the boxes by itself."
+ },
+ {
+  "tr": "Kilitle: uygulamayı parolaya bağlar, cüzdan arka planda çalışmaya devam eder.",
+  "en": "Lock: puts the app behind the password; the wallet keeps running in the background."
+ },
+ {
+  "tr": "Çıkış yap: kilitlemeden cüzdan listesine döner. Cüzdan arka planda açık kalır ve ödeme almaya devam eder.",
+  "en": "Log out: returns to the wallet list without locking. The wallet stays open in the background and keeps receiving payments."
+ },
+ {
+  "tr": "Tor üzerinden ödeme alabilmen için açık tutuluyor. Durdurmak için cüzdanı kapat.",
+  "en": "Kept open so you can receive payments over Tor. Close the wallet to stop."
+ },
+ {
+  "tr": "Bu ağda henüz cüzdanın yok. Yeni bir cüzdan oluştur ya da kurtarma ifadenle içe aktar. Anahtarların yalnızca bu cihazda durur; ödemeler Tor üzerinden gelir ve gider.",
+  "en": "You have no wallet on this network yet. Create a new wallet or import one with your recovery phrase. Your keys stay on this device only; payments come and go over Tor."
+ },
+ {
+  "tr": "Pencereyi kapatıyorsun",
+  "en": "You are closing the window"
+ },
+ {
+  "tr": "Tamamen kapatırsan Tor adresin çevrimdışı olur ve ödeme alamazsın. Küçültürsen cüzdan arka planda çalışmaya devam eder.",
+  "en": "If you quit completely, your Tor address goes offline and you cannot receive payments. If you minimize, the wallet keeps running in the background."
+ },
+ {
+  "tr": "Bir daha sorma",
+  "en": "Don't ask again"
+ },
+ {
+  "tr": "Tamamen kapat",
+  "en": "Quit completely"
+ },
+ {
+  "tr": "Kapat (X) düğmesine basınca",
+  "en": "When I press the Close (X) button"
+ },
+ {
+  "tr": "Ne yapacağımı sor",
+  "en": "Ask me what to do"
+ },
+ {
+  "tr": "Küçült: arka planda çalışmaya devam et",
+  "en": "Minimize: keep running in the background"
+ },
+ {
+  "tr": "Küçültünce cüzdan açık kalır, ödeme almaya ve bildirim göndermeye devam eder. Tamamen kapatmak için tepsi simgesine sağ tıkla.",
+  "en": "When minimized the wallet stays open and keeps receiving payments and sending notifications. To quit completely, right-click the tray icon."
  }
 ]

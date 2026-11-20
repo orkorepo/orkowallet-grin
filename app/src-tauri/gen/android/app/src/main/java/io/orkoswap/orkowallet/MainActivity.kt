@@ -1,6 +1,8 @@
 package io.orkoswap.orkowallet
 
 import android.Manifest
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -48,6 +50,13 @@ class MainActivity : TauriActivity() {
     @JavascriptInterface
     fun serviceOff() {
       runOnUiThread { stopKeepAlive() }
+    }
+
+    /** Text on the clipboard (the WebView may refuse navigator.clipboard.readText); empty if there is none. */
+    @JavascriptInterface
+    fun readClipboard(): String {
+      val cm = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+      return cm.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(this@MainActivity)?.toString() ?: ""
     }
 
     /** While the recovery phrase is on screen: no screenshots, no screen recording, no recents preview. */
