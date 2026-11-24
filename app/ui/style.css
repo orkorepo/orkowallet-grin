@@ -358,6 +358,9 @@ body.loading { visibility: hidden; }
 /* ------------------------------------------------------------------ v4: polish (Orkoswap look) */
 ::-webkit-scrollbar { width: 10px; height: 10px; } ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
 ::-webkit-scrollbar-thumb:hover { background: var(--input-hover); background-clip: padding-box; border: 2px solid transparent; }
+/* No grey arrow buttons or track: only the thin thumb, in every scrolling area (also the drop-down lists). */
+::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: transparent; }
 .topbar { backdrop-filter: blur(10px); background: color-mix(in srgb, var(--bg-1) 88%, transparent); padding: 10px var(--sp-5); }
 .brand-word { font-size: 1.2rem; }
 .card { border-radius: 16px; box-shadow: 0 1px 0 rgba(255,255,255,.03) inset, var(--shadow); transition: border-color .15s; }
@@ -598,7 +601,7 @@ li.enter { animation: slidein .55s cubic-bezier(.2, .8, .2, 1); }
 .dd-list { position: fixed; inset: auto; margin: 0; padding: 4px; overflow-y: auto; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--bg-1); color: var(--text); box-shadow: var(--shadow); }
 .dd-list:not(:popover-open) { display: none; }
 .dd-list { overscroll-behavior: contain; position: fixed; }
-.dd-list { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+.dd-list::-webkit-scrollbar { width: 6px; }
 .dd-opt { padding: 8px 10px; border-radius: 8px; font: 400 var(--fs-md) var(--font); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dd-opt.on { background: var(--bg-3); }
 .dd-opt.sel { color: var(--accent); font-weight: 600; background: var(--accent-soft); }
