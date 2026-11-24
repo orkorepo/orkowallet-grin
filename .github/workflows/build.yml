@@ -71,9 +71,11 @@ jobs:
           # libraries and the AppImage step fails. Linuxdeploy itself is an AppImage: run it without FUSE.
           NO_STRIP: 'true'
           APPIMAGE_EXTRACT_AND_RUN: '1'
+          # tor's own libraries (libevent, OpenSSL) sit next to it; linuxdeploy must find them there.
+          LD_LIBRARY_PATH: ${{ github.workspace }}/vendor/tor-16.0.1/tor
         run: |
           npm ci
-          npx tauri build --bundles deb,appimage
+          npx tauri build --bundles deb,appimage --verbose
 
       - uses: actions/upload-artifact@v4
         with:
