@@ -209,6 +209,7 @@ dialog::backdrop { background: var(--backdrop); }
 .kv { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font-size: var(--fs-sm); }
 .kv dt { color: var(--text-faint); }
 .kv dd { margin: 0; word-break: break-all; }
+.bio-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 8px; }
 .more { margin-top: 12px; font-size: var(--fs-sm); }
 .more summary { cursor: pointer; color: var(--text-faint); padding: 6px 0; }
 .more .kv { margin-top: 8px; }

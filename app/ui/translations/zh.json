@@ -638,5 +638,16 @@
  "Ana hesap listeden kaldırılamaz.": "主账户不能从列表移除。",
  "Ayrıntılar": "详情",
  "Zincir taramasıyla bulundu. Tarama yalnızca şu an sahip olduğun parayı görür; giden ödemeler yalnızca onları yapan cihazda listelenir.": "通过扫描区块链找到。扫描只能看到你现在拥有的资金;发出的付款只显示在发出它们的设备上。",
- "Bu para başka bir cihazda (aynı kurtarma ifadesiyle) harcandı. Alıcı, ağ ücreti ve tam tarih yalnızca o cihazda kayıtlı. Kalan para üstü bu cüzdana döndüyse ayrıca “Taramayla bulundu” olarak görünür.": "这笔钱已在另一台设备上花掉(使用相同的恢复短语)。收款人、手续费和确切日期只保存在那台设备上。如果找零回到了这个钱包,它也会显示为“扫描发现”。"
+ "Bu para başka bir cihazda (aynı kurtarma ifadesiyle) harcandı. Alıcı, ağ ücreti ve tam tarih yalnızca o cihazda kayıtlı. Kalan para üstü bu cüzdana döndüyse ayrıca “Taramayla bulundu” olarak görünür.": "这笔钱已在另一台设备上花掉(使用相同的恢复短语)。收款人、手续费和确切日期只保存在那台设备上。如果找零回到了这个钱包,它也会显示为“扫描发现”。",
+ "Parmak izi": "指纹",
+ "Cüzdanı parmak iziyle aç": "用指纹打开钱包",
+ "Parolan telefonun güvenli donanımında şifreli saklanır; parmak iziyle açılır. Parola her zaman çalışmaya devam eder, yeni bir parmak izi eklersen bu özellik kendiliğinden kapanır.": "你的密码以加密形式保存在手机的安全硬件中,用指纹解锁。密码始终可用;如果你在手机上添加了新的指纹,此功能会自动关闭。",
+ "Onay için parolan": "用于确认的密码",
+ "Parmak iziyle aç": "用指纹打开",
+ "Parolayı kullan": "使用密码",
+ "Parmak izini onayla": "确认你的指纹",
+ "Parmak izi açıldı": "指纹解锁已开启",
+ "Parmak izi açılamadı": "无法开启指纹解锁",
+ "Parmak izi kapatıldı": "指纹解锁已关闭",
+ "Parmak izi kapatıldı: parola değişmiş. Parolayı yaz.": "指纹解锁已关闭:密码已更改。请输入密码。"
 }

@@ -702,6 +702,19 @@ const EN = {
   'Ayrıntılar': 'Details',
   'Zincir taramasıyla bulundu. Tarama yalnızca şu an sahip olduğun parayı görür; giden ödemeler yalnızca onları yapan cihazda listelenir.': 'Found by scanning the chain. A scan only sees the money you hold now; payments you sent are listed only on the device that made them.',
   'Bu para başka bir cihazda (aynı kurtarma ifadesiyle) harcandı. Alıcı, ağ ücreti ve tam tarih yalnızca o cihazda kayıtlı. Kalan para üstü bu cüzdana döndüyse ayrıca “Taramayla bulundu” olarak görünür.': 'This money was spent on another device (same recovery phrase). The recipient, fee and exact date are only stored on that device. If change came back to this wallet it also shows up as “Found by scan”.',
+
+  // ---- 0.3.2: account hiding, pull to refresh
+  'Parmak izi': 'Fingerprint',
+  'Cüzdanı parmak iziyle aç': 'Open the wallet with my fingerprint',
+  'Parolan telefonun güvenli donanımında şifreli saklanır; parmak iziyle açılır. Parola her zaman çalışmaya devam eder, yeni bir parmak izi eklersen bu özellik kendiliğinden kapanır.': 'Your password is kept encrypted in the phone\'s secure hardware and released by your fingerprint. The password always keeps working; if you add a new fingerprint to the phone, this switches itself off.',
+  'Onay için parolan': 'Your password, to confirm',
+  'Parmak iziyle aç': 'Open with fingerprint',
+  'Parolayı kullan': 'Use password',
+  'Parmak izini onayla': 'Confirm your fingerprint',
+  'Parmak izi açıldı': 'Fingerprint unlock is on',
+  'Parmak izi açılamadı': 'Fingerprint unlock could not be turned on',
+  'Parmak izi kapatıldı': 'Fingerprint unlock is off',
+  'Parmak izi kapatıldı: parola değişmiş. Parolayı yaz.': 'Fingerprint unlock switched off: the password was changed. Type the password.',
 };
 
 // lang-xx.js (loaded before this file) define LANG_DE/FR/RU/ZH; a missing entry falls back to English.

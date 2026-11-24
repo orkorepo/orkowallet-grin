@@ -360,6 +360,7 @@
       <label class="field">Parola <input type="password" id="lk-pass" autocomplete="current-password"></label>
       <p class="error" id="lk-error" role="alert"></p>
       <button class="btn btn-primary btn-lg" type="submit" id="lk-submit">Kilidi aç</button>
+      <button class="btn btn-lg bio-btn" type="button" id="lk-bio" hidden><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M7 11a5 5 0 0 1 10 0v2.5M12 11v4.5a3 3 0 0 1-3 3M9 11a3 3 0 0 1 6 0v3.5M4.5 9.5A8 8 0 0 1 19.5 9M12 11v1.5M15.5 16.5c-.3 1.6-1 2.8-2 3.7M4 14c.2 2.5 1 4.600 2.500 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> <span>Parmak iziyle aç</span></button>
       <button class="link" type="button" id="lk-logout">Cüzdanı kapat</button>
     </form>
   </div>
@@ -371,6 +372,7 @@
       <label class="field">Parola <input type="password" id="ul-pass" autocomplete="current-password"></label>
       <p class="error" id="ul-error" role="alert"></p>
       <button class="btn btn-primary btn-lg" type="submit" id="ul-submit">Aç</button>
+      <button class="btn btn-lg bio-btn" type="button" id="ul-bio" hidden><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M7 11a5 5 0 0 1 10 0v2.5M12 11v4.5a3 3 0 0 1-3 3M9 11a3 3 0 0 1 6 0v3.5M4.5 9.5A8 8 0 0 1 19.5 9M12 11v1.5M15.5 16.5c-.3 1.6-1 2.8-2 3.7M4 14c.2 2.5 1 4.600 2.500 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> <span>Parmak iziyle aç</span></button>
     </form>
   </dialog>
 
@@ -720,6 +722,16 @@
               <legend>Gönderirken parola</legend>
               <label class="check"><input type="checkbox" id="set-confirm-pw"> Her gönderimden önce parolayı tekrar iste</label>
               <p class="hint">Ekranı açık bırakan birinin senin adına para göndermesini engeller.</p>
+            </fieldset>
+            <fieldset class="wallet-only" id="bio-box" hidden>
+              <legend>Parmak izi</legend>
+              <label class="check"><input type="checkbox" id="bio-on"> Cüzdanı parmak iziyle aç</label>
+              <p class="hint">Parolan telefonun güvenli donanımında şifreli saklanır; parmak iziyle açılır. Parola her zaman çalışmaya devam eder, yeni bir parmak izi eklersen bu özellik kendiliğinden kapanır.</p>
+              <div id="bio-pw" hidden>
+                <label class="field">Onay için parolan <input type="password" id="bio-pass" autocomplete="current-password"></label>
+                <p class="error" id="bio-error" role="alert"></p>
+                <div class="row"><button class="btn btn-primary" type="button" id="bio-go">Etkinleştir</button></div>
+              </div>
             </fieldset>
             <fieldset class="wallet-only">
               <legend>Parola</legend>

@@ -18,6 +18,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 class MainActivity : TauriActivity() {
@@ -28,6 +29,13 @@ class MainActivity : TauriActivity() {
   private var svcClose = "Close wallet"
   private var web: WebView? = null
   private var quitting = false
+  private val bio by lazy { BioLock(this) }
+
+  /** Answer a fingerprint request in the page: window.orkoBio(reqId, {ok, secret}). */
+  private fun bioReply(req: String, ok: Boolean, secret: String? = null) {
+    val o = JSONObject().put("ok", ok).put("secret", secret ?: "")
+    runOnUiThread { web?.evaluateJavascript("window.orkoBio && window.orkoBio(" + JSONObject.quote(req) + "," + o + ")", null) }
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     enableEdgeToEdge()
@@ -126,6 +134,28 @@ class MainActivity : TauriActivity() {
       } catch (e: Exception) {
         false
       }
+    }
+
+    /** Fingerprint unlock (see BioLock): is it usable on this phone, is it set up for this wallet. */
+    @JavascriptInterface
+    fun bioAvailable(): Boolean = try { bio.available() } catch (e: Exception) { false }
+
+    @JavascriptInterface
+    fun bioHas(id: String): Boolean = try { bio.has(id) } catch (e: Exception) { false }
+
+    @JavascriptInterface
+    fun bioRemove(id: String) { try { bio.remove(id) } catch (_: Exception) { } }
+
+    /** Store the wallet password behind the fingerprint. The answer comes back through window.orkoBio. */
+    @JavascriptInterface
+    fun bioEnroll(req: String, id: String, secret: String, title: String, cancel: String) {
+      runOnUiThread { bio.enroll(id, secret, title, cancel) { ok -> bioReply(req, ok) } }
+    }
+
+    /** Ask for the fingerprint and hand back the stored password. */
+    @JavascriptInterface
+    fun bioUnlock(req: String, id: String, title: String, cancel: String) {
+      runOnUiThread { bio.unlock(id, title, cancel) { s -> bioReply(req, s != null, s) } }
     }
 
     @JavascriptInterface

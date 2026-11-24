@@ -294,6 +294,7 @@ $('wr-form').addEventListener('submit', async (e) => {
   await busy($('wr-submit'), async () => {
     try {
       await invoke('wallet_remove', { id: w.id });
+      try { window.OrkoAndroid?.bioRemove?.(w.id); } catch { /* not on Android */ }
       state.removeW = null; $('dlg-wremove').close();
       state.status = await invoke('status'); renderWallets(); toast(t('Cüzdan silindi'));
     } catch (x) { err('wr-error', E(x)); }
@@ -304,7 +305,10 @@ function askUnlock(w) {
   state.unlockId = w.id;
   $('ul-title').textContent = t('“{name}” cüzdanını aç', { name: w.name });
   $('ul-pass').value = ''; err('ul-error');
-  $('dlg-unlock').showModal(); $('ul-pass').focus();
+  $('dlg-unlock').showModal();
+  const bio = bioReady(w.id);
+  $('ul-bio').hidden = !bio;
+  if (bio) bioFill('ul', w.id); else $('ul-pass').focus();
 }
 
 $('ul-form').addEventListener('submit', async (e) => {
@@ -315,7 +319,7 @@ $('ul-form').addEventListener('submit', async (e) => {
       await invoke('wallet_open', { id: state.unlockId, password: $('ul-pass').value });
       $('ul-pass').value = ''; $('dlg-unlock').close();
       state.status = await invoke('status'); enterWallet();
-    } catch (x) { err('ul-error', E(x)); $('ul-pass').select(); }
+    } catch (x) { bioStale('ul', state.unlockId, x); err('ul-error', E(x)); $('ul-pass').select(); }
   });
 });
 
@@ -589,6 +593,65 @@ document.querySelector('[data-qr-toggle="tc-qr"]').addEventListener('click', asy
   if (state.overview) $('tc-qr').innerHTML = await invoke('address_qr', { text: state.overview.address });
 });
 
+// ------------------------------------------------------------------ fingerprint (Android)
+// The Kotlin side keeps the wallet password encrypted under a key that only a fingerprint can use (see BioLock.kt).
+const BIO = window.OrkoAndroid && window.OrkoAndroid.bioAvailable ? window.OrkoAndroid : null;
+const bioWaits = new Map();
+let bioSeq = 0;
+window.orkoBio = (req, r) => { const f = bioWaits.get(req); if (f) { bioWaits.delete(req); f(r); } };
+const bioCall = (fn, ...args) => new Promise((res) => {
+  const req = `b${++bioSeq}`; bioWaits.set(req, res);
+  try { BIO[fn](req, ...args); } catch { bioWaits.delete(req); res({ ok: false }); }
+});
+const bioReady = (id) => { try { return !!BIO && !!id && BIO.bioAvailable() && BIO.bioHas(id); } catch { return false; } };
+const bioFilled = {}; // which form got its password from the fingerprint
+/** Ask for the fingerprint; on success put the password in the form and submit it like a typed one. */
+async function bioFill(prefix, id) {
+  const r = await bioCall('bioUnlock', id, t('Parmak iziyle aç'), t('Parolayı kullan'));
+  if (!r.ok || !r.secret) { if (!$(`${prefix}-bio`).hidden) $(`${prefix}-pass`).focus(); return; }
+  $(`${prefix}-pass`).value = r.secret; bioFilled[prefix] = true;
+  $(`${prefix}-form`).requestSubmit();
+}
+/** The stored password stopped working (it was changed elsewhere): forget it and say so. */
+function bioStale(prefix, id, x) {
+  if (!bioFilled[prefix]) return;
+  bioFilled[prefix] = false;
+  if (String(x?.message ?? x).includes('Parola yanlış')) {
+    try { BIO.bioRemove(id); } catch { /* ignore */ }
+    $(`${prefix}-bio`).hidden = true;
+    toast(t('Parmak izi kapatıldı: parola değişmiş. Parolayı yaz.'));
+  }
+}
+['lk', 'ul'].forEach((p) => $(`${p}-pass`).addEventListener('input', () => { bioFilled[p] = false; }));
+$('lk-bio').addEventListener('click', () => bioFill('lk', state.open.id));
+$('ul-bio').addEventListener('click', () => bioFill('ul', state.unlockId));
+
+function syncBioForm() {
+  let ok = false;
+  try { ok = !!BIO && !!state.open && BIO.bioAvailable(); } catch { /* ignore */ }
+  $('bio-box').hidden = !ok;
+  if (!ok) return;
+  $('bio-on').checked = bioReady(state.open.id);
+  $('bio-pw').hidden = true; $('bio-pass').value = ''; err('bio-error');
+}
+$('bio-on').addEventListener('change', () => {
+  if ($('bio-on').checked) { $('bio-pw').hidden = false; $('bio-pass').focus(); return; }
+  try { BIO.bioRemove(state.open.id); } catch { /* ignore */ }
+  $('bio-pw').hidden = true; toast(t('Parmak izi kapatıldı'));
+});
+$('bio-pass').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); $('bio-go').click(); } });
+$('bio-go').addEventListener('click', async () => {
+  err('bio-error');
+  await busy($('bio-go'), async () => {
+    const pw = $('bio-pass').value;
+    try { await invoke('verify_password', { password: pw }); } catch (x) { err('bio-error', E(x)); return; }
+    const r = await bioCall('bioEnroll', state.open.id, pw, t('Parmak izini onayla'), t('Vazgeç'));
+    $('bio-pass').value = ''; $('bio-pw').hidden = true;
+    if (r.ok) toast(t('Parmak izi açıldı'));
+    else { $('bio-on').checked = false; toast(t('Parmak izi açılamadı')); }
+  });
+});
+
 // ------------------------------------------------------------------ lock / log out
 let locked = false;
 let lastActive = Date.now();
@@ -601,7 +664,9 @@ function lockScreen() {
   $('lk-name').textContent = state.open.name;
   $('lk-pass').value = ''; err('lk-error');
   $('lockscreen').hidden = false;
-  $('lk-pass').focus();
+  const bio = bioReady(state.open.id);
+  $('lk-bio').hidden = !bio;
+  if (bio) bioFill('lk', state.open.id); else $('lk-pass').focus();
 }
 /** Log out: back to the wallet list WITHOUT locking. The wallet stays open in the background (Tor, receiving, the
  *  Android service keep running); "Gir" on the list returns to it without a password. */
@@ -647,7 +712,7 @@ $('lk-form').addEventListener('submit', async (e) => {
     try {
       await invoke('verify_password', { password: $('lk-pass').value });
       $('lk-pass').value = ''; $('lockscreen').hidden = true; locked = false; lastActive = Date.now();
-    } catch (x) { err('lk-error', E(x)); $('lk-pass').select(); }
+    } catch (x) { bioStale('lk', state.open?.id, x); err('lk-error', E(x)); $('lk-pass').select(); }
   });
 });
 
@@ -1016,7 +1081,11 @@ $('pw-form').addEventListener('submit', async (e) => {
   if (n.length < 4) return err('pw-error', t('Yeni parola en az 4 karakter olmalı.'));
   if (n !== $('pw-new2').value) return err('pw-error', t('Yeni parolalar aynı değil.'));
   await busy($('pw-submit'), async () => {
-    try { await invoke('change_password', { old: $('pw-old').value, new: n }); $('dlg-password').close(); toast(t('Parola değiştirildi')); }
+    try {
+      await invoke('change_password', { old: $('pw-old').value, new: n });
+      try { if (state.open) window.OrkoAndroid?.bioRemove?.(state.open.id); } catch { /* not on Android */ }
+      $('dlg-password').close(); toast(t('Parola değiştirildi'));
+    }
     catch (x) { err('pw-error', E(x)); }
   });
 });
@@ -1613,6 +1682,7 @@ const SHEET = matchMedia('(max-width: 720px)');
 function fillSettingsForm() {
   const s = state.status.settings;
   syncTorMode();
+  syncBioForm();
   $('set-box').dataset.wallet = state.open ? '1' : '0';
   $('set-lang').value = s.language;
   document.querySelectorAll('input[name="theme"]').forEach((r) => { r.checked = r.value === s.theme; });
