@@ -1,6 +1,6 @@
 [package]
 name = "orko-grin-core"
-version = "0.3.1"
+version = "0.3.2"
 edition = "2021"
 description = "Orkoswap Grin wallet core: wraps the official grin-wallet libraries"
 publish = false

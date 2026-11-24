@@ -206,6 +206,24 @@ pub struct Wallet {
     bundled_tor: std::sync::Mutex<Option<Arc<BundledTor>>>,
     /// Current bridge lines (changeable at runtime with restart_tor).
     bridges: std::sync::Mutex<Vec<String>>,
+    /// Input commitments of this wallet's own sends, by transaction id (read once from the stored
+    /// transaction files; see `spent_elsewhere`).
+    sent_inputs: std::sync::Mutex<std::collections::HashMap<uuid::Uuid, Vec<String>>>,
+    /// "Slatepack only" mode: no Tor at all (no onion service, no Tor sends). Every path that could start
+    /// Tor checks this, so nothing starts it behind the user's back.
+    tor_off: std::sync::atomic::AtomicBool,
+}
+
+/// An output of this wallet that the chain shows as spent although none of this wallet's own sends
+/// used it: the same wallet (recovery phrase) spent it on another device.
+#[derive(Clone, Debug)]
+pub struct ForeignSpend {
+    /// Output commitment (hex).
+    pub commit: String,
+    /// Value in nanogrin.
+    pub value: u64,
+    /// Height the output was created at (the spend came later).
+    pub height: u64,
 }
 
 fn set_chain(network: Network) {
@@ -226,6 +244,10 @@ fn new_inst(s: &Settings) -> Result<(Inst, PoolNodeClient)> {
 }
 
 use std::sync::atomic::{AtomicI32, Ordering};
+
+fn hex(b: &[u8]) -> String {
+    b.iter().map(|x| format!("{x:02x}")).collect()
+}
 
 /// Percent of the chain scan running now in this process (0..100), -1 when none has started.
 /// One wallet is open per process, so a process-wide value is enough.
@@ -371,6 +393,8 @@ impl Wallet {
             server: std::sync::Mutex::new(None),
             bundled_tor: std::sync::Mutex::new(None),
             bridges: std::sync::Mutex::new(settings_bridges),
+            sent_inputs: Default::default(),
+            tor_off: Default::default(),
         })
     }
 
@@ -407,7 +431,19 @@ impl Wallet {
         if self.listening() {
             return Ok(());
         }
+        if self.tor_is_off() {
+            return Ok(()); // Slatepack only: no listener, no onion service
+        }
         if let TorMode::Bundled(bundle) = &self.settings.tor {
+            let bundle = bundle.clone();
+            return self.start_bundled_listener(&bundle);
+        }
+        self.start_integrated_listener()
+    }
+
+    /// Bundled tor: the Foreign API on localhost, published as the wallet's onion service.
+    fn start_bundled_listener(&self, bundle: &TorBundle) -> Result<()> {
+        {
             // Plain HTTP on localhost; our own tor publishes it as the onion service. Unlike
             // grin-wallet's `foreign_listener` this server can be stopped, so logging out does
             // not need an app restart.
@@ -435,8 +471,11 @@ impl Wallet {
                 bridges: &self.bridges.lock().unwrap().clone(),
             })?;
             *self.bundled_tor.lock().unwrap() = Some(Arc::new(tor));
-            return Ok(());
+            Ok(())
         }
+    }
+
+    fn start_integrated_listener(&mut self) -> Result<()> {
         let integrated = matches!(self.settings.tor, TorMode::Integrated);
         let inst = self.inst.clone();
         let config_path = self.settings.config_path();
@@ -470,6 +509,56 @@ impl Wallet {
 
     fn listening(&self) -> bool {
         self.listener.is_some() || self.server.lock().unwrap().is_some()
+    }
+
+    /// True in "Slatepack only" mode.
+    pub fn tor_is_off(&self) -> bool {
+        self.tor_off.load(Ordering::SeqCst)
+    }
+
+    /// Mark "Slatepack only" before the wallet is used (no Tor is started afterwards).
+    pub fn set_tor_off(&self, off: bool) {
+        self.tor_off.store(off, Ordering::SeqCst);
+    }
+
+    fn tor_allowed(&self) -> Result<()> {
+        if self.tor_is_off() {
+            bail!("Tor kapalı (yalnızca Slatepack modu).");
+        }
+        Ok(())
+    }
+
+    /// Switch "Slatepack only" on or off while the wallet is open. Off -> on starts the onion service
+    /// (bundled tor only). Returns false when the change needs the wallet to be opened again (the
+    /// integrated Arti listener can neither be stopped nor started here).
+    pub fn switch_tor(&self, off: bool) -> Result<bool> {
+        if self.listener.is_some() || matches!(self.settings.tor, TorMode::Integrated) {
+            self.set_tor_off(off);
+            return Ok(false);
+        }
+        if off {
+            self.set_tor_off(true);
+            if let Some((mut apis, handle)) = self.server.lock().unwrap().take() {
+                apis.stop();
+                let _ = handle.join();
+            }
+            if let Some(t) = self.bundled_tor.lock().unwrap().take() {
+                t.stop();
+            }
+            return Ok(true);
+        }
+        self.set_tor_off(false);
+        if let TorMode::Bundled(b) = &self.settings.tor {
+            let b = b.clone();
+            if self.server.lock().unwrap().is_none() {
+                // Two tor processes must never share the data folder: stop any earlier one first.
+                if let Some(t) = self.bundled_tor.lock().unwrap().take() {
+                    t.stop();
+                }
+                self.start_bundled_listener(&b)?;
+            }
+        }
+        Ok(true)
     }
 
     /// Stop everything this wallet runs (Foreign API server, Tor). Returns false when it cannot
@@ -517,6 +606,7 @@ impl Wallet {
 
     /// The running bundled tor, started send-only if the listener did not start it.
     fn bundled(&self, bundle: &TorBundle) -> Result<Arc<BundledTor>> {
+        self.tor_allowed()?;
         let tor = {
             let mut slot = self.bundled_tor.lock().unwrap();
             let dead = matches!(slot.as_ref().map(|t| t.status()), Some(TorStatus::Failed(_)));
@@ -537,6 +627,7 @@ impl Wallet {
     /// Hand a slate to the wallet behind `dest` over Tor and get its answer:
     /// `finalize` = false asks it to sign (receive_tx), true asks it to finalize (finalize_tx).
     fn deliver(&self, slate: &Slate, dest: &SlatepackAddress, finalize: bool, reach: Duration) -> Result<Slate> {
+        self.tor_allowed()?;
         let bundle = match &self.settings.tor {
             TorMode::Integrated => {
                 return Ok(try_slatepack_sync_workflow(
@@ -567,13 +658,74 @@ impl Wallet {
 
     /// Balances, refreshed from the node.
     pub fn balance(&self, min_confirmations: u64) -> Result<(bool, WalletInfo)> {
+        self.balance_with(min_confirmations, true)
+    }
+
+    /// Balances; with `refresh = false` from the wallet's own records only (no node round trip).
+    pub fn balance_with(&self, min_confirmations: u64, refresh: bool) -> Result<(bool, WalletInfo)> {
         Ok(self
             .owner
-            .retrieve_summary_info(self.mask(), true, min_confirmations)?)
+            .retrieve_summary_info(self.mask(), refresh, min_confirmations)?)
     }
 
     pub fn transactions(&self, refresh_from_node: bool) -> Result<Vec<TxLogEntry>> {
         Ok(self.owner.retrieve_txs(self.mask(), refresh_from_node, None, None, None)?.1)
+    }
+
+    /// Outputs of the active account that the chain shows as spent but that no send of this wallet
+    /// used as an input, i.e. they were spent by another copy of the wallet (same recovery phrase on
+    /// another device). Grin keeps the history only on the device that made a payment, so this is the
+    /// only trace such a payment leaves here. Uses the wallet's own records (no node round trip); the
+    /// regular balance refresh is what marks outputs as spent.
+    ///
+    /// A send's inputs are read from its stored transaction file. For an old send without that file the
+    /// amount it spent is subtracted instead (oldest outputs first), so such sends are never reported as
+    /// spent elsewhere.
+    pub fn spent_elsewhere(&self) -> Result<Vec<ForeignSpend>> {
+        use grin_wallet_libwallet::{OutputStatus, TxLogEntryType};
+        let (_, outs) = self.owner.retrieve_outputs(self.mask(), true, false, None)?;
+        let mut spent: Vec<ForeignSpend> = outs
+            .into_iter()
+            .filter(|m| m.output.status == OutputStatus::Spent)
+            .map(|m| ForeignSpend { commit: hex(&m.commit.0), value: m.output.value, height: m.output.height })
+            .collect();
+        if spent.is_empty() {
+            return Ok(spent);
+        }
+        let mut used = std::collections::HashSet::new();
+        let mut unknown_debit = 0u64;
+        for t in self.transactions(false)? {
+            if t.tx_type != TxLogEntryType::TxSent {
+                continue;
+            }
+            match t.tx_slate_id.and_then(|id| self.sent_inputs_of(id)) {
+                Some(commits) => used.extend(commits),
+                None => unknown_debit = unknown_debit.saturating_add(t.amount_debited),
+            }
+        }
+        spent.retain(|s| !used.contains(&s.commit));
+        spent.sort_by_key(|s| s.height);
+        spent.retain(|s| {
+            if s.value <= unknown_debit {
+                unknown_debit -= s.value;
+                false
+            } else {
+                true
+            }
+        });
+        Ok(spent)
+    }
+
+    fn sent_inputs_of(&self, id: uuid::Uuid) -> Option<Vec<String>> {
+        if let Some(c) = self.sent_inputs.lock().unwrap().get(&id) {
+            return Some(c.clone());
+        }
+        let slate = self.owner.get_stored_tx(self.mask(), None, Some(&id)).ok()??;
+        let tx = slate.tx?;
+        let wrappers: Vec<grin_core::core::transaction::CommitWrapper> = tx.inputs().into();
+        let commits: Vec<String> = wrappers.iter().map(|w| hex(&w.commitment().0)).collect();
+        self.sent_inputs.lock().unwrap().insert(id, commits.clone());
+        Some(commits)
     }
 
     /// Rescan the chain for this wallet's outputs (needed after a restore). With
@@ -638,9 +790,10 @@ impl Wallet {
 
     /// The most that can be sent in one payment: every spendable output (with `min_confirmations`)
     /// minus the network fee. Returns (amount to send in the transaction, what to pass as `amount`
-    /// together with `amount_includes_fee`, fee).
-    pub fn max_sendable(&self, min_confirmations: u64) -> Result<(u64, u64, u64)> {
-        let (_, info) = self.balance(min_confirmations)?;
+    /// together with `amount_includes_fee`, fee). `refresh = false` uses the wallet's own records (the
+    /// balance is refreshed every 30 s anyway), which makes the "Max" button instant; sending refreshes.
+    pub fn max_sendable(&self, min_confirmations: u64, refresh: bool) -> Result<(u64, u64, u64)> {
+        let (_, info) = self.balance_with(min_confirmations, refresh)?;
         let spendable = info.amount_currently_spendable;
         if spendable == 0 {
             return Ok((0, 0, 0));
@@ -755,6 +908,7 @@ impl Wallet {
     /// Is the wallet behind this Slatepack address reachable over Tor right now? (The same
     /// `check_version` call a Tor send starts with.)
     pub fn ping(&self, dest: &str, timeout_secs: u64) -> Result<()> {
+        self.tor_allowed()?;
         let addr = SlatepackAddress::try_from(dest.trim())
             .map_err(|_| anyhow!("not a valid Grin address"))?;
         match &self.settings.tor {
@@ -831,6 +985,9 @@ impl Wallet {
 
     /// Wipe tor's saved state and start it again (with the onion service when this wallet listens).
     pub fn reset_tor(&self) -> Result<()> {
+        if self.tor_is_off() {
+            return Ok(());
+        }
         let TorMode::Bundled(bundle) = &self.settings.tor else {
             bail!("the integrated Arti engine has no saved state to reset");
         };
@@ -859,6 +1016,9 @@ impl Wallet {
 
     pub fn restart_tor(&self, bridges: Vec<String>) -> Result<()> {
         *self.bridges.lock().unwrap() = bridges;
+        if self.tor_is_off() {
+            return Ok(()); // the new bridges apply when Tor is switched on
+        }
         let TorMode::Bundled(bundle) = &self.settings.tor else {
             bail!("the integrated Arti engine picks up bridge changes on the next start");
         };

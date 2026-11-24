@@ -815,3 +815,135 @@ html[data-platform="mobile"] .winctl { display: none !important; }
 
 #dlg-close .dlg-actions { display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px; justify-content: flex-end; margin-top: var(--sp-3); }
 #dlg-close .dlg-actions .btn { flex: 1 1 140px; }
+
+/* ------------------------------------------------------------------ v12: one Settings, clear buttons, phone scrolling */
+/* transactions card: a heading instead of the old tabs */
+.txhead { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.txhead h2 { font-size: var(--fs-lg); }
+.txhead .btn svg { width: 16px; height: 16px; }
+
+/* settings categories: icon + name (+ a one-line summary in the phone list) */
+.snav button { display: flex; align-items: center; gap: 10px; }
+.snav-ico { flex: none; width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: var(--bg-2); color: var(--text-dim); }
+.snav-ico svg { width: 18px; height: 18px; }
+.snav button[aria-selected="true"] .snav-ico { background: var(--accent-soft); color: var(--accent); }
+.snav-t { display: flex; flex-direction: column; min-width: 0; }
+.snav-t b { font-weight: 600; }
+.snav-t small { display: none; font-size: var(--fs-xs); font-weight: 400; color: var(--text-faint); white-space: normal; }
+.sback { margin-right: 4px; }
+.sback svg { width: 22px; height: 22px; }
+#dlg-settings .dlg-head h2 { margin-right: auto; }
+@media (min-width: 721px) { #dlg-settings { width: min(820px, calc(100vw - 32px)); } }
+
+/* sections that need an open wallet */
+#set-box[data-wallet="0"] .wallet-only { display: none; }
+#set-box[data-wallet="1"] .no-wallet { display: none; }
+.spane fieldset { padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; background: color-mix(in srgb, var(--bg-2) 45%, transparent); gap: 8px; }
+.spane fieldset > legend { float: left; width: 100%; margin-bottom: 4px; color: var(--text); }
+.spane fieldset > legend + * { clear: both; }
+.danger-box { border-color: color-mix(in srgb, var(--bad) 40%, var(--line)) !important; }
+.danger-box legend { color: var(--bad) !important; }
+.chips-3 { grid-template-columns: repeat(3, 1fr); }
+.chips-2 { grid-template-columns: repeat(2, 1fr); }
+
+/* node connection: three big choices instead of small radios */
+.opt-cards { display: grid; gap: 8px; }
+.opt-card { position: relative; display: block; cursor: pointer; }
+.opt-card input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.opt-card span { display: flex; flex-direction: column; gap: 2px; padding: 11px 14px 11px 40px; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--bg-2); position: relative; }
+.opt-card span::before { content: ""; position: absolute; left: 14px; top: 14px; width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line-strong); }
+.opt-card small { color: var(--text-faint); font-size: var(--fs-xs); }
+.opt-card:hover span { border-color: var(--input-hover); }
+.opt-card input:checked + span { border-color: var(--accent); background: var(--accent-soft); }
+.opt-card input:checked + span::before { border-color: var(--accent); background: radial-gradient(circle, var(--accent) 0 4px, transparent 5px); }
+.opt-card input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 2px; }
+#nd-conn-url { margin-top: 4px; }
+
+/* node panel: everything you can press looks like a button */
+.nb-actions { display: grid; grid-template-columns: 1fr; gap: 6px; }
+.nb-btn { width: 100%; justify-content: flex-start; gap: 10px; }
+.nb-btn svg { width: 16px; height: 16px; flex: none; }
+.hashbtn { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 3px 8px; border: 1px solid var(--line-strong); border-radius: 7px; background: var(--bg-1); }
+.hashbtn::after { content: ""; flex: none; width: 11px; height: 11px; border: 1.6px solid currentColor; border-radius: 2px; box-shadow: 2px -2px 0 -0.6px var(--bg-1), 2px -2px 0 1px currentColor; opacity: .7; }
+.hashbtn:hover { border-color: var(--accent); text-decoration: none; }
+
+/* desktop-only / mobile-only blocks */
+.mobile-only { display: none !important; }
+[data-platform="mobile"] .mobile-only { display: flex !important; }
+
+/* scroll button (phone) */
+.scroll-fab { display: none; }
+
+@media (max-width: 1140px) {
+  /* The page must grow with its content: a stretched .screen of exactly one screen height let the
+     content overflow it, so the bottom padding (room for the tab bar) was lost and the last controls
+     stayed hidden behind the tab bar. */
+  main.content { display: block; }
+  .screen { min-height: 100%; }
+  .screen[hidden] { display: none !important; }
+  main.content, .nodebar, .spanes, dialog { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+  main.content::-webkit-scrollbar, .nodebar::-webkit-scrollbar, .spanes::-webkit-scrollbar { width: 5px; }
+
+  .scroll-fab { position: fixed; left: 50%; margin-left: -21px; bottom: calc(var(--nav-h) + var(--safe-b) + 10px); z-index: 31; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center;
+    border: 1px solid var(--line-strong); background: color-mix(in srgb, var(--bg-1) 90%, transparent); backdrop-filter: blur(10px); color: var(--accent); box-shadow: var(--shadow); cursor: pointer; transition: transform .2s; }
+  body:not([data-view="wallet"]):not([data-view="wallets"]) .scroll-fab { bottom: calc(var(--safe-b) + 18px); }
+  .scroll-fab[hidden] { display: none !important; }
+  .scroll-fab svg { width: 22px; height: 22px; transition: transform .2s; }
+  .scroll-fab[data-dir="up"] svg { transform: rotate(180deg); }
+  .toast { bottom: calc(var(--nav-h) + var(--safe-b) + 70px); }
+
+  /* node tab: large, obviously pressable buttons */
+  .nb-actions { grid-template-columns: 1fr 1fr; }
+  .nb-actions .nb-btn { min-height: 46px; justify-content: center; font-size: var(--fs-md); }
+  .nb-actions .nb-btn:first-child { grid-column: 1 / -1; background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); color: var(--accent); }
+  .nb-actions .nb-btn:only-child, .nb-actions .nb-btn[hidden] + .nb-btn, .nb-actions .nb-btn:has(+ .nb-btn[hidden]) { grid-column: 1 / -1; }
+  .hashbtn { padding: 8px 10px; font-size: var(--fs-sm); }
+  .nb-card { padding: 12px 14px; }
+}
+
+/* phone: Settings is a list of categories, a tap opens one, "‹" goes back */
+@media (max-width: 720px) {
+  .sgrid { display: block; flex: 1; min-height: 0; overflow: hidden; }
+  .sbox[data-level="menu"] .spanes, .sbox[data-level="menu"] .sfoot { display: none !important; }
+  .sbox[data-level="pane"] .snav { display: none; }
+  .sbox[data-level="menu"] .snav { display: flex; flex-direction: column; overflow-y: auto; height: 100%; border: 0; padding: 0; gap: 6px; }
+  .sbox[data-level="menu"] .snav button { min-height: 62px; padding: 10px 12px; border: 1px solid var(--line); background: var(--bg-2); border-radius: 14px; white-space: normal; }
+  .sbox[data-level="menu"] .snav button::after { content: ""; margin-left: auto; flex: none; width: 8px; height: 8px; border-right: 2px solid var(--text-faint); border-bottom: 2px solid var(--text-faint); transform: rotate(-45deg); }
+  .sbox[data-level="menu"] .snav button[aria-selected="true"] { background: var(--bg-2); color: var(--text); }
+  .sbox[data-level="menu"] .snav-t small { display: block; }
+  .snav-ico { width: 38px; height: 38px; border-radius: 11px; }
+  .snav-ico svg { width: 20px; height: 20px; }
+  .spanes { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding-bottom: 12px; }
+  .spane fieldset { padding: 12px; }
+  .sfoot { padding-top: 10px; }
+}
+/* settings: a text field and its button stay on one line */
+.spane .row:has(> input) { flex-wrap: nowrap; }
+.spane .row:has(> input) > input { width: auto; flex: 1 1 auto; min-width: 0; }
+.spane .row:has(> input) > .btn { flex: 0 0 auto; }
+/* Tor card: "With Tor" / "Slatepack only" */
+.tor-mode { display: flex; margin-top: 2px; } .tor-mode button { flex: 1; white-space: nowrap; }
+#tor-on-only { display: flex; flex-direction: column; gap: 8px; }
+/* node list health dots: green = answering, red = unreachable (the neutral rule above used to win) */
+.node-list .dot.ok { background: var(--ok); } .node-list .dot.bad { background: var(--bad); }
+
+/* settings: never scroll sideways (a fieldset is min-content wide by default) */
+fieldset { min-width: 0; }
+.spanes, .spane, #dlg-settings .sbox { overflow-x: hidden; }
+.spane fieldset, .spane .row { max-width: 100%; }
+
+/* accounts: hide / show again */
+.acc-list li { flex-wrap: wrap; }
+.acc-acts { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.acc-hidden { opacity: .6; }
+.acc-note { margin: 0 0 4px; }
+#acc-hidden-toggle { align-self: flex-start; margin-top: 4px; }
+
+/* phone: pull-to-refresh indicator */
+.ptr { position: fixed; top: calc(var(--safe-t, 0px) + 58px); left: 50%; margin-left: -20px; z-index: 40; width: 40px; height: 40px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--bg-1); border: 1px solid var(--line-strong); box-shadow: var(--shadow); color: var(--text-dim); pointer-events: none; }
+.ptr[hidden] { display: none !important; }
+.ptr svg { width: 22px; height: 22px; }
+.ptr.ready { color: var(--accent); border-color: var(--accent); }
+.ptr.spin { transform: translateY(40px) !important; color: var(--accent); }
+.ptr.spin svg { animation: spin .8s linear infinite; }

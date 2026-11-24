@@ -35,6 +35,73 @@ function setMobileTab(tab) {
   if (tab === 'node') requestAnimationFrame(() => fitAll());
 }
 
+// Phone: pull the page down at the top to refresh (wallet: balance and history; list: wallets; node tab:
+// the node panel). The browser's own pull-to-refresh is off (overscroll-behavior), this one reloads data only.
+(function pullToRefresh() {
+  const PULL = 70;
+  let y0 = null, dy = 0, area = null;
+  const ind = $('ptr');
+  const reset = () => { y0 = null; dy = 0; ind.style.transform = ''; ind.classList.remove('ready'); ind.hidden = true; };
+  document.addEventListener('touchstart', (e) => {
+    area = scrollArea();
+    if (!area || area.scrollTop > 0 || document.querySelector('dialog[open]') || !$('lockscreen').hidden || e.touches.length !== 1) { y0 = null; return; }
+    y0 = e.touches[0].clientY; dy = 0;
+  }, { passive: true });
+  document.addEventListener('touchmove', (e) => {
+    if (y0 === null) return;
+    dy = e.touches[0].clientY - y0;
+    if (dy <= 0 || area.scrollTop > 0) { ind.hidden = true; return; }
+    ind.hidden = false;
+    const d = Math.min(dy, PULL * 1.6);
+    ind.style.transform = `translateY(${d * 0.6}px) rotate(${d * 3}deg)`;
+    ind.classList.toggle('ready', dy >= PULL);
+  }, { passive: true });
+  document.addEventListener('touchend', async () => {
+    if (y0 === null) return;
+    const go = dy >= PULL;
+    reset();
+    if (!go) return;
+    ind.hidden = false; ind.classList.add('spin');
+    try {
+      if (document.body.dataset.mtab === 'node') await pollNode();
+      else if (document.body.dataset.view === 'wallet') await Promise.all([refresh(), pollTor(), pollScan()]);
+      else if (document.body.dataset.view === 'wallets') { state.status = await invoke('status'); renderWallets(); }
+      toast(t('Yenilendi'));
+    } finally { ind.classList.remove('spin'); ind.hidden = true; }
+  });
+})();
+
+// Phone: a round button over the bottom tabs shows that the page goes on below. A tap scrolls one screen
+// down; at the bottom it turns into "back to top". It follows whichever area is shown (page or node panel).
+function scrollArea() {
+  if (!PHONE.matches) return null;
+  if (document.body.dataset.mtab === 'node' && ['wallet', 'wallets'].includes(document.body.dataset.view)) return $('nodebar');
+  return $('app');
+}
+let fabRaf = 0;
+function syncScrollFab() {
+  cancelAnimationFrame(fabRaf);
+  fabRaf = requestAnimationFrame(() => {
+    const fab = $('scroll-fab'), a = scrollArea();
+    const room = a ? a.scrollHeight - a.clientHeight : 0;
+    if (!a || room < 80 || document.querySelector('dialog[open]') || !$('lockscreen').hidden) { fab.hidden = true; return; }
+    const atEnd = a.scrollTop >= room - 24;
+    fab.hidden = false;
+    fab.dataset.dir = atEnd ? 'up' : 'down';
+    const label = atEnd ? t('Başa dön') : t('Aşağı kaydır');
+    if (fab.getAttribute('aria-label') !== label) { fab.setAttribute('aria-label', label); fab.title = label; }
+  });
+}
+$('scroll-fab').addEventListener('click', () => {
+  const a = scrollArea(); if (!a) return;
+  const up = $('scroll-fab').dataset.dir === 'up';
+  a.scrollBy({ top: up ? -a.scrollHeight : a.clientHeight * 0.8, behavior: REDUCED_MOTION ? 'auto' : 'smooth' });
+});
+const REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches;
+['app', 'nodebar'].forEach((id) => $(id).addEventListener('scroll', syncScrollFab, { passive: true }));
+window.addEventListener('resize', syncScrollFab);
+new MutationObserver(syncScrollFab).observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['hidden', 'open', 'data-mtab', 'data-view'] });
+
 async function busy(btn, fn) {
   btn.disabled = true; btn.setAttribute('aria-busy', 'true');
   try { return await fn(); } finally { btn.disabled = false; btn.removeAttribute('aria-busy'); }
@@ -347,11 +414,20 @@ $('wf-clear').addEventListener('click', () => { buildSeedGrid(seedLen, false); e
 function fillSince(select, withNever) {
   select.replaceChildren();
   const opt = (v, text) => { const o = el('option', '', text); o.value = v; select.append(o); };
-  opt('all', t('Bilmiyorum / emin değilim: en baştan (en uzun, en güvenli)'));
-  if (state.status?.network === 'mainnet') {
+  const years = () => {
+    const net = state.status?.network;
+    if (net !== 'mainnet' && !(net === 'testnet' && !withNever)) return;
     for (let y = new Date().getFullYear(); y >= 2020; y--) opt(String(y), t('{y} veya sonrasında', { y }));
+  };
+  if (withNever) { // restoring: when unsure, the whole chain is the safe choice
+    opt('all', t('Bilmiyorum / emin değilim: en baştan (en uzun, en güvenli)'));
+    years();
+    opt('never', t('Bu cüzdan hiç kullanılmadı (tarama yok)'));
+  } else { // repairing an open wallet: start with the latest year (fastest), the whole chain last
+    years();
+    opt('all', t('En baştan (en uzun)'));
   }
-  if (withNever) opt('never', t('Bu cüzdan hiç kullanılmadı (tarama yok)'));
+  select.value = select.options[0].value;
 }
 
 $('wf').addEventListener('submit', async (e) => {
@@ -435,10 +511,25 @@ function protect(on) {
 function androidKeepAlive(on) {
   try {
     if (!window.OrkoAndroid) return;
-    if (on) window.OrkoAndroid.serviceOn(t('OrkoWallet çalışıyor'), t('Tor üzerinden ödeme alabilmen için açık tutuluyor. Durdurmak için cüzdanı kapat.'));
-    else window.OrkoAndroid.serviceOff();
+    const title = t('OrkoWallet çalışıyor');
+    const text = t('Tor üzerinden ödeme alabilmen için açık tutuluyor. Tamamen kapatmak için “Cüzdanı kapat”a bas.');
+    if (!on) window.OrkoAndroid.serviceOff();
+    else if (window.OrkoAndroid.serviceStart) window.OrkoAndroid.serviceStart(title, text, t('Cüzdanı kapat'));
+    else window.OrkoAndroid.serviceOn(title, text);
   } catch { /* not on Android */ }
 }
+/** Quit for good: close the wallet and Tor cleanly, then end the app. Android calls this from the
+ *  notification's "Close wallet" button; Settings > General has the same button. */
+let quitting = false;
+async function quitApp() {
+  if (quitting) return;
+  quitting = true;
+  toast(t('Cüzdan kapanıyor…'));
+  try { await invoke('app_shutdown'); } catch { /* end the app anyway */ }
+  try { if (window.OrkoAndroid && window.OrkoAndroid.exitApp) { window.OrkoAndroid.exitApp(); return; } } catch { /* fall through */ }
+  invoke('close_choice', { choice: 'quit', remember: false });
+}
+window.orkoQuit = quitApp;
 function enterWallet() {
   state.open = state.status.open_wallet;
   androidKeepAlive(true);
@@ -447,7 +538,6 @@ function enterWallet() {
   fillWalletSettings();
   syncTorForm();
   show('wallet');
-  selectTab('txs');
   refresh(); pollTor();
   walletTimers.forEach(clearInterval);
   fillSince($('rescan-since'), false);
@@ -477,23 +567,25 @@ async function refresh() {
     warn.textContent = o.connection === 'integrated'
       ? t('Kendi node\'una ulaşılamıyor ya da node henüz senkronize değil; gösterilen bakiye son bilinen değer. Node panelinden node\'u başlat.')
       : t('Node\'a ulaşılamıyor; gösterilen bakiye son bilinen değer.');
+    // Money of this wallet was just spent on another device: warn once per event (remembered per wallet).
+    const seenKey = `orko.elsewhere.${state.open?.id}`;
+    let seenAt = 0;
+    try { seenAt = Number(localStorage.getItem(seenKey) || 0); } catch { /* private mode */ }
+    $('elsewhere-warn').hidden = !(o.elsewhere_at > seenAt);
+    $('elsewhere-warn').dataset.at = String(o.elsewhere_at || 0);
   } catch (x) { toast(E(x)); }
   try { renderTxs(await invoke('transactions')); } catch { /* shown via overview */ }
 }
 $('btn-refresh').addEventListener('click', refresh);
+$('elsewhere-ok').addEventListener('click', () => {
+  try { localStorage.setItem(`orko.elsewhere.${state.open?.id}`, $('elsewhere-warn').dataset.at || '0'); } catch { /* private mode */ }
+  $('elsewhere-warn').hidden = true;
+});
 $('tc-copy').addEventListener('click', () => copy($('tc-addr').textContent));
 $('tc-onion-copy').addEventListener('click', () => copy($('tc-onion').textContent));
 document.querySelector('[data-qr-toggle="tc-qr"]').addEventListener('click', async () => {
   if (state.overview) $('tc-qr').innerHTML = await invoke('address_qr', { text: state.overview.address });
 });
-
-// tabs
-function selectTab(name) {
-  document.querySelectorAll('.tabs [data-tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === name)));
-  document.querySelectorAll('[data-pane]').forEach((p) => { p.hidden = p.dataset.pane !== name; });
-  if (name === 'accounts') loadAccounts();
-}
-document.querySelectorAll('.tabs [data-tab]').forEach((b) => b.addEventListener('click', () => selectTab(b.dataset.tab)));
 
 // ------------------------------------------------------------------ lock / log out
 let locked = false;
@@ -603,11 +695,18 @@ async function pollJobs() {
   else if (list.some((j) => j.state === 'retrying')) renderTxs();
 }
 
+/** An output the chain scan found (restore / repair): it has no transaction id, and the scan cannot know
+ *  which payment it came from, nor anything about payments that went out. */
+const fromScan = (x) => x.incoming && !x.slate_id && x.kind === 'TxReceived';
+/** Money of this wallet that another device (same recovery phrase) spent; made up by the backend from spent outputs. */
+const elsewhere = (x) => x.kind === 'SpentElsewhere';
 function txTitle(x) {
   const job = state.jobs[x.slate_id];
   if (x.cancelled && job && job.state === 'failed') return t('Gönderim başarısız');
   if (x.cancelled) return x.incoming ? t('Alma iptal edildi') : t('Gönderim iptal edildi');
   if (x.kind === 'ConfirmedCoinbase') return t('Madencilik ödülü');
+  if (fromScan(x)) return t('Taramayla bulundu');
+  if (elsewhere(x)) return t('Başka bir cihazda harcandı');
   return x.incoming ? t('Alındı') : t('Gönderildi');
 }
 function txStatus(x) {
@@ -662,7 +761,7 @@ function renderTxs(list, measured) {
         ? t('Alıcı aranıyor {a}/{b}', { a: job.attempts, b: job.max_attempts })
         : x.finalized || x.incoming ? t('Onay bekliyor') : t('Yanıt bekliyor')));
     }
-    const meta = el('div', 'tx-meta', fmtDate(x.time));
+    const meta = el('div', 'tx-meta', elsewhere(x) ? t('fark edildi {date}', { date: fmtDate(x.time) }) : fmtDate(x.time));
     if (job && job.state === 'retrying') {
       const eta = el('span'); eta.dataset.eta = String(job.eta);
       eta.textContent = t('sonraki deneme {n} sn', { n: Math.max(0, Math.round((job.eta - Date.now()) / 1000)) });
@@ -728,6 +827,7 @@ $('tx-list').addEventListener('click', (e) => {
   const x = state.txCache[+b.dataset.i]; txOpen = x;
   const kv = $('tx-kv'); kv.replaceChildren();
   const add = (k, v) => { if (!v && v !== 0) return; kv.append(el('dt', '', t(k)), el('dd', '', String(v))); };
+  if (elsewhere(x)) return showElsewhere(x, add);
   add('Durum', txStatus(x));
   add('Tutar', `${x.incoming ? '+' : '−'}${amt(x.amount)} ツ`);
   if (!x.incoming && x.fee) add('Ağ ücreti', `${x.fee} ツ`);
@@ -742,10 +842,19 @@ $('tx-list').addEventListener('click', (e) => {
     const a = el('button', 'kernel-link'); a.type = 'button';
     a.title = t('Grin Scan\'de aç'); a.setAttribute('aria-label', t('Grin Scan\'de aç'));
     a.innerHTML = ICON_EXT;
-    a.addEventListener('click', async () => { try { await invoke('open_kernel', { kernel: x.kernel }); } catch (e) { toast(E(e)); } });
+    a.addEventListener('click', async () => {
+      try {
+        const url = await invoke('open_kernel', { kernel: x.kernel });
+        // Android: the WebView cannot open the system browser itself; the bridge does (Grin Scan pages only).
+        if (window.OrkoAndroid && window.OrkoAndroid.openUrl && !window.OrkoAndroid.openUrl(url)) toast(t('Tarayıcı açılamadı'));
+      } catch (e) { toast(E(e)); }
+    });
     dd.append(' ', a);
   }
   add('Yerel no', x.id);
+  if (fromScan(x)) {
+    kv.append(el('dt', '', t('Not')), el('dd', '', t('Bu kayıt zincir taramasıyla bulundu (kurtarma ifadesiyle içe aktarma ya da yeniden tarama). Tarama yalnızca şu an sahip olduğun çıktıları görür: giden ödemeler listede görünmez, bir gönderimden kalan para üstü de “Taramayla bulundu” olarak görünür. Aynı cüzdanı iki cihazda kullanırsan her cihaz yalnızca kendi yaptığı gönderimleri listeler.')));
+  }
   $('tx-title').textContent = txTitle(x);
   $('tx-proof-box').hidden = true;
   $('tx-proof-btn').hidden = !(x.has_proof && !x.incoming);
@@ -755,6 +864,20 @@ $('tx-list').addEventListener('click', (e) => {
   showTxSlatepack(x);
   $('dlg-tx').showModal();
 });
+
+/** Details of a "spent on another device" entry: what is known, and what cannot be known here. */
+function showElsewhere(x, add) {
+  add('Tutar', `−${amt(x.amount)} ツ`);
+  add('Harcanan çıktı', x.inputs);
+  add(x.early ? 'İlk kontrol' : 'Fark edildi', fmtDate(x.time));
+  $('tx-kv').append(el('dt', '', t('Not')), el('dd', '', x.early
+    ? t('Bu para, bu cihazda ilk kontrol yapılmadan önce başka bir cihazda (aynı kurtarma ifadesiyle) harcanmış. Ödemenin alıcısı, ağ ücreti ve tam tarihi yalnızca o cihazda kayıtlı. Tutar, harcanan çıktıların toplamıdır; ödemeden kalan para üstü bu cüzdana döndüyse ayrı bir “Taramayla bulundu” kaydı olarak görünür (görünmüyorsa Ayarlar → Bakım ve onarım bölümünden yeniden tara).')
+    : t('Bu para başka bir cihazda (aynı kurtarma ifadesiyle) harcandı. Ödemenin alıcısı, ağ ücreti ve tam tarihi yalnızca o cihazda kayıtlı; burada görünen tarih bu cihazın fark ettiği andır. Tutar, harcanan çıktıların toplamıdır; para üstünü bulmak için kısa bir tarama kendiliğinden başlar ve bulunan para üstü “Taramayla bulundu” olarak görünür.')));
+  $('tx-title').textContent = txTitle(x);
+  ['tx-proof-box', 'tx-proof-btn', 'tx-repost', 'tx-cancel', 'tx-sp'].forEach((id) => { $(id).hidden = true; });
+  err('tx-error');
+  $('dlg-tx').showModal();
+}
 
 // An unfinished Slatepack exchange can be continued from the transaction: the text to hand over is shown
 // again, and for our own payment there is a box for the recipient's reply.
@@ -812,27 +935,45 @@ $('tx-cancel').addEventListener('click', async (e) => {
 async function loadAccounts() {
   err('acc-error');
   try {
-    const list = await invoke('accounts');
+    const all = await invoke('accounts');
+    const hiddenN = all.filter((a) => a.hidden).length;
+    const list = all.filter((a) => !a.hidden || showHiddenAccounts);
     const ul = $('acc-list'); ul.replaceChildren();
     list.forEach((a) => {
-      const li = el('li');
+      const li = el('li', a.hidden ? 'acc-hidden' : '');
       const left = el('div');
       const name = el('div', 'tx-title', a.label);
       if (a.active) name.append(el('span', 'badge active', t('Etkin')));
       left.append(name, el('div', 'p', a.path));
       li.append(left);
-      if (!a.active) {
+      const acts = el('div', 'acc-acts');
+      if (!a.active && !a.hidden) {
         const b = el('button', 'btn btn-sm', t('Etkinleştir')); b.type = 'button';
         b.addEventListener('click', () => busy(b, async () => {
           try { await invoke('account_set', { label: a.label }); toast(t('“{name}” hesabı etkin; Tor adresi değişti', { name: a.label })); loadAccounts(); refresh(); }
           catch (x) { err('acc-error', E(x)); }
         }));
-        li.append(b);
+        acts.append(b);
       }
+      if (!a.active && a.label !== 'default') {
+        const h = el('button', `btn btn-sm${a.hidden ? '' : ' danger-text'}`, a.hidden ? t('Listeye geri al') : t('Listeden kaldır')); h.type = 'button';
+        h.title = t('Hesap yalnızca gizlenir; parası ve adresi kaybolmaz.');
+        h.addEventListener('click', () => busy(h, async () => {
+          try { await invoke('account_hide', { label: a.label, hide: !a.hidden }); loadAccounts(); }
+          catch (x) { err('acc-error', E(x)); }
+        }));
+        acts.append(h);
+      }
+      if (acts.childElementCount) li.append(acts);
       ul.append(li);
     });
+    const tog = $('acc-hidden-toggle');
+    tog.hidden = hiddenN === 0;
+    tog.textContent = showHiddenAccounts ? t('Gizli hesapları sakla') : t('Gizli hesapları göster ({n})', { n: hiddenN });
   } catch (x) { err('acc-error', E(x)); }
 }
+let showHiddenAccounts = false;
+$('acc-hidden-toggle').addEventListener('click', () => { showHiddenAccounts = !showHiddenAccounts; loadAccounts(); });
 $('acc-form').addEventListener('submit', async (e) => {
   e.preventDefault(); err('acc-error');
   const label = $('acc-name').value.trim();
@@ -841,41 +982,22 @@ $('acc-form').addEventListener('submit', async (e) => {
   catch (x) { err('acc-error', E(x)); }
 });
 
-// ------------------------------------------------------------------ wallet settings
-async function fillNodeDatalist() {
-  try {
-    const list = await invoke('nodes_list');
-    const dl = $('node-datalist'); dl.replaceChildren();
-    list.forEach((n) => { const o = el('option'); o.value = n.url; dl.append(o); });
-  } catch { /* optional */ }
-}
+// ------------------------------------------------------------------ wallet settings (Settings > Wallet)
 function fillWalletSettings() {
-  const w = state.open;
-  const conn = w.connection === 'integrated' ? 'integrated' : w.connection === 'custom' ? 'custom' : 'auto';
-  $('ws-f-name').value = w.name;
-  $('ws-f-conn').value = conn;
-  $('ws-f-url').value = w.custom_url;
-  $('ws-f-url-f').hidden = conn !== 'custom';
-  $('ws-note').hidden = true; err('ws-error');
-  fillNodeDatalist();
+  if (!state.open) return;
+  $('ws-f-name').value = state.open.name;
+  err('ws-error');
 }
-$('ws-f-conn').addEventListener('change', () => { $('ws-f-url-f').hidden = $('ws-f-conn').value !== 'custom'; });
-$('ws-form').addEventListener('submit', async (e) => {
-  e.preventDefault(); err('ws-error');
+$('ws-rename').addEventListener('click', (e) => busy(e.currentTarget, async () => {
+  err('ws-error');
+  const name = $('ws-f-name').value.trim();
+  if (!name) return err('ws-error', t('Cüzdan adı yaz.'));
   try {
-    const reconnect = await invoke('wallet_update', {
-      id: state.open.id, name: $('ws-f-name').value, connection: $('ws-f-conn').value,
-      customUrl: $('ws-f-url').value,
-    });
+    await invoke('wallet_update', { id: state.open.id, name, connection: state.open.connection, customUrl: state.open.custom_url || '' });
     state.status = await invoke('status'); state.open = state.status.open_wallet;
-    $('ws-name').textContent = state.open.name;
-    if (reconnect) {
-      const note = $('ws-note'); note.hidden = false; note.textContent = `${t('Kaydedildi. Yeni node bağlantısı cüzdan yeniden açılınca geçerli olur.')} `;
-      const b = el('button', 'link', t('Şimdi kapat')); b.type = 'button'; b.addEventListener('click', closeWallet); note.append(b);
-    } else toast(t('Kaydedildi'));
-    refresh();
+    $('ws-name').textContent = state.open.name; toast(t('Kaydedildi'));
   } catch (x) { err('ws-error', E(x)); }
-});
+}));
 $('btn-rescan').addEventListener('click', async (e) => {
   await busy(e.currentTarget, async () => {
     try { await invoke('rescan', { since: $('rescan-since').value }); toast(t('Tarama başladı; ilerlemesi bakiye kartında')); pollScan(); }
@@ -944,7 +1066,7 @@ async function pollScan() {
     scanSeen = s.finished_at;
     if (s.error) {
       banner.hidden = false; banner.dataset.state = 'error';
-      $('scan-text').textContent = t('Tarama yarıda kaldı: {e}. Cüzdanı yeniden açınca kaldığı yerden sürer; ya da Cüzdan ayarları > Bakım\'dan yeniden başlat.', { e: E(s.error) });
+      $('scan-text').textContent = t('Tarama yarıda kaldı: {e}. Cüzdanı yeniden açınca kaldığı yerden sürer; ya da Ayarlar > Bakım ve onarım bölümünden yeniden başlat.', { e: E(s.error) });
     } else {
       banner.hidden = true; toast(t('Tarama bitti, bakiye güncel')); refresh();
     }
@@ -954,7 +1076,9 @@ async function pollScan() {
 }
 
 // ------------------------------------------------------------------ tor
+const slatepackOnly = () => !!state.status?.settings?.tor_off;
 function torView(x) {
+  if (slatepackOnly()) return { state: 'off', chip: t('Slatepack'), text: t('Slatepack modu'), note: t('Tor kapalı (yalnızca Slatepack modu). Ödemeler Slatepack metniyle gönderilir ve alınır: gönderen sana bir metin verir, sen yanıtı geri verirsin. Adresini yine paylaşabilirsin; Slatepack metinleri ona göre şifrelenir.'), progress: false };
   if (!x || x.state === 'off') return { state: 'off', chip: t('Kapalı'), text: t('Tor kapalı'), note: t('Tor kapalı: Tor üzerinden ödeme alınamaz, Slatepack ile alabilirsin.'), progress: false };
   if (x.state === 'failed') return { state: 'failed', chip: t('Hata'), text: t('Tor hatası'), note: t('Tor bağlanamadı. Aşağıdan bir köprü (Snowflake) seçip "Uygula"ya bas.'), progress: false };
   const p = x.overall;
@@ -967,6 +1091,9 @@ function torView(x) {
 async function pollTor() {
   try { state.tor = await invoke('tor_status'); } catch { return; }
   const v = torView(state.tor);
+  syncTorMode();
+  const title = slatepackOnly() ? t('Slatepack adresin') : t('Tor adresin');
+  if ($('tc-title').textContent !== title) $('tc-title').textContent = title;
   $('tor-pill').dataset.state = v.state; $('tor-text').textContent = v.text;
   $('tc-state').dataset.state = v.state; $('tc-state').textContent = v.chip;
   ['tc-note', 'r-tor'].forEach((id) => { $(id).dataset.state = v.state; $(id).textContent = v.note; });
@@ -983,7 +1110,30 @@ async function pollTor() {
   $('tc-addr').scrollIntoView({ behavior: 'smooth', block: 'center' });
 });
 
+function syncTorMode() {
+  const off = slatepackOnly();
+  document.querySelectorAll('#tor-mode [data-tm], #set-tor-mode [data-tm]').forEach((b) => b.setAttribute('aria-checked', String((b.dataset.tm === 'off') === off)));
+  $('tor-on-only').hidden = off;
+  $('tor-mode-hint').textContent = off
+    ? t('Tor hiç çalışmaz; Tor adresin çevrimdışıdır. Node bağlantısı için internet yine gerekir.')
+    : t('Ödemeler Tor üzerinden doğrudan gelir ve gider. Tor engelliyse ya da kullanmak istemiyorsan “Yalnızca Slatepack”i seç.');
+}
+async function onTorModeClick(e) {
+  const b = e.target.closest('[data-tm]'); if (!b) return;
+  const off = b.dataset.tm === 'off';
+  if (off === slatepackOnly()) return;
+  err('tor-error');
+  try {
+    const applied = await invoke('tor_mode', { off });
+    state.status = await invoke('status');
+    syncTorMode(); pollTor();
+    toast(!applied ? t('Değişiklik cüzdan yeniden açılınca geçerli olur') : off ? t('Tor kapatıldı: yalnızca Slatepack') : t('Tor açılıyor; adresin birkaç dakikada çevrimiçi olur'));
+  } catch (x) { err('tor-error', E(x)); toast(E(x)); }
+}
+$('tor-mode').addEventListener('click', onTorModeClick);
+$('set-tor-mode').addEventListener('click', onTorModeClick);
 function syncTorForm() {
+  syncTorMode();
   const s = state.status.settings;
   document.querySelectorAll('input[name="bridges"]').forEach((r) => { r.checked = r.value === s.bridges; });
   $('tor-custom').value = s.custom_bridges; $('tor-engine').value = s.tor;
@@ -1217,6 +1367,13 @@ function setupWindow() {
 // X button / Alt+F4 with "ask" on: the Rust side keeps the window and sends "close-ask".
 function askClose() { closeDialogs(); $('cl-remember').checked = false; $('dlg-close').showModal(); $('cl-min').focus(); }
 try { window.__TAURI__.event.listen('close-ask', askClose); } catch { /* not on the desktop shell */ }
+// Android: the backend cannot relaunch the app by itself (network change, repair); MainActivity does it.
+try {
+  window.__TAURI__.event.listen('restart-app', () => {
+    toast(t('Uygulama yeniden başlıyor…'));
+    try { if (window.OrkoAndroid && window.OrkoAndroid.restartApp) window.OrkoAndroid.restartApp(); } catch { /* not on Android */ }
+  });
+} catch { /* no event bus */ }
 const closeChoice = (choice) => { const remember = $('cl-remember').checked; $('dlg-close').close(); invoke('close_choice', { choice, remember }); };
 $('cl-quit').addEventListener('click', () => closeChoice('quit'));
 $('cl-min').addEventListener('click', () => closeChoice('tray'));
@@ -1279,7 +1436,7 @@ $('nd-add').addEventListener('click', async (e) => {
   const url = $('nd-new').value.trim();
   if (!url) return;
   await busy(e.currentTarget, async () => {
-    try { renderNodeList(await invoke('node_add', { url })); $('nd-new').value = ''; toast(t('Node eklendi')); fillNodeDatalist(); }
+    try { renderNodeList(await invoke('node_add', { url })); $('nd-new').value = ''; toast(t('Node eklendi')); }
     catch (x) { err('nd-list-error', E(x)); }
   });
 });
@@ -1288,17 +1445,9 @@ $('nd-auto-pick').addEventListener('click', async () => {
   try { renderNodeList(await invoke('node_use', { url: null })); toast(t('Otomatik seçim açık')); } catch (x) { err('nd-list-error', E(x)); }
 });
 
-// ---- tabs of the node dialog
-function selectNodeTab(name) {
-  document.querySelectorAll('.snav [data-ntab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.ntab === name)));
-  document.querySelectorAll('[data-npane]').forEach((p) => { p.hidden = p.dataset.npane !== name; });
-}
-document.querySelectorAll('.snav [data-ntab]').forEach((b) => b.addEventListener('click', () => selectNodeTab(b.dataset.ntab)));
-
 // ---- this wallet's connection: pool / one node / own node
 function fillConnTab() {
   const w = state.open;
-  $('nd-conn-box').hidden = !w; $('nd-conn-none').hidden = !!w;
   $('nd-conn-note').hidden = true; err('nd-conn-error');
   if (!w) return;
   const mode = w.connection === 'integrated' ? 'integrated' : w.connection === 'custom' ? 'custom' : 'auto';
@@ -1307,11 +1456,13 @@ function fillConnTab() {
     const sel = $('nd-conn-url'); sel.replaceChildren();
     list.forEach((n) => { const o = el('option', '', n.url); o.value = n.url; sel.append(o); });
     if (w.custom_url) sel.value = w.custom_url;
-    sel.hidden = mode !== 'custom';
+    showConnUrl(mode === 'custom');
   }).catch(() => {});
 }
+/** The node list for "one node" is only shown with that choice (the select sits inside a themed drop-down). */
+function showConnUrl(on) { const s = $('nd-conn-url'); (s.closest('.dd') || s).hidden = !on; }
 document.querySelectorAll('input[name="ndconn"]').forEach((r) => r.addEventListener('change', () => {
-  $('nd-conn-url').hidden = document.querySelector('input[name="ndconn"]:checked').value !== 'custom';
+  showConnUrl(document.querySelector('input[name="ndconn"]:checked').value === 'custom');
 }));
 $('nd-conn-apply').addEventListener('click', async (e) => {
   err('nd-conn-error');
@@ -1332,54 +1483,10 @@ $('nd-conn-apply').addEventListener('click', async (e) => {
   });
 });
 
-$('nd-form').addEventListener('submit', async (e) => {
-  e.preventDefault(); err('nd-error');
-  const peers = $('nd-peers').value;
-  const badPeer = peers.split('\n').map((l) => l.trim()).filter(Boolean).find((l) => !/^[\w.\-[\]:]+:\d{1,5}$/.test(l));
-  if (badPeer) return err('nd-error', t('Eş adresi host:port olmalı: {p}', { p: badPeer }));
-  try {
-    const s = state.status.settings;
-    await invoke('save_settings', {
-      theme: s.theme, language: s.language, autoLockMinutes: s.auto_lock_minutes,
-      node: { autostart: $('nd-auto').checked, peers, only_peers: $('nd-only').checked, archive: $('nd-archive').checked },
-      send: s.send,
-    });
-    state.status = await invoke('status'); $('dlg-node').close(); toast(t('Node ayarları kaydedildi'));
-  } catch (x) { err('nd-error', E(x)); }
-});
-
 // ------------------------------------------------------------------ dialogs
 function openDialog(name) {
-  if (name === 'settings') {
-    const s = state.status.settings;
-    $('set-lang').value = s.language;
-    document.querySelectorAll('input[name="theme"]').forEach((r) => { r.checked = r.value === s.theme; });
-    document.querySelectorAll('input[name="palette"]').forEach((r) => { r.checked = r.value === (s.palette === 'orko' ? 'orko' : 'grin'); });
-    $('set-notify-pay').checked = s.notify_payments !== false;
-    $('set-notify-tor').checked = s.notify_tor !== false;
-    $('set-close').value = s.close_ask !== false ? 'ask' : (s.close_to_tray !== false ? 'tray' : 'quit');
-    $('set-network').value = s.network;
-    $('opt-usernet').hidden = s.network !== 'usernet';
-    $('set-net-apply').disabled = true;
-    $('set-autolock').value = String(s.auto_lock_minutes);
-    $('set-lock-box').hidden = !state.open;
-    $('set-backup-none').hidden = !!state.open;
-    selectSettingsTab('general');
-    $('set-confirm-pw').checked = s.send.confirm_password; $('set-fluff').checked = s.send.fluff;
-    $('set-minconf').value = String(s.send.min_confirmations || 10); $('set-change').value = String(s.send.change_outputs); $('set-strategy').value = s.send.strategy; $('set-ttl').value = s.send.ttl_blocks;
-    $('set-retry').checked = s.send.retry; $('set-retry-min').value = s.send.retry_minutes; $('set-retry-min').disabled = !s.send.retry;
-    $('set-backup-box').hidden = !state.open; $('set-phrase-box').hidden = !state.open; err('set-backup-note');
-    return $('dlg-settings').showModal();
-  }
-  if (name === 'node') {
-    const s = state.status.settings;
-    $('nd-pool-title').textContent = t('Node havuzu ({net})', { net: NET_LABEL()[state.status.network] });
-    $('nd-auto').checked = s.node.autostart; $('nd-archive').checked = s.node.archive;
-    $('nd-peers').value = s.node.peers; $('nd-only').checked = s.node.only_peers;
-    err('nd-error'); err('nd-list-error'); $('nd-new').value = '';
-    selectNodeTab('pool'); fillConnTab();
-    $('dlg-node').showModal();
-    return loadNodeList(true);
+  if (name === 'settings' || name.startsWith('settings:') || name === 'node') {
+    return openSettings(name === 'node' ? 'node' : name.split(':')[1] || null);
   }
   if (name === 'password') { ['pw-old', 'pw-new', 'pw-new2'].forEach((id) => { $(id).value = ''; }); err('pw-error'); return $('dlg-password').showModal(); }
   if (name === 'phrase') { $('ph-pass').value = ''; err('ph-error'); return $('dlg-phrase').showModal(); }
@@ -1393,8 +1500,10 @@ function openDialog(name) {
     $('send-step-form').hidden = false;
     $('s-avail').textContent = amt(state.overview?.spendable);
     $('s-pass-f').hidden = !state.status.settings.send.confirm_password; $('s-pass').value = '';
-    setSendMethod('tor');
+    $('s-method').hidden = slatepackOnly();
+    setSendMethod(slatepackOnly() ? 'slatepack' : 'tor');
     err('send-error'); stopRecipientCheck(); $('s-recipient-box').hidden = true; $('s-recipient').dataset.state = ''; pingSeq++;
+    prefetchMax();
     $('dlg-send').showModal(); $('s-addr').focus();
     return;
   }
@@ -1437,6 +1546,10 @@ $('set-donate').addEventListener('click', () => {
 
 $('set-save').addEventListener('click', async () => {
   const s = state.status.settings;
+  const peers = $('nd-peers').value;
+  const badPeer = peers.split('\n').map((l) => l.trim()).filter(Boolean).find((l) => !/^[\w.\-[\]:]+:\d{1,5}$/.test(l));
+  if (badPeer) { selectSettingsTab('node'); $('set-box').dataset.level = 'pane'; syncSettingsChrome(); return err('nd-error', t('Eş adresi host:port olmalı: {p}', { p: badPeer })); }
+  const node = { autostart: $('nd-auto').checked, peers, only_peers: $('nd-only').checked, archive: $('nd-archive').checked };
   const theme = document.querySelector('input[name="theme"]:checked')?.value || 'system';
   const palette = document.querySelector('input[name="palette"]:checked')?.value || 'grin';
   const notifyPayments = $('set-notify-pay').checked, notifyTor = $('set-notify-tor').checked, closeMode = $('set-close').value, closeToTray = closeMode !== 'quit', closeAsk = closeMode === 'ask';
@@ -1449,7 +1562,7 @@ $('set-save').addEventListener('click', async () => {
       min_confirmations: Math.min(10, Math.max(1, Number($('set-minconf').value) || 10)),
       retry: $('set-retry').checked, retry_minutes: Math.min(240, Math.max(1, Number($('set-retry-min').value) || 30)),
     };
-    await invoke('save_settings', { theme, palette, notifyPayments, notifyTor, closeToTray, closeAsk, language, autoLockMinutes: minutes, node: s.node, send });
+    await invoke('save_settings', { theme, palette, notifyPayments, notifyTor, closeToTray, closeAsk, language, autoLockMinutes: minutes, node, send });
     state.status = await invoke('status'); applyTheme(theme); applyPalette(palette);
     if (language !== s.language) applyLanguage(language);
     autoLockMs = minutes * 60000;
@@ -1470,16 +1583,69 @@ function applyLanguage(pref) {
   if (state.open && !listShown) {
       fillSince($('rescan-since'), false);
     refresh(); pollTor(); pollScan();
-    if (document.querySelector('.tabs [data-tab="accounts"][aria-selected="true"]')) loadAccounts();
+    if ($('dlg-settings').open && $('set-box').dataset.tab === 'wallet') loadAccounts();
   } else if (document.querySelector('[data-screen="form"]') && !document.querySelector('[data-screen="form"]').hidden) { openForm(state.formMode); } else renderWallets();
   pollNode();
 }
 
+// ---- Settings: one dialog, the same categories on every screen size.
+// Wide window: categories on the left, the chosen one on the right. Phone (<= 720px): first the list
+// of categories (data-level="menu"), a tap opens one (data-level="pane"), the back arrow returns.
+const SHEET = matchMedia('(max-width: 720px)');
+function fillSettingsForm() {
+  const s = state.status.settings;
+  syncTorMode();
+  $('set-box').dataset.wallet = state.open ? '1' : '0';
+  $('set-lang').value = s.language;
+  document.querySelectorAll('input[name="theme"]').forEach((r) => { r.checked = r.value === s.theme; });
+  document.querySelectorAll('input[name="palette"]').forEach((r) => { r.checked = r.value === (s.palette === 'orko' ? 'orko' : 'grin'); });
+  $('set-notify-pay').checked = s.notify_payments !== false;
+  $('set-notify-tor').checked = s.notify_tor !== false;
+  $('set-close').value = s.close_ask !== false ? 'ask' : (s.close_to_tray !== false ? 'tray' : 'quit');
+  $('set-network').value = s.network;
+  $('opt-usernet').hidden = s.network !== 'usernet';
+  $('set-net-apply').disabled = true;
+  $('set-autolock').value = String(s.auto_lock_minutes);
+  $('set-confirm-pw').checked = s.send.confirm_password; $('set-fluff').checked = s.send.fluff;
+  $('set-minconf').value = String(s.send.min_confirmations || 10); $('set-change').value = String(s.send.change_outputs); $('set-strategy').value = s.send.strategy; $('set-ttl').value = s.send.ttl_blocks;
+  $('set-retry').checked = s.send.retry; $('set-retry-min').value = s.send.retry_minutes; $('set-retry-min').disabled = !s.send.retry;
+  $('nd-pool-title').textContent = t('Node havuzu ({net})', { net: NET_LABEL()[state.status.network] });
+  $('nd-auto').checked = s.node.autostart; $('nd-archive').checked = s.node.archive;
+  $('nd-peers').value = s.node.peers; $('nd-only').checked = s.node.only_peers;
+  ['nd-error', 'nd-list-error', 'set-backup-note', 'acc-error'].forEach((id) => err(id)); $('nd-new').value = '';
+  fillWalletSettings();
+}
+function openSettings(tab) {
+  closeDialogs();
+  fillSettingsForm();
+  selectSettingsTab(tab || 'general');
+  $('set-box').dataset.level = tab || !SHEET.matches ? 'pane' : 'menu';
+  syncSettingsChrome();
+  $('dlg-settings').showModal();
+  $('set-panes').scrollTop = 0;
+}
+/** Title, back arrow and the Save bar follow the level and the category. */
+function syncSettingsChrome() {
+  const box = $('set-box');
+  const inPane = box.dataset.level === 'pane' || !SHEET.matches;
+  const cur = document.querySelector(`.snav [data-stab="${box.dataset.tab}"] b`);
+  $('set-title').textContent = SHEET.matches && inPane && cur ? cur.textContent : t('Ayarlar');
+  $('set-back').hidden = !(SHEET.matches && inPane);
+  $('set-foot').hidden = !(inPane && document.querySelector(`[data-spane="${box.dataset.tab}"]`)?.hasAttribute('data-save'));
+}
 function selectSettingsTab(name) {
+  $('set-box').dataset.tab = name;
   document.querySelectorAll('.snav [data-stab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.stab === name)));
   document.querySelectorAll('[data-spane]').forEach((p) => { p.hidden = p.dataset.spane !== name; });
+  if (name === 'wallet' && state.open) loadAccounts();
+  if (name === 'node') { fillConnTab(); loadNodeList(true); }
 }
-document.querySelectorAll('.snav [data-stab]').forEach((b) => b.addEventListener('click', () => selectSettingsTab(b.dataset.stab)));
+document.querySelectorAll('.snav [data-stab]').forEach((b) => b.addEventListener('click', () => {
+  selectSettingsTab(b.dataset.stab);
+  $('set-box').dataset.level = 'pane'; syncSettingsChrome(); $('set-panes').scrollTop = 0;
+}));
+$('set-back').addEventListener('click', () => { $('set-box').dataset.level = 'menu'; syncSettingsChrome(); });
+SHEET.addEventListener('change', () => { if ($('dlg-settings').open) syncSettingsChrome(); });
 
 // ---- connection diagnosis: facts come from the backend, the wording lives here (so it is translated)
 function diagRows(r) {
@@ -1550,6 +1716,7 @@ $('set-csv').addEventListener('click', (e) => busy(e.currentTarget, async () => 
   catch (x) { $('set-backup-note').textContent = E(x); }
 }));
 $('set-logs').addEventListener('click', () => invoke('open_data_folder'));
+$('set-quit').addEventListener('click', quitApp);
 
 // ---- send
 let sendMethod = 'tor';
@@ -1566,7 +1733,7 @@ function setSendMethod(m) {
   sendMethod = m;
   document.querySelectorAll('#s-method [data-m]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.m === m)));
   const tor = m === 'tor';
-  $('s-method-desc').textContent = tor ? torNote() : t('Alıcı çevrimdışıysa ya da Tor kullanamıyorsa: bir Slatepack metni oluşturulur. Onu alıcıya mesajla, e-postayla ya da QR ile ilet; alıcı yanıtı geri verince buraya yapıştırıp tamamlarsın.');
+  $('s-method-desc').textContent = tor ? torNote() : slatepackOnly() ? t('Yalnızca Slatepack modu: bir Slatepack metni oluşturulur. Onu alıcıya mesajla, e-postayla ya da QR ile ilet; alıcının geri verdiği yanıtı buraya yapıştırınca ödeme tamamlanır.') : t('Alıcı çevrimdışıysa ya da Tor kullanamıyorsa: bir Slatepack metni oluşturulur. Onu alıcıya mesajla, e-postayla ya da QR ile ilet; alıcı yanıtı geri verince buraya yapıştırıp tamamlarsın.');
   $('s-addr-field').hidden = !tor; // Slatepack mode needs only the amount
   if (!tor) $('s-addr').value = '';
   $('s-addr-l').textContent = t('Alıcının adresi');
@@ -1647,16 +1814,28 @@ $('s-addr').addEventListener('input', checkRecipient);
 $('s-recheck').addEventListener('click', checkRecipient);
 
 // "Maks": the whole spendable balance minus the network fee; the backend recomputes it when sending.
+// The amount is worked out as soon as the Send dialog opens (from the wallet's own records, no node round
+// trip), so the button fills the field at once.
 let sendMax = false;
+let maxPromise = null;
+function prefetchMax() {
+  maxPromise = invoke('max_sendable');
+  maxPromise.catch(() => {}); // an error is shown when the button is pressed
+}
 $('s-amount').addEventListener('input', () => { sendMax = false; });
 $('s-max').addEventListener('click', async () => {
   err('send-error');
+  if (!maxPromise) prefetchMax();
+  const fill = (v) => {
+    if (Number(v) <= 0) return err('send-error', t('Gönderilebilir bakiye yok.'));
+    $('s-amount').value = v; sendMax = true;
+  };
+  let settled = false, v;
+  maxPromise.then((x) => { settled = true; v = x; }, () => {});
+  await Promise.resolve();
+  if (settled) return fill(v); // already known: no spinner at all
   await busy($('s-max'), async () => {
-    try {
-      const v = await invoke('max_sendable');
-      if (Number(v) <= 0) return err('send-error', t('Gönderilebilir bakiye yok.'));
-      $('s-amount').value = v; sendMax = true;
-    } catch (x) { err('send-error', E(x)); }
+    try { fill(await maxPromise); } catch (x) { maxPromise = null; err('send-error', E(x)); }
   });
 });
 

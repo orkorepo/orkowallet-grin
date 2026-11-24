@@ -118,6 +118,9 @@ struct AppSettings {
     last_wallet: BTreeMap<String, String>,
     /// Wallet folders to delete on the next start (they are locked while open).
     pending_delete: Vec<String>,
+    /// "Slatepack only": the wallet uses no Tor at all (no onion address online, payments go and come
+    /// as Slatepack texts). The node connection is not affected.
+    tor_off: bool,
 }
 
 impl Default for AppSettings {
@@ -142,6 +145,7 @@ impl Default for AppSettings {
             send: SendCfg::default(),
             last_wallet: BTreeMap::new(),
             pending_delete: Vec::new(),
+            tor_off: false,
         }
     }
 }
@@ -184,6 +188,9 @@ struct WalletMeta {
     min_confirmations: u64,
     /// A chain scan that has not finished yet: (start height, delete unconfirmed). Resumed on open.
     scan_pending: Option<(u64, bool)>,
+    /// Accounts the user removed from the list. Grin cannot delete an account (its keys come from the
+    /// recovery phrase), so it is only hidden: its money and address stay, and it can be shown again.
+    hidden_accounts: Vec<String>,
 }
 
 impl Default for WalletMeta {
@@ -195,6 +202,7 @@ impl Default for WalletMeta {
             connection: "auto".into(),
             custom_url: String::new(),
             min_confirmations: 10,
+            hidden_accounts: Vec::new(),
             scan_pending: None,
         }
     }
@@ -240,6 +248,9 @@ struct AppState {
     guard: Mutex<(u32, Instant)>,
     /// Interface language as reported by the UI (tray menu and notifications are worded here).
     ui_lang: Mutex<String>,
+    /// When this session last noticed money of the open wallet being spent on another device (unix
+    /// seconds, 0 = never). The page shows a warning about using one wallet on two devices.
+    elsewhere_at: std::sync::atomic::AtomicU64,
 }
 
 #[derive(Default, Clone, Serialize)]
@@ -451,6 +462,14 @@ fn graceful_restart(app: &tauri::AppHandle) {
     if let Some(st) = app.try_state::<Arc<AppState>>() {
         st.node.stop(true);
     }
+    // Android: `restart()` only ends the process, nothing starts it again (the user was left on the home
+    // screen after a network change). The page asks MainActivity to relaunch the app instead.
+    #[cfg(target_os = "android")]
+    {
+        use tauri::Emitter;
+        let _ = app.emit("restart-app", ());
+    }
+    #[cfg(not(target_os = "android"))]
     app.restart();
 }
 
@@ -612,6 +631,7 @@ async fn open_with(
                 (w, None)
             }
         };
+        w.set_tor_off(st.settings.lock().unwrap().tor_off);
         w.start_listener()?;
         *st.tor_ready_at.lock().unwrap() = None;
         {
@@ -682,7 +702,14 @@ fn scan_start(state: &AppState, since: &str) -> Option<u64> {
             // Unix time of Jan 1st of `year` (00:00 UTC), no leap-second fuss needed here.
             let days = (1970..year).map(|yy| if (yy % 4 == 0 && yy % 100 != 0) || yy % 400 == 0 { 366 } else { 365 }).sum::<i64>();
             let net = state.settings.lock().unwrap().network();
-            Some(orko_grin_core::start_height_for(net, days * 86_400))
+            if net == orko_grin_core::Network::Mainnet {
+                return Some(orko_grin_core::start_height_for(net, days * 86_400));
+            }
+            // Other networks: count back from the open wallet's chain height (one block a minute) with a
+            // month of margin, as for mainnet. No open wallet: from the start.
+            let tip = state.open().ok().and_then(|o| o.wallet.balance_with(10, false).ok()).map(|(_, i)| i.last_confirmed_height).unwrap_or(0);
+            let back = (now_secs() as i64 - days * 86_400).max(0) / 60 + 30 * 24 * 60;
+            Some((tip as i64 - back).max(1) as u64)
         }
     }
 }
@@ -856,10 +883,37 @@ async fn wallet_close(app: tauri::AppHandle, state: St<'_>) -> Result<bool, Stri
     }
     state.locked.store(false, std::sync::atomic::Ordering::SeqCst);
     state.reachable.store(false, std::sync::atomic::Ordering::Relaxed);
+    state.elsewhere_at.store(0, std::sync::atomic::Ordering::Relaxed);
     *state.tor_ready_at.lock().unwrap() = None;
     *state.scan.lock().unwrap() = ScanState::default();
     orko_grin_core::reset_scan_progress();
     Ok(false)
+}
+
+/// Before the app quits for good (Android: "Close wallet" in the notification): stop waiting payments,
+/// shut the wallet (Foreign API, Tor) and the integrated node down cleanly. Never restarts; the caller ends
+/// the process afterwards. Waits at most a few seconds for each part.
+#[tauri::command]
+async fn app_shutdown(state: St<'_>) -> Result<(), String> {
+    state.jobs_stop.store(true, std::sync::atomic::Ordering::SeqCst);
+    let st = state.inner().clone();
+    blocking(move || {
+        for _ in 0..30 {
+            if st.jobs_active.load(std::sync::atomic::Ordering::SeqCst) == 0 {
+                break;
+            }
+            std::thread::sleep(Duration::from_millis(100));
+        }
+        let open = st.open.write().unwrap().take();
+        if let Some(o) = open {
+            let w = o.wallet.clone();
+            drop(o);
+            let _ = w.shutdown();
+        }
+        st.node.stop(true);
+        Ok(())
+    })
+    .await
 }
 
 #[tauri::command]
@@ -1178,18 +1232,37 @@ struct AccountDto {
     label: String,
     path: String,
     active: bool,
+    hidden: bool,
 }
 
 #[tauri::command]
 async fn accounts(state: St<'_>) -> Result<Vec<AccountDto>, String> {
-    let w = state.wallet()?;
+    let o = state.open()?;
+    let hidden = state.read_meta(&o.meta.id).map(|m| m.hidden_accounts).unwrap_or_default();
+    let w = o.wallet.clone();
     blocking(move || {
         Ok(w.accounts()?
             .into_iter()
-            .map(|(label, path, active)| AccountDto { label, path, active })
+            .map(|(label, path, active)| AccountDto { hidden: !active && hidden.contains(&label), label, path, active })
             .collect())
     })
     .await
+}
+
+/// Remove an account from the list (hide = true) or show it again. The active account and "default"
+/// cannot be hidden; nothing is deleted.
+#[tauri::command]
+fn account_hide(state: St<'_>, label: String, hide: bool) -> Result<(), String> {
+    let o = state.open()?;
+    if hide && label == "default" {
+        return Err("Ana hesap listeden kaldırılamaz.".into());
+    }
+    let mut meta = state.read_meta(&o.meta.id)?;
+    meta.hidden_accounts.retain(|l| l != &label);
+    if hide {
+        meta.hidden_accounts.push(label);
+    }
+    state.write_meta(&meta)
 }
 
 #[tauri::command]
@@ -1225,11 +1298,14 @@ struct Overview {
     node_in_use: String,
     node_failovers: usize,
     connection: String,
+    /// See `AppState::elsewhere_at`.
+    elsewhere_at: u64,
 }
 
 #[tauri::command]
 async fn overview(state: St<'_>) -> Result<Overview, String> {
     let o = state.open()?;
+    let elsewhere_at = state.elsewhere_at.load(std::sync::atomic::Ordering::Relaxed);
     let min_conf = state.settings.lock().unwrap().send.min_confirmations.clamp(1, 10);
     blocking(move || {
         let w = &o.wallet;
@@ -1252,6 +1328,7 @@ async fn overview(state: St<'_>) -> Result<Overview, String> {
             node_in_use: w.node_in_use(),
             node_failovers: w.node_failovers(),
             connection: o.meta.connection.clone(),
+            elsewhere_at,
         })
     })
     .await
@@ -1277,6 +1354,9 @@ struct TxDto {
     inputs: usize,
     outputs: usize,
     ttl_height: u64,
+    /// "SpentElsewhere" entries only: the outputs were already spent the first time this wallet was
+    /// checked, so the time shown is when that was noticed, not when they were spent.
+    early: bool,
 }
 
 fn tx_dto(t: orko_grin_core::TxLogEntry) -> TxDto {
@@ -1310,15 +1390,108 @@ fn tx_dto(t: orko_grin_core::TxLogEntry) -> TxDto {
         outputs: t.num_outputs,
         ttl_height: t.ttl_cutoff_height.unwrap_or(0),
         kind,
+        early: false,
     }
+}
+
+// ------------------------------------------------------------------ spent on another device
+// Grin keeps a payment's history only on the device that made it. When the same wallet (recovery phrase)
+// runs on two devices, the other device's payments show up here only as outputs that are suddenly spent.
+// Those are listed as "spent on another device" entries: outputs noticed in the same check form one entry,
+// dated when they were noticed. The first-seen times are kept in <wallet>/spent_elsewhere.json.
+
+#[derive(Serialize, Deserialize, Default)]
+struct ElsewhereLog {
+    /// Output commitment -> (unix time it was first seen spent, already spent at the very first check).
+    seen: BTreeMap<String, (u64, bool)>,
+    /// Wallet height at the last check: a spend found later happened after it.
+    checked_height: u64,
+}
+
+fn elsewhere_entries(state: &Arc<AppState>, o: &OpenWallet) -> Vec<TxDto> {
+    let Ok(spends) = o.wallet.spent_elsewhere() else { return Vec::new() };
+    let Ok(dir) = state.wallet_dir(&o.meta.id) else { return Vec::new() };
+    let path = dir.join("spent_elsewhere.json");
+    let first_check = !path.exists();
+    let mut log: ElsewhereLog =
+        std::fs::read(&path).ok().and_then(|b| serde_json::from_slice(&b).ok()).unwrap_or_default();
+    // While a scan runs, outputs come and go; nothing is recorded until it is over.
+    let scanning = state.scan.lock().unwrap().active;
+    let height = o.wallet.balance_with(10, false).map(|(_, i)| i.last_confirmed_height).unwrap_or(0);
+    let now = now_secs();
+    let mut fresh = false;
+    let mut changed = false;
+    for sp in &spends {
+        if !log.seen.contains_key(&sp.commit) && !scanning {
+            log.seen.insert(sp.commit.clone(), (now, first_check));
+            fresh |= !first_check;
+            changed = true;
+        }
+    }
+    let previous_height = log.checked_height;
+    if !scanning && height > 0 && height != log.checked_height {
+        log.checked_height = height;
+        changed = true;
+    }
+    if changed {
+        if let Ok(b) = serde_json::to_vec(&log) {
+            let _ = std::fs::write(&path, b);
+        }
+    }
+    if fresh {
+        state.elsewhere_at.store(now, std::sync::atomic::Ordering::Relaxed);
+        // The other device's payment usually left change that belongs to this wallet too, and only a
+        // chain scan can find it. Scan the blocks since the last check (with an hour of margin).
+        if previous_height > 0 {
+            let _ = start_scan(state, previous_height.saturating_sub(60).max(1), false);
+        }
+    }
+    let mut groups: BTreeMap<(u64, bool), (u64, usize)> = BTreeMap::new();
+    for sp in &spends {
+        let key = log.seen.get(&sp.commit).copied().unwrap_or((now, false));
+        let g = groups.entry(key).or_default();
+        g.0 = g.0.saturating_add(sp.value);
+        g.1 += 1;
+    }
+    groups
+        .into_iter()
+        .rev()
+        .enumerate()
+        .map(|(i, ((time, early), (value, count)))| TxDto {
+            id: u32::MAX - i as u32,
+            kind: "SpentElsewhere".into(),
+            amount: amount_to_hr_string(value, true),
+            incoming: false,
+            fee: String::new(),
+            confirmed: true,
+            cancelled: false,
+            finalized: true,
+            time: time as i64,
+            confirmed_time: 0,
+            slate_id: String::new(),
+            kernel: String::new(),
+            has_proof: false,
+            has_stored_tx: false,
+            inputs: count,
+            outputs: 0,
+            ttl_height: 0,
+            early,
+        })
+        .collect()
 }
 
 #[tauri::command]
 async fn transactions(state: St<'_>) -> Result<Vec<TxDto>, String> {
-    let w = state.wallet()?;
+    let o = state.open()?;
+    let st = state.inner().clone();
     blocking(move || {
-        let mut out: Vec<TxDto> = w.transactions(false)?.into_iter().map(tx_dto).collect();
-        out.reverse();
+        let mut out: Vec<TxDto> = o.wallet.transactions(false)?.into_iter().map(tx_dto).collect();
+        out.reverse(); // newest first
+        // Entries for money spent on another device go in by date (newest first as well).
+        for e in elsewhere_entries(&st, &o) {
+            let at = out.iter().position(|x| x.time < e.time).unwrap_or(out.len());
+            out.insert(at, e);
+        }
         Ok(out)
     })
     .await
@@ -1398,6 +1571,8 @@ fn rescan(state: St<'_>, since: String) -> Result<(), String> {
 struct TorDto {
     /// "off" | "starting" | "ready" | "failed"
     state: String,
+    /// "Slatepack only" mode is on (Tor switched off on purpose).
+    slatepack_only: bool,
     percent: u8,
     message: String,
     /// Seconds since tor became ready (the onion is findable ~2 min later).
@@ -1439,6 +1614,7 @@ fn tor_status(state: St<'_>) -> TorDto {
     };
     let set = state.settings.lock().unwrap();
     TorDto {
+        slatepack_only: set.tor_off,
         overall,
         stage,
         reachable,
@@ -1495,6 +1671,18 @@ async fn tor_diagnose(state: St<'_>) -> Result<serde_json::Value, String> {
         "hints": hints,
         "advice": advice,
     }))
+}
+
+/// "Slatepack only" on or off. Saved for every wallet; applied at once to the open wallet when possible.
+/// Returns false when the open wallet must be opened again for the change (integrated Arti engine).
+#[tauri::command]
+async fn tor_mode(state: St<'_>, off: bool) -> Result<bool, String> {
+    state.settings.lock().unwrap().tor_off = off;
+    state.save_settings()?;
+    *state.tor_ready_at.lock().unwrap() = None;
+    state.reachable.store(false, std::sync::atomic::Ordering::Relaxed);
+    let Ok(w) = state.wallet() else { return Ok(true) };
+    blocking(move || w.switch_tor(off)).await
 }
 
 /// Save bridge settings and apply them at once (restarts the bundled tor).
@@ -1635,7 +1823,7 @@ async fn max_sendable(state: St<'_>) -> Result<String, String> {
     let o = state.open()?;
     let min_conf = state.settings.lock().unwrap().send.min_confirmations.clamp(1, 10);
     blocking(move || {
-        let (max, _, _) = o.wallet.max_sendable(min_conf)?;
+        let (max, _, _) = o.wallet.max_sendable(min_conf, false)?;
         Ok(amount_to_hr_string(max, true))
     })
     .await
@@ -1648,6 +1836,9 @@ async fn send(state: St<'_>, amount: String, address: String, password: Option<S
         return Err("Tor ile göndermek için alıcının adresini yaz.".into());
     }
     let o = state.open()?;
+    if over_tor && o.wallet.tor_is_off() {
+        return Err("Tor kapalı (yalnızca Slatepack modu). Slatepack ile gönder ya da Tor'u aç.".into());
+    }
     let cfg = state.settings.lock().unwrap().send.clone();
     if cfg.confirm_password {
         // Spending needs the password again (stops someone at an unlocked screen).
@@ -1670,7 +1861,7 @@ async fn send(state: St<'_>, amount: String, address: String, password: Option<S
     let amount = if send_max.unwrap_or(false) {
         // "Max": everything spendable goes out and the fee is taken from it.
         let w = o.wallet.clone();
-        let (_, total, _) = blocking(move || w.max_sendable(min_conf)).await?;
+        let (_, total, _) = blocking(move || w.max_sendable(min_conf, true)).await?;
         if total == 0 {
             return Err("Gönderilebilir bakiye yok.".into());
         }
@@ -1818,6 +2009,8 @@ async fn process_slatepack(state: St<'_>, text: String) -> Result<ProcessDto, St
     blocking(move || {
         let sid = w.slatepack_id(&text).ok();
         let (outcome, pending) = w.process_slatepack(&text)?;
+        // Slatepack only: the signed reply is handed back as text, never over Tor.
+        let pending = if w.tor_is_off() { None } else { pending };
         let auto_return = pending.is_some();
         if let Some(p) = pending {
             let w2 = w.clone();
@@ -2013,19 +2206,32 @@ async fn backup_wallet(app: tauri::AppHandle, state: St<'_>) -> Result<String, S
 /// Show the app data folder (logs, settings) in the file manager.
 #[tauri::command]
 fn open_data_folder(state: St<'_>) {
+    let _ = open_with_system(&state.root.to_string_lossy());
+}
+
+/// Open a folder or a web address with the system's own handler (Explorer, `open` on macOS, `xdg-open`
+/// on Linux). Android has none here: the page opens web addresses through its bridge.
+fn open_with_system(target: &str) -> Result<(), String> {
     #[cfg(windows)]
-    {
-        let _ = std::process::Command::new("explorer").arg(&state.root).spawn();
+    let prog = Some("explorer");
+    #[cfg(target_os = "macos")]
+    let prog = Some("open");
+    #[cfg(all(unix, not(target_os = "macos"), not(target_os = "android")))]
+    let prog = Some("xdg-open");
+    #[cfg(target_os = "android")]
+    let prog: Option<&str> = None;
+    if let Some(p) = prog {
+        std::process::Command::new(p).arg(target).spawn().map_err(|e| e.to_string())?;
     }
-    #[cfg(not(windows))]
-    let _ = &state;
+    Ok(())
 }
 
 /// Open a transaction kernel in the Grin Scan block explorer (mainnet only), in the default browser.
 /// Only a kernel excerpt (hex) is accepted, so the address that is opened is always
 /// `https://scan.grin.money/kernel/<hex>` and nothing the UI sends can change the host or add arguments.
+/// Returns that address: on Android the page hands it to the system browser (see MainActivity.openUrl).
 #[tauri::command]
-fn open_kernel(state: St<'_>, kernel: String) -> Result<(), String> {
+fn open_kernel(state: St<'_>, kernel: String) -> Result<String, String> {
     if state.settings.lock().unwrap().network != "mainnet" {
         return Err("Kernel explorer is only available on mainnet".into());
     }
@@ -2034,13 +2240,8 @@ fn open_kernel(state: St<'_>, kernel: String) -> Result<(), String> {
         return Err("Not a kernel".into());
     }
     let url = format!("https://scan.grin.money/kernel/{}", k.to_ascii_lowercase());
-    #[cfg(windows)]
-    {
-        std::process::Command::new("explorer").arg(&url).spawn().map_err(|e| e.to_string())?;
-    }
-    #[cfg(not(windows))]
-    let _ = url;
-    Ok(())
+    open_with_system(&url)?;
+    Ok(url)
 }
 
 // ------------------------------------------------------------------ node pool
@@ -2511,7 +2712,12 @@ fn notifier(app: tauri::AppHandle, state: Arc<AppState>) {
 
             // Tor: gone for a minute = tell once; back = tell once. A short restart stays silent.
             let ok = matches!(ow.wallet.tor_status(), Some(TorStatus::Ready)) && state.reachable.load(Relaxed);
-            if ok {
+            if ow.wallet.tor_is_off() {
+                // Slatepack only: Tor is off on purpose, nothing to tell.
+                was_ok = false;
+                down_since = None;
+                told_down = false;
+            } else if ok {
                 if told_down && want_tor {
                     toast(&app, say(&l, "tor_back_title"), say(&l, "tor_back_body"));
                 }
@@ -2691,6 +2897,7 @@ pub fn run() {
                 jobs_active: std::sync::atomic::AtomicUsize::new(0),
                 guard: Mutex::new((0, Instant::now())),
                 ui_lang: Mutex::new("en".into()),
+                elsewhere_at: std::sync::atomic::AtomicU64::new(0),
             });
             let _ = state.save_settings();
             probe_poller(state.clone());
@@ -2712,6 +2919,8 @@ pub fn run() {
             wallet_import,
             wallet_open,
             wallet_close,
+            app_shutdown,
+            tor_mode,
             win_min,
             win_max,
             win_drag,
@@ -2732,6 +2941,7 @@ pub fn run() {
             show_phrase,
             accounts,
             account_create,
+            account_hide,
             account_set,
             overview,
             transactions,

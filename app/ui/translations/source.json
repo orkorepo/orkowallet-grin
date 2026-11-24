@@ -1292,8 +1292,8 @@
   "en": "About"
  },
  {
-  "tr": "OrkoWallet – Grin 0.3.1 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap",
-  "en": "OrkoWallet – Grin 0.3.1 · official grin-wallet 5.5.1 and grin 5.5.2 libraries · Tor 0.4.9.16 · Orkoswap"
+  "tr": "OrkoWallet – Grin 0.3.2 · grin-wallet 5.5.1 ve grin 5.5.2 resmi kütüphaneleri · Tor 0.4.9.16 · Orkoswap",
+  "en": "OrkoWallet – Grin 0.3.2 · official grin-wallet 5.5.1 and grin 5.5.2 libraries · Tor 0.4.9.16 · Orkoswap"
  },
  {
   "tr": "Ağ değişince açık cüzdan kapanır ve uygulama yeniden başlar.",
@@ -2262,5 +2262,289 @@
  {
   "tr": "Küçültünce cüzdan açık kalır, ödeme almaya ve bildirim göndermeye devam eder. Tamamen kapatmak için tepsi simgesine sağ tıkla.",
   "en": "When minimized the wallet stays open and keeps receiving payments and sending notifications. To quit completely, right-click the tray icon."
+ },
+ {
+  "tr": "Cüzdan adı, hesaplar, cüzdanı silme",
+  "en": "Wallet name, accounts, deleting the wallet"
+ },
+ {
+  "tr": "Ayarlar listesine dön",
+  "en": "Back to the settings list"
+ },
+ {
+  "tr": "Dil, görünüm, bildirimler, ağ",
+  "en": "Language, appearance, notifications, network"
+ },
+ {
+  "tr": "Ad, hesaplar, cüzdanı silme",
+  "en": "Name, accounts, deleting the wallet"
+ },
+ {
+  "tr": "Otomatik kilit, parola",
+  "en": "Auto-lock, password"
+ },
+ {
+  "tr": "Onay sayısı, yeniden deneme, gizlilik",
+  "en": "Confirmations, retrying, privacy"
+ },
+ {
+  "tr": "Bağlantı, node listesi, gömülü node",
+  "en": "Connection, node list, built-in node"
+ },
+ {
+  "tr": "Kurtarma ifadesi, yedek, CSV",
+  "en": "Recovery phrase, backup, CSV"
+ },
+ {
+  "tr": "Bakım ve onarım",
+  "en": "Maintenance and repair"
+ },
+ {
+  "tr": "Yeniden tarama, bağlantı tanısı",
+  "en": "Rescan, connection check"
+ },
+ {
+  "tr": "Sürüm, bağış, destek",
+  "en": "Version, donation, support"
+ },
+ {
+  "tr": "Pencereyi kapatınca",
+  "en": "When closing the window"
+ },
+ {
+  "tr": "Uygulamayı kapatmak",
+  "en": "Quitting the app"
+ },
+ {
+  "tr": "Cüzdan açıkken uygulama arka planda çalışır ve bildirim çubuğunda görünür. Tamamen kapatmak için bildirimdeki “Cüzdanı kapat” düğmesine bas ya da aşağıdaki düğmeyi kullan.",
+  "en": "While a wallet is open the app runs in the background and shows in the notification bar. To quit completely, press “Close wallet” in the notification or use the button below."
+ },
+ {
+  "tr": "Cüzdanı kapat ve uygulamadan çık",
+  "en": "Close the wallet and quit the app"
+ },
+ {
+  "tr": "Adı değiştir",
+  "en": "Rename"
+ },
+ {
+  "tr": "Cüzdan dosyaları bu cihazdan silinir. Kurtarma ifaden yoksa paran kaybolur.",
+  "en": "The wallet files are deleted from this device. Without your recovery phrase your money is lost."
+ },
+ {
+  "tr": "Bu bölüm için önce bir cüzdan aç.",
+  "en": "Open a wallet first to use this section."
+ },
+ {
+  "tr": "Gönderirken parola",
+  "en": "Password when sending"
+ },
+ {
+  "tr": "Önerilen. Hata olunca kendiliğinden diğer node'a geçer.",
+  "en": "Recommended. Switches to another node by itself on errors."
+ },
+ {
+  "tr": "Yalnızca seçtiğin node; başka node'a geçmez.",
+  "en": "Only the node you choose; never switches to another."
+ },
+ {
+  "tr": "Zinciri bu cihaza indirir; kimseye sormadan çalışır.",
+  "en": "Downloads the chain to this device; works without asking anyone."
+ },
+ {
+  "tr": "Bağlantıyı uygula",
+  "en": "Apply connection"
+ },
+ {
+  "tr": "Son yıl en hızlısıdır. Daha eski bir ödeme eksikse daha eski bir yıl ya da “en baştan” seç.",
+  "en": "The latest year is the fastest. If an older payment is missing, choose an earlier year or “from the start”."
+ },
+ {
+  "tr": "Yeniden taramayı başlat",
+  "en": "Start rescan"
+ },
+ {
+  "tr": "Aşağı kaydır",
+  "en": "Scroll down"
+ },
+ {
+  "tr": "Başa dön",
+  "en": "Back to top"
+ },
+ {
+  "tr": "Cüzdan adı yaz.",
+  "en": "Enter a wallet name."
+ },
+ {
+  "tr": "En baştan (en uzun)",
+  "en": "From the start (longest)"
+ },
+ {
+  "tr": "Tor üzerinden ödeme alabilmen için açık tutuluyor. Tamamen kapatmak için “Cüzdanı kapat”a bas.",
+  "en": "Kept open so you can receive payments over Tor. Press “Close wallet” to quit completely."
+ },
+ {
+  "tr": "Tarayıcı açılamadı",
+  "en": "Could not open the browser"
+ },
+ {
+  "tr": "Taramayla bulundu",
+  "en": "Found by scan"
+ },
+ {
+  "tr": "Not",
+  "en": "Note"
+ },
+ {
+  "tr": "Bu kayıt zincir taramasıyla bulundu (kurtarma ifadesiyle içe aktarma ya da yeniden tarama). Tarama yalnızca şu an sahip olduğun çıktıları görür: giden ödemeler listede görünmez, bir gönderimden kalan para üstü de “Taramayla bulundu” olarak görünür. Aynı cüzdanı iki cihazda kullanırsan her cihaz yalnızca kendi yaptığı gönderimleri listeler.",
+  "en": "This entry was found by a chain scan (import with the recovery phrase, or a rescan). A scan only sees the outputs you own right now: outgoing payments do not appear in the list, and the change left over from a payment also shows as “Found by scan”. If you use the same wallet on two devices, each device lists only the payments it sent itself."
+ },
+ {
+  "tr": "Bu cüzdan başka bir cihazda da kullanılıyor.",
+  "en": "This wallet is also used on another device."
+ },
+ {
+  "tr": "Paranın bir kısmı başka bir cihazda harcandı (aynı kurtarma ifadesi). İki cihaz aynı anda açıkken gelen ödemeler hangisine düşeceği belli olmadan gelir ve iki cihaz aynı parayı harcamaya çalışabilir; işlem geçmişini de her cihaz yalnızca kendi yaptıklarıyla görür. Bir cihazı kapat ya da ikinci cihazda ayrı bir hesap kullan (Ayarlar → Cüzdan → Hesaplar). Para üstünü bulmak için kısa bir tarama başlatıldı.",
+  "en": "Some of your money was spent on another device (same recovery phrase). While both devices are open, incoming payments land on either one, and both may try to spend the same money; each device also shows only its own payments in the history. Close one device, or use a separate account on the second one (Settings → Wallet → Accounts). A short scan was started to find the change."
+ },
+ {
+  "tr": "Anladım",
+  "en": "Got it"
+ },
+ {
+  "tr": "Başka bir cihazda harcandı",
+  "en": "Spent on another device"
+ },
+ {
+  "tr": "fark edildi {date}",
+  "en": "noticed {date}"
+ },
+ {
+  "tr": "Harcanan çıktı",
+  "en": "Outputs spent"
+ },
+ {
+  "tr": "İlk kontrol",
+  "en": "First check"
+ },
+ {
+  "tr": "Fark edildi",
+  "en": "Noticed"
+ },
+ {
+  "tr": "Bu para, bu cihazda ilk kontrol yapılmadan önce başka bir cihazda (aynı kurtarma ifadesiyle) harcanmış. Ödemenin alıcısı, ağ ücreti ve tam tarihi yalnızca o cihazda kayıtlı. Tutar, harcanan çıktıların toplamıdır; ödemeden kalan para üstü bu cüzdana döndüyse ayrı bir “Taramayla bulundu” kaydı olarak görünür (görünmüyorsa Ayarlar → Bakım ve onarım bölümünden yeniden tara).",
+  "en": "This money was spent on another device (with the same recovery phrase) before this device first checked. The recipient, the network fee and the exact date are recorded only on that device. The amount is the total of the spent outputs; change from the payment that came back to this wallet shows as a separate “Found by scan” entry (if it does not, rescan in Settings → Maintenance and repair)."
+ },
+ {
+  "tr": "Bu para başka bir cihazda (aynı kurtarma ifadesiyle) harcandı. Ödemenin alıcısı, ağ ücreti ve tam tarihi yalnızca o cihazda kayıtlı; burada görünen tarih bu cihazın fark ettiği andır. Tutar, harcanan çıktıların toplamıdır; para üstünü bulmak için kısa bir tarama kendiliğinden başlar ve bulunan para üstü “Taramayla bulundu” olarak görünür.",
+  "en": "This money was spent on another device (with the same recovery phrase). The recipient, the network fee and the exact date are recorded only on that device; the date shown here is when this device noticed it. The amount is the total of the spent outputs; a short scan starts by itself to find the change, which then shows as “Found by scan”."
+ },
+ {
+  "tr": "Slatepack modu",
+  "en": "Slatepack mode"
+ },
+ {
+  "tr": "Slatepack adresin",
+  "en": "Your Slatepack address"
+ },
+ {
+  "tr": "Tor ile (önerilen)",
+  "en": "With Tor (recommended)"
+ },
+ {
+  "tr": "Yalnızca Slatepack",
+  "en": "Slatepack only"
+ },
+ {
+  "tr": "Bağlantı modu",
+  "en": "Connection mode"
+ },
+ {
+  "tr": "Tor kapalı (yalnızca Slatepack modu). Ödemeler Slatepack metniyle gönderilir ve alınır: gönderen sana bir metin verir, sen yanıtı geri verirsin. Adresini yine paylaşabilirsin; Slatepack metinleri ona göre şifrelenir.",
+  "en": "Tor is off (Slatepack only mode). Payments are sent and received as Slatepack texts: the sender gives you a text, you give the reply back. You can still share your address; Slatepack texts are encrypted to it."
+ },
+ {
+  "tr": "Tor hiç çalışmaz; Tor adresin çevrimdışıdır. Node bağlantısı için internet yine gerekir.",
+  "en": "Tor does not run at all; your Tor address is offline. The node connection still needs the internet."
+ },
+ {
+  "tr": "Ödemeler Tor üzerinden doğrudan gelir ve gider. Tor engelliyse ya da kullanmak istemiyorsan “Yalnızca Slatepack”i seç.",
+  "en": "Payments come and go directly over Tor. If Tor is blocked or you do not want to use it, choose “Slatepack only”."
+ },
+ {
+  "tr": "Değişiklik cüzdan yeniden açılınca geçerli olur",
+  "en": "The change applies when the wallet is opened again"
+ },
+ {
+  "tr": "Tor kapatıldı: yalnızca Slatepack",
+  "en": "Tor switched off: Slatepack only"
+ },
+ {
+  "tr": "Tor açılıyor; adresin birkaç dakikada çevrimiçi olur",
+  "en": "Tor is starting; your address will be online in a few minutes"
+ },
+ {
+  "tr": "Yalnızca Slatepack modu: bir Slatepack metni oluşturulur. Onu alıcıya mesajla, e-postayla ya da QR ile ilet; alıcının geri verdiği yanıtı buraya yapıştırınca ödeme tamamlanır.",
+  "en": "Slatepack only mode: a Slatepack text is made. Pass it to the recipient by message, e-mail or QR code; paste the reply they give back here to complete the payment."
+ },
+ {
+  "tr": "Tor kapalı (yalnızca Slatepack modu).",
+  "en": "Tor is off (Slatepack only mode)."
+ },
+ {
+  "tr": "Tor kapalı (yalnızca Slatepack modu). Slatepack ile gönder ya da Tor'u aç.",
+  "en": "Tor is off (Slatepack only mode). Send with Slatepack or switch Tor on."
+ },
+ {
+  "tr": "Tarama yarıda kaldı: {e}. Cüzdanı yeniden açınca kaldığı yerden sürer; ya da Ayarlar > Bakım ve onarım bölümünden yeniden başlat.",
+  "en": "The scan stopped: {e}. It continues where it stopped when you open the wallet again; or start it again in Settings > Maintenance and repair."
+ },
+ {
+  "tr": "Listeden kaldır",
+  "en": "Remove from list"
+ },
+ {
+  "tr": "Listeye geri al",
+  "en": "Show in list again"
+ },
+ {
+  "tr": "Hesap yalnızca gizlenir; parası ve adresi kaybolmaz.",
+  "en": "The account is only hidden; its money and address are kept."
+ },
+ {
+  "tr": "Gizli hesapları sakla",
+  "en": "Hide hidden accounts"
+ },
+ {
+  "tr": "Gizli hesapları göster ({n})",
+  "en": "Show hidden accounts ({n})"
+ },
+ {
+  "tr": "Yenilendi",
+  "en": "Refreshed"
+ },
+ {
+  "tr": "Listeden kaldır:",
+  "en": "Remove from list:"
+ },
+ {
+  "tr": "hesap yalnızca gizlenir, parası ve adresi kaybolmaz.",
+  "en": "the account is only hidden, its money and address are kept."
+ },
+ {
+  "tr": "Cüzdanı sil:",
+  "en": "Delete wallet:"
+ },
+ {
+  "tr": "cüzdanın tamamı bu cihazdan silinir.",
+  "en": "the whole wallet is deleted from this device."
+ },
+ {
+  "tr": "“Yalnızca Slatepack”: Tor hiç çalışmaz, ödemeler Slatepack metniyle gider ve gelir. Hemen uygulanır.",
+  "en": "“Slatepack only”: Tor does not run at all, payments go and come as Slatepack texts. Applies at once."
+ },
+ {
+  "tr": "Ana hesap listeden kaldırılamaz.",
+  "en": "The main account cannot be removed from the list."
  }
 ]

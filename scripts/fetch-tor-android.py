@@ -5,7 +5,7 @@ Run once before building the APK (and again after a Tor version bump):
     python scripts/fetch-tor-android.py
 
 What it does
-  1. Downloads tor-expert-bundle-android-<abi>-<version>.tar.gz from dist.torproject.org and checks its
+  1. Downloads tor-expert-bundle-android-<abi>-<version>.tar.gz from archive.torproject.org and checks its
      SHA-256 against the value pinned below (taken from Tor's signed sha256sums-signed-build.txt for 16.0.1).
   2. Unpacks it to vendor/tor-android-<version>/<abi>/.
   3. Copies libTor.so and the bridge plugin (as liblyrebird.so) into
@@ -41,7 +41,7 @@ def fetch(abi, want):
     f = dl / name
     if not f.exists():
         dl.mkdir(parents=True, exist_ok=True)
-        url = f"https://dist.torproject.org/torbrowser/{VERSION}/{name}"
+        url = f"https://archive.torproject.org/tor-package-archive/torbrowser/{VERSION}/{name}"  # dist keeps only the latest releases
         print("downloading", url)
         urllib.request.urlretrieve(url, f)
     got = hashlib.sha256(f.read_bytes()).hexdigest()

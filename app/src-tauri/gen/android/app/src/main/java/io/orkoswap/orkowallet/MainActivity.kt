@@ -5,8 +5,12 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Process
 import android.webkit.JavascriptInterface
 import android.view.WindowManager
 import android.webkit.WebView
@@ -14,16 +18,21 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import java.lang.ref.WeakReference
 
 class MainActivity : TauriActivity() {
   /** True while a wallet is open: the foreground service runs and Back sends the app to the background. */
   private var keepAlive = false
   private var svcTitle = "OrkoWallet"
   private var svcText = ""
+  private var svcClose = "Close wallet"
+  private var web: WebView? = null
+  private var quitting = false
 
   override fun onCreate(savedInstanceState: Bundle?) {
     enableEdgeToEdge()
     super.onCreate(savedInstanceState)
+    current = WeakReference(this)
     onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
       override fun handleOnBackPressed() {
         if (keepAlive) {
@@ -37,7 +46,36 @@ class MainActivity : TauriActivity() {
   }
 
   override fun onWebViewCreate(webView: WebView) {
+    web = webView
     webView.addJavascriptInterface(Bridge(), "OrkoAndroid")
+  }
+
+  override fun onDestroy() {
+    if (current?.get() === this) current = null
+    super.onDestroy()
+  }
+
+  /**
+   * "Close wallet" in the notification: the page closes the wallet and Tor cleanly (window.orkoQuit, which
+   * calls back exitApp()). If the page does not answer in time, the app is ended anyway.
+   */
+  fun quitFromNotification() {
+    if (quitting) return
+    quitting = true
+    val w = web
+    if (w == null) { exitNow(); return }
+    w.evaluateJavascript("window.orkoQuit ? (window.orkoQuit(), 1) : 0") { r ->
+      if (r != "1") exitNow()
+    }
+    Handler(Looper.getMainLooper()).postDelayed({ exitNow() }, 12_000)
+  }
+
+  private fun exitNow() {
+    keepAlive = false
+    stopService(Intent(this, OrkoService::class.java))
+    finishAndRemoveTask()
+    // The wallet and Tor were shut down by the page (or did not answer); end the process so nothing keeps running.
+    Handler(Looper.getMainLooper()).postDelayed({ Process.killProcess(Process.myPid()) }, 300)
   }
 
   /** Called from the page (window.OrkoAndroid) when a wallet is opened or closed. */
@@ -45,6 +83,49 @@ class MainActivity : TauriActivity() {
     @JavascriptInterface
     fun serviceOn(title: String, text: String) {
       runOnUiThread { startKeepAlive(title, text) }
+    }
+
+    /** Same, with the (translated) label of the notification's "Close wallet" button. */
+    @JavascriptInterface
+    fun serviceStart(title: String, text: String, closeLabel: String) {
+      runOnUiThread { svcClose = closeLabel; startKeepAlive(title, text) }
+    }
+
+    /**
+     * Start the app again in a fresh process (network change, connection repair): the grin libraries keep
+     * the network in process-wide state, so a new process is the only clean way. The new task is queued
+     * first, then this process ends; Android starts a new one for the queued activity.
+     */
+    @JavascriptInterface
+    fun restartApp() {
+      runOnUiThread {
+        keepAlive = false
+        stopService(Intent(this@MainActivity, OrkoService::class.java))
+        val launch = packageManager.getLaunchIntentForPackage(packageName)?.component
+        if (launch != null) startActivity(Intent.makeRestartActivityTask(launch))
+        Handler(Looper.getMainLooper()).postDelayed({ Process.killProcess(Process.myPid()) }, 200)
+      }
+    }
+
+    /** The page has closed the wallet for good: stop the service and end the app. */
+    @JavascriptInterface
+    fun exitApp() {
+      runOnUiThread { exitNow() }
+    }
+
+    /**
+     * Open a block-explorer page in the system browser. Only Grin Scan kernel pages are accepted, so the
+     * page cannot use this to open anything else.
+     */
+    @JavascriptInterface
+    fun openUrl(url: String): Boolean {
+      if (!KERNEL_URL.matches(url)) return false
+      return try {
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        true
+      } catch (e: Exception) {
+        false
+      }
     }
 
     @JavascriptInterface
@@ -84,7 +165,7 @@ class MainActivity : TauriActivity() {
   }
 
   private fun launchService() {
-    val i = Intent(this, OrkoService::class.java).putExtra("title", svcTitle).putExtra("text", svcText)
+    val i = Intent(this, OrkoService::class.java).putExtra("title", svcTitle).putExtra("text", svcText).putExtra("close", svcClose)
     ContextCompat.startForegroundService(this, i)
   }
 
@@ -100,5 +181,11 @@ class MainActivity : TauriActivity() {
   private fun stopKeepAlive() {
     keepAlive = false
     stopService(Intent(this, OrkoService::class.java))
+  }
+
+  companion object {
+    /** The running activity, for the notification's "Close wallet" button (null when there is none). */
+    @Volatile var current: WeakReference<MainActivity>? = null
+    private val KERNEL_URL = Regex("""^https://scan\.grin\.money/kernel/[0-9a-f]{8,130}$""")
   }
 }

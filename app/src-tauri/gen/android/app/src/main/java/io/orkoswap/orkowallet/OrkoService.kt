@@ -15,6 +15,7 @@ import androidx.core.app.NotificationCompat
  * Keeps the app process (and with it the wallet's Tor onion address) alive while a wallet is open, so
  * payments can arrive with the screen off. Android allows that only with a visible foreground-service
  * notification. It stops when the wallet is closed or the app is swiped away from the recent apps.
+ * The notification has a "Close wallet" button that shuts the wallet down and ends the app.
  */
 class OrkoService : Service() {
   private var wake: PowerManager.WakeLock? = null
@@ -22,8 +23,21 @@ class OrkoService : Service() {
   override fun onBind(intent: Intent?): IBinder? = null
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    if (intent?.action == ACTION_QUIT) {
+      val act = MainActivity.current?.get()
+      if (act != null) {
+        act.runOnUiThread { act.quitFromNotification() }
+      } else {
+        // No page left to close the wallet cleanly: stop and end the process.
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
+        android.os.Process.killProcess(android.os.Process.myPid())
+      }
+      return START_NOT_STICKY
+    }
     val title = intent?.getStringExtra("title") ?: "OrkoWallet"
     val text = intent?.getStringExtra("text") ?: ""
+    val closeLabel = intent?.getStringExtra("close") ?: "Close wallet"
     val nm = getSystemService(NotificationManager::class.java)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && nm.getNotificationChannel(CHANNEL) == null) {
       val ch = NotificationChannel(CHANNEL, "OrkoWallet", NotificationManager.IMPORTANCE_LOW)
@@ -35,12 +49,18 @@ class OrkoService : Service() {
       Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP),
       PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
     )
+    val quit = PendingIntent.getService(
+      this, 1,
+      Intent(this, OrkoService::class.java).setAction(ACTION_QUIT),
+      PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+    )
     val n = NotificationCompat.Builder(this, CHANNEL)
       .setSmallIcon(applicationInfo.icon)
       .setContentTitle(title)
       .setContentText(text)
       .setStyle(NotificationCompat.BigTextStyle().bigText(text))
       .setContentIntent(open)
+      .addAction(0, closeLabel, quit)
       .setOngoing(true)
       .setOnlyAlertOnce(true)
       .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -69,5 +89,6 @@ class OrkoService : Service() {
   companion object {
     const val CHANNEL = "orko_keepalive"
     const val ID = 4711
+    const val ACTION_QUIT = "io.orkoswap.orkowallet.QUIT"
   }
 }

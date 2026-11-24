@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.3.2 – 2026-11-24 · The big update
+
+- **Linux and macOS.** The desktop app is now built for Linux (`.deb`, `.AppImage`) and macOS (`.dmg`, Apple Silicon and Intel) by the same public GitHub workflow as Windows, with the same features. Tor comes from the Tor Project's permanent archive (the old download address only keeps the newest releases): pinned SHA-256 for Windows, the Tor Project's GPG-signed hash list for Linux and macOS. Opening the log folder and the kernel link work on every desktop. The macOS app is not signed with a paid Apple Developer ID; the README explains how to open it
+- **Remove an account from the list.** Settings → Wallet → Accounts: "Remove from list" only hides an account (its money and address stay; "Show hidden accounts" brings it back). Deleting a wallet stays a separate step with its own warning
+- **Phone: pull down to refresh** the wallet, the wallet list or the node panel
+- **Connection mode in Settings → General** as well (With Tor / Slatepack only), not only on the Tor card
+- **Repair (rescan) on testnet** also offers the years (counted back from the chain height)
+- Fixed: Android closed but did not start again after a network change, a connection repair or closing a wallet during a scan; it now restarts by itself
+- Fixed: the Settings window could scroll sideways on the desktop
+- Fixed: the health dots in the node list were always grey
+- **One Settings window, in categories.** Settings, Wallet settings and Node settings are now a single window with the same eight categories on the desktop and the phone: General, Wallet, Security, Sending, Node, Backup, Maintenance and repair, About. On the desktop the categories are on the left; on the phone Settings opens as a list of categories, a tap opens one, the back arrow returns. The wallet card shows only the transactions, with a "Wallet settings" button that opens Settings → Wallet (name, accounts, delete). The node connection is chosen with three large options in Settings → Node
+- **Android: "Close wallet" in the notification.** The ongoing notification has a button that closes the wallet and Tor cleanly and quits the app. Settings → General has the same button on the phone
+- **Android: fixed scrolling.** On the phone the last part of long pages (wallet settings, the transaction list and others) stayed hidden behind the bottom tabs and could not be scrolled into view. Pages now scroll to the end, and a round button shows when a page goes on below (at the bottom it takes you back to the top)
+- **Android: the kernel link opens Grin Scan** in the browser (it did nothing before)
+- **Node panel:** "Node settings", "Run your own node" and the hash buttons are now clearly buttons (large on the phone)
+- **"Max" is instant:** the amount is worked out when the Send window opens, from the wallet's own records; sending still checks it against the node
+- **Repair (rescan)** now starts with the current year selected (the fastest choice); "from the start" is the last option. Importing with a recovery phrase still starts with "I don't know: from the start"
+- Transactions found by a chain scan (after importing with the recovery phrase, or a rescan) are labelled "Found by scan" instead of "Received", with a note: a scan cannot see outgoing payments, so a restored wallet, or the same wallet used on a second device, shows only what that device knows
+- **Same wallet on two devices: "Spent on another device".** Grin keeps a payment's history only on the device that made it. When money of this wallet is spent on another device (same recovery phrase), the history now shows a "Spent on another device" entry with the amount and when this device noticed it (outputs noticed together form one entry; the recipient and fee are only known on the other device). A short background scan then looks for the change, which appears as "Found by scan". A warning on the balance card explains the risks of keeping the same wallet open on two devices and suggests a separate account on the second one. Detection compares the outputs the chain shows as spent with the inputs of this device's own sends (from their stored transaction files), so this device's own payments are never reported
+- **Slatepack only mode (no Tor).** The Tor card has a switch: "With Tor" or "Slatepack only". In Slatepack only mode Tor does not run at all (no onion service, no Tor sends, no reply over Tor, no automatic Tor restarts, no "Tor lost" notifications); payments go and come as Slatepack texts, and the Send window offers only Slatepack. The choice is saved and applies at once to the open wallet (with the integrated Arti engine, when the wallet is opened again). The node connection still uses the internet
+- New texts translated into all six languages
+
 ## 0.3.1 – 2026-11-20
 
 - **Import = recovery phrase.** "Import" now takes the recovery phrase (it used to take a wallet folder). The words go into numbered boxes (12, 15, 18, 21 or 24), with a **Paste** button that spreads a copied phrase over the boxes by itself (numbers and line breaks are ignored); a **Clear** button empties them
