@@ -5,8 +5,16 @@
 <h1 align="center">OrkoWallet – Grin</h1>
 
 <p align="center">
-  A private, open-source wallet for <a href="https://grin.mw">Grin</a> on Windows, Linux, macOS and Android.<br>
-  Tor is built in. No account, no tracking, no middleman. Made by the community, for the community.
+  <b>A private, open-source wallet for <a href="https://grin.mw">Grin</a></b><br>
+  on Windows · Linux · macOS · Android<br>
+  <sub>Tor is built in. No account, no tracking, no middleman. Free, and made by the community for the community.</sub>
+</p>
+
+<p align="center">
+  <a href="../../releases/latest"><b>⬇️ Download</b></a> &nbsp;·&nbsp;
+  <a href="#whats-new">✨ What's new</a> &nbsp;·&nbsp;
+  <a href="#install">📖 Install</a> &nbsp;·&nbsp;
+  <a href="https://t.me/chat_orko"><b>💬 Feedback on Telegram</b></a>
 </p>
 
 <p align="center">
@@ -15,6 +23,7 @@
   <img alt="Platform: Windows, Linux, macOS and Android" src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS%20%7C%20Android-black.svg">
   <img alt="Languages: 6" src="https://img.shields.io/badge/languages-6-ffd60a.svg">
   <a href="../../actions/workflows/build.yml"><img alt="Build" src="../../actions/workflows/build.yml/badge.svg"></a>
+  <a href="https://t.me/chat_orko"><img alt="Chat on Telegram" src="https://img.shields.io/badge/chat-Telegram-26a5e4.svg?logo=telegram&logoColor=white"></a>
 </p>
 
 <p align="center">
@@ -22,6 +31,29 @@
 </p>
 
 ---
+
+<a id="download"></a>
+
+## ⬇️ Download
+
+Get the file for your system from the **[latest release](../../releases/latest)**, check it against `SHA256SUMS.txt`, install. Every file has the same name pattern: `OrkoWallet-<version>-<system>-<arch>.<ext>`.
+
+| | System | File | Status |
+|:-:|---|---|:-:|
+| 🪟 | **Windows** 10 / 11 | `…-windows-x64-setup.exe` (installer) · `…-windows-x64-portable.zip` | ✅ tested |
+| 🤖 | **Android** 7+ (arm64) | `…-android-arm64.apk` | ✅ tested |
+| 🐧 | **Linux** Debian, Ubuntu, Mint | `…-linux-amd64.deb` | 🧪 new |
+| 🐧 | **Linux** Fedora, openSUSE | `…-linux-x86_64.rpm` | 🧪 new |
+| 🐧 | **Linux** any distribution | `…-linux-x86_64.AppImage` · `…-linux-x86_64.tar.gz` | 🧪 new |
+| 🍎 | **macOS** Apple Silicon (M1 and newer) | `…-macos-arm64.dmg` | 🧪 new |
+| 🍎 | **macOS** Intel | `…-macos-x64.dmg` | 🧪 new |
+| 📦 | Source code | `…-source.zip` | |
+
+> **🧪 Linux and macOS are brand new in 0.3.2.** They build and package cleanly, but we have not been able to try them on many real machines yet. If something does not work (Tor does not connect, the window does not open, a button does nothing), **please tell us: [t.me/chat_orko](https://t.me/chat_orko)**. Your feedback is what makes these builds good, and we answer.
+
+---
+
+<a id="whats-new"></a>
 
 ## ✨ What's new in 0.3.2: the big update
 
@@ -42,7 +74,8 @@ See the [changelog](CHANGELOG.md) for every detail.
 
 ## Contents
 
-- [What's new in 0.3.2](#-whats-new-in-032-the-big-update)
+- [Download](#download)
+- [What's new in 0.3.2](#whats-new)
 - [Why OrkoWallet](#why-orkowallet)
 - [Features](#features)
 - [Screenshots](#screenshots)
@@ -52,6 +85,7 @@ See the [changelog](CHANGELOG.md) for every detail.
 - [Build from source](#build-from-source)
 - [Project layout](#project-layout)
 - [Translations](#translations)
+- [Feedback and community](#feedback)
 - [Contributing](#contributing)
 - [About Orkoswap](#about-orkoswap)
 - [Donate](#donate)
@@ -168,11 +202,11 @@ The same wallet in a narrow window or on a phone-sized screen: one column, botto
 
 ### Windows installer
 
-1. Download the installer (`OrkoWallet.-.Grin_<version>_x64-setup.exe`) from the [Releases](../../releases) page.
+1. Download the installer (`OrkoWallet-<version>-windows-x64-setup.exe`) from the [Releases](../../releases) page. No installation wanted? `OrkoWallet-<version>-windows-x64-portable.zip` runs from any folder.
 2. Compare its SHA-256 with the value in the release notes:
 
    ```powershell
-   Get-FileHash .\OrkoWallet.-.Grin_0.3.2_x64-setup.exe -Algorithm SHA256
+   Get-FileHash .\OrkoWallet-0.3.2-windows-x64-setup.exe -Algorithm SHA256
    ```
 
 3. Run it. It installs for the current user and needs no administrator rights.
@@ -186,13 +220,17 @@ Download one of these from the [Releases](../../releases) page and compare its S
 - **`.deb`** (Debian, Ubuntu, Mint and friends): `sudo apt install ./OrkoWallet*.deb`
 - **`.AppImage`** (any distribution): `chmod +x OrkoWallet*.AppImage` and run it.
 
-Tor is included, nothing else to install. The tray icon needs an AppIndicator-capable desktop (GNOME needs the *AppIndicator* extension).
+Tor is included, nothing else to install. The tray icon needs an AppIndicator-capable desktop (GNOME needs the *AppIndicator* extension). Prefer no installation? The `.tar.gz` holds the program with its Tor folder next to it: unpack and run `orkowallet`.
+
+🧪 *New in 0.3.2 and not yet tried on many machines. Does it work for you? Tell us at [t.me/chat_orko](https://t.me/chat_orko).*
 
 ### macOS
 
 Download the `.dmg` for your Mac (**Apple Silicon** or **Intel**) from the [Releases](../../releases) page, check its SHA-256 (`shasum -a 256 <file>`), open it and drag the app to *Applications*.
 
 The app is **not signed with an Apple Developer ID**: the project has no income and does not pay for one. macOS will say it cannot check the developer. The first time, **right-click the app → Open → Open**. If it still refuses, open *System Settings → Privacy & Security* and press **Open Anyway**.
+
+🧪 *New in 0.3.2 and not yet tried on many Macs. Does it work for you? Tell us at [t.me/chat_orko](https://t.me/chat_orko).*
 
 ### Android
 
@@ -235,6 +273,8 @@ Two copies of the app were started. Since 0.1.2 only one copy can run: opening i
 **Android: payments only arrive while the app is open.** Check that the "OrkoWallet is running" notification is there (allow notifications for the app), that the wallet is open (not logged out) and that the battery use of OrkoWallet is *Unrestricted*. Do not swipe the app away from the recent apps list; use the Back button to leave it running in the background.
 
 **Android: the app closes and does not come back after changing the network.** Fixed in 0.3.2; the app now starts again by itself.
+
+**Still stuck?** Ask in the chat: [t.me/chat_orko](https://t.me/chat_orko).
 
 **Logs.** *Settings → About → Open the log folder* opens `orkowallet.log` (desktop). Please attach the last lines when you report a problem, and remove anything private first.
 
@@ -294,6 +334,22 @@ Add `--debug` for a debug build. A release build is signed with the key named in
 
 The Turkish source text is the key; `app/ui/i18n.js` holds English and `app/ui/translations/<code>.json` the other languages. After editing a JSON file run `node scripts/build-lang.js <code>` to regenerate `app/ui/lang-<code>.js`, then `node scripts/check-i18n.js` to verify every key and placeholder. Corrections from native speakers are very welcome, and so are new languages.
 
+<a id="feedback"></a>
+
+## 💬 Feedback and community
+
+Your feedback matters to us: a bug, something confusing, an idea, a translation fix, or just "it works on my Fedora". Write to us in the community chat:
+
+<p align="center">
+  <a href="https://t.me/chat_orko"><img alt="Join the OrkoWallet chat on Telegram" src="https://img.shields.io/badge/%F0%9F%92%AC%20Join%20the%20chat-t.me%2Fchat__orko-26a5e4?style=for-the-badge&logo=telegram&logoColor=white"></a>
+</p>
+
+- **Quick question or "does this work for you?"** → the Telegram chat.
+- **A clear bug or a feature idea** → a [GitHub issue](../../issues/new/choose) (templates included), so it does not get lost.
+- **A security problem** → privately, see [SECURITY.md](SECURITY.md). Never post a recovery phrase, a password or a wallet file anywhere.
+
+When you report a problem please add your system (Windows, Linux distribution, macOS version, Android model), the OrkoWallet version (*Settings → About*) and the last lines of `orkowallet.log` (*Settings → About → Open the log folder*), with anything private removed.
+
 ## Contributing
 
 Bug reports, fixes, translations and ideas are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) first. For security problems use [SECURITY.md](SECURITY.md), not a public issue.
@@ -306,7 +362,7 @@ Orkoswap is a community-driven project that puts privacy first. We build the too
 
 ## Donate
 
-OrkoWallet is free. If you want to support its development, send Grin to our always-online address (also available in the app under *Settings → About → Donate*):
+OrkoWallet is free, has no income and no ads. If you want to support its development, send Grin to our always-online address (also available in the app under *Settings → About → Donate*):
 
 ```
 grin1tzlscdyzl0pgns8rw9sl7q9wqptftjez2xsdrszj9se4vmvwj8wqajj4yz

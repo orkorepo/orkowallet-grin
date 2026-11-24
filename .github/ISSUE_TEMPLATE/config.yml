@@ -3,3 +3,6 @@ contact_links:
   - name: Security vulnerability
     url: https://github.com/orkorepo/orkowallet-grin/blob/main/SECURITY.md
     about: Please report vulnerabilities privately as described in SECURITY.md.
+  - name: Question, feedback or "does it work for you?"
+    url: https://t.me/chat_orko
+    about: Chat with the community on Telegram. For clear bugs and ideas please use the issue templates.
