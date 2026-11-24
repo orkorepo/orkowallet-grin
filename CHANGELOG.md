@@ -10,6 +10,7 @@
 - Fixed: Android closed but did not start again after a network change, a connection repair or closing a wallet during a scan; it now restarts by itself
 - Fixed: the Settings window could scroll sideways on the desktop
 - Fixed: the health dots in the node list were always grey
+- On the phone, the "Wallet settings" and "Node settings" buttons now open the list of settings categories first (the category you asked for is marked), instead of jumping straight into it
 - Fixed: in the drop-down lists (years, language, node and so on) the list moved by itself when the mouse rested on a half-visible row at its edge, and changed the marked row; now only the keyboard scrolls the list, the mouse just marks the row
 - Fixed: the progress bar of the scan of old transactions went up and down; it now only goes forward, and the "minutes left" estimate is steady (it follows the speed of the last minutes and only counts down)
 - **One Settings window, in categories.** Settings, Wallet settings and Node settings are now a single window with the same eight categories on the desktop and the phone: General, Wallet, Security, Sending, Node, Backup, Maintenance and repair, About. On the desktop the categories are on the left; on the phone Settings opens as a list of categories, a tap opens one, the back arrow returns. The wallet card shows only the transactions, with a "Wallet settings" button that opens Settings → Wallet (name, accounts, delete). The node connection is chosen with three large options in Settings → Node

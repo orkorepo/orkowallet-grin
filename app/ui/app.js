@@ -1632,7 +1632,8 @@ function openSettings(tab) {
   closeDialogs();
   fillSettingsForm();
   selectSettingsTab(tab || 'general');
-  $('set-box').dataset.level = tab || !SHEET.matches ? 'pane' : 'menu';
+  // Phone: always the category list first (the asked category is marked); desktop: the category itself.
+  $('set-box').dataset.level = SHEET.matches ? 'menu' : 'pane';
   syncSettingsChrome();
   $('dlg-settings').showModal();
   $('set-panes').scrollTop = 0;
