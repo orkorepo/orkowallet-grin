@@ -67,7 +67,7 @@
     const place = () => {
       const r = btn.getBoundingClientRect();
       const below = innerHeight - r.bottom - 8, above = r.top - 8;
-      const max = Math.min(280, Math.max(below, above));
+      const max = Math.min(400, Math.max(below, above));
       const up = below < Math.min(180, list.scrollHeight) && above > below;
       Object.assign(list.style, {
         left: r.left + 'px', width: r.width + 'px', maxHeight: max + 'px',
