@@ -649,5 +649,17 @@
  "Parmak izi açıldı": "Вход по отпечатку включён",
  "Parmak izi açılamadı": "Не удалось включить вход по отпечатку",
  "Parmak izi kapatıldı": "Вход по отпечатку выключен",
- "Parmak izi kapatıldı: parola değişmiş. Parolayı yaz.": "Вход по отпечатку выключен: пароль был изменён. Введи пароль."
+ "Parmak izi kapatıldı: parola değişmiş. Parolayı yaz.": "Вход по отпечатку выключен: пароль был изменён. Введи пароль.",
+ "Hızlı eşitleme": "Быстрая синхронизация",
+ "İsteğe bağlı. Zinciri baştan eşitlemek yerine topluluk sunucularının yayınladığı yakın tarihli bir anlık görüntüyü indirir (yaklaşık 4–6 GB, Wi-Fi önerilir); node yalnızca son birkaç günü tamamlar. Dosya, sunucunun yayınladığı sağlama toplamıyla doğrulanır. Normal eşitleme her zaman çalışır ve varsayılan olarak o kullanılır. Bu işlem node durduğunda başlar ve yarım kalmış zincir verisinin yerine geçer.": "По желанию. Вместо синхронизации цепочки с нуля скачивается свежий снимок, опубликованный серверами сообщества (около 4–6 ГБ, лучше по Wi-Fi); затем узел догоняет только последние дни. Файл проверяется по контрольной сумме, которую публикует сервер. Обычная синхронизация всегда работает и используется по умолчанию. Запускается при остановленном узле и заменяет наполовину синхронизированную цепочку.",
+ "Anlık görüntüden indir": "Скачать из снимка",
+ "Durdur": "Остановить",
+ "Sunucular kontrol ediliyor…": "Проверка серверов…",
+ "İndiriliyor: {a} / {b} GB ({host})": "Загрузка: {a} / {b} ГБ ({host})",
+ "Açılıyor… %{p}": "Распаковка… {p}%",
+ "Yerleştiriliyor…": "Установка на место…",
+ "Hazır. Node başlatıldı, son blokları tamamlıyor.": "Готово. Узел запущен и догоняет последние блоки.",
+ "Durduruldu. Tekrar başlatırsan kaldığı yerden devam eder.": "Остановлено. При повторном запуске продолжится с того же места.",
+ "Olmadı: {e}. Normal eşitleme etkilenmedi.": "Не получилось: {e}. Обычная синхронизация не затронута.",
+ "Emin misin? Tekrar dokun": "Уверен? Нажми ещё раз"
 }

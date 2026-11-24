@@ -809,6 +809,17 @@
               <span class="hint">Gömülü node değişiklikleri uygulama yeniden açılınca geçerli olur.</span>
               <p class="error" id="nd-error" role="alert"></p>
             </fieldset>
+            <fieldset id="fs-box">
+              <legend>Hızlı eşitleme</legend>
+              <p class="hint">İsteğe bağlı. Zinciri baştan eşitlemek yerine topluluk sunucularının yayınladığı yakın tarihli bir anlık görüntüyü indirir (yaklaşık 4–6 GB, Wi-Fi önerilir); node yalnızca son birkaç günü tamamlar. Dosya, sunucunun yayınladığı sağlama toplamıyla doğrulanır. Normal eşitleme her zaman çalışır ve varsayılan olarak o kullanılır. Bu işlem node durduğunda başlar ve yarım kalmış zincir verisinin yerine geçer.</p>
+              <div class="bar" id="fs-bar" hidden><span id="fs-bar-fill"></span></div>
+              <p class="hint" id="fs-state"></p>
+              <p class="error" id="fs-error" role="alert"></p>
+              <div class="row">
+                <button class="btn" type="button" id="fs-go">Anlık görüntüden indir</button>
+                <button class="btn danger-text" type="button" id="fs-cancel" hidden>Durdur</button>
+              </div>
+            </fieldset>
           </div>
 
           <!-- ---------------------------------------------------- Backup -->

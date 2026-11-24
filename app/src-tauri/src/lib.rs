@@ -2115,6 +2115,33 @@ async fn node_start(state: St<'_>) -> Result<(), String> {
     blocking(move || n.start()).await
 }
 
+/// Fast sync (opt-in): download a recent pruned snapshot and start the built-in node from it.
+/// Only while the node is stopped; on any failure the existing chain data stays as it was.
+#[tauri::command]
+fn fastsync_start(state: St<'_>) -> Result<(), String> {
+    if state.node.is_running() {
+        return Err("Önce gömülü node'u durdur.".into());
+    }
+    let n = state.node.clone();
+    let (dir, network) = (n.settings.dir.clone(), n.settings.network);
+    orko_grin_core::fastsync::start(dir, network, move || {
+        if let Err(e) = n.start() {
+            log::warn!("node did not start after fast sync: {e}");
+        }
+    })
+    .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn fastsync_view() -> orko_grin_core::fastsync::FastView {
+    orko_grin_core::fastsync::view()
+}
+
+#[tauri::command]
+fn fastsync_cancel() {
+    orko_grin_core::fastsync::cancel();
+}
+
 #[tauri::command]
 async fn node_stop(state: St<'_>) -> Result<(), String> {
     let n = state.node.clone();
@@ -2988,6 +3015,9 @@ pub fn run() {
             address_qr,
             node_view,
             node_start,
+            fastsync_start,
+            fastsync_view,
+            fastsync_cancel,
             node_stop
         ])
         .build(tauri::generate_context!())

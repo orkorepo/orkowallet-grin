@@ -715,6 +715,20 @@ const EN = {
   'Parmak izi açılamadı': 'Fingerprint unlock could not be turned on',
   'Parmak izi kapatıldı': 'Fingerprint unlock is off',
   'Parmak izi kapatıldı: parola değişmiş. Parolayı yaz.': 'Fingerprint unlock switched off: the password was changed. Type the password.',
+
+  // ---- 0.3.2: account hiding, pull to refresh
+  'Hızlı eşitleme': 'Fast sync',
+  'İsteğe bağlı. Zinciri baştan eşitlemek yerine topluluk sunucularının yayınladığı yakın tarihli bir anlık görüntüyü indirir (yaklaşık 4–6 GB, Wi-Fi önerilir); node yalnızca son birkaç günü tamamlar. Dosya, sunucunun yayınladığı sağlama toplamıyla doğrulanır. Normal eşitleme her zaman çalışır ve varsayılan olarak o kullanılır. Bu işlem node durduğunda başlar ve yarım kalmış zincir verisinin yerine geçer.': 'Optional. Instead of syncing the chain from scratch, it downloads a recent snapshot published by community servers (about 4–6 GB, Wi-Fi recommended); the node then only catches up the last few days. The file is checked against the checksum the server publishes. The normal sync always works and is what is used by default. This starts while the node is stopped and replaces a half-synced chain.',
+  'Anlık görüntüden indir': 'Download from a snapshot',
+  'Durdur': 'Stop',
+  'Sunucular kontrol ediliyor…': 'Checking servers…',
+  'İndiriliyor: {a} / {b} GB ({host})': 'Downloading: {a} / {b} GB ({host})',
+  'Açılıyor… %{p}': 'Unpacking… {p}%',
+  'Yerleştiriliyor…': 'Putting it in place…',
+  'Hazır. Node başlatıldı, son blokları tamamlıyor.': 'Ready. The node has started and is catching up the last blocks.',
+  'Durduruldu. Tekrar başlatırsan kaldığı yerden devam eder.': 'Stopped. If you start it again it carries on where it left off.',
+  'Olmadı: {e}. Normal eşitleme etkilenmedi.': 'Did not work: {e}. The normal sync is not affected.',
+  'Emin misin? Tekrar dokun': 'Sure? Tap again',
 };
 
 // lang-xx.js (loaded before this file) define LANG_DE/FR/RU/ZH; a missing entry falls back to English.

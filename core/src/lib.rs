@@ -10,6 +10,7 @@
 //! inside a tokio runtime (in Tauri: `spawn_blocking` or `std::thread`).
 
 pub mod diag;
+pub mod fastsync;
 pub mod node;
 pub mod pool;
 pub mod remote;

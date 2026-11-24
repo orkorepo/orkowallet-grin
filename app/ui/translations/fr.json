@@ -649,5 +649,17 @@
  "Parmak izi açıldı": "Le déverrouillage par empreinte est activé",
  "Parmak izi açılamadı": "Impossible d'activer le déverrouillage par empreinte",
  "Parmak izi kapatıldı": "Le déverrouillage par empreinte est désactivé",
- "Parmak izi kapatıldı: parola değişmiş. Parolayı yaz.": "Déverrouillage par empreinte désactivé : le mot de passe a changé. Saisis le mot de passe."
+ "Parmak izi kapatıldı: parola değişmiş. Parolayı yaz.": "Déverrouillage par empreinte désactivé : le mot de passe a changé. Saisis le mot de passe.",
+ "Hızlı eşitleme": "Synchronisation rapide",
+ "İsteğe bağlı. Zinciri baştan eşitlemek yerine topluluk sunucularının yayınladığı yakın tarihli bir anlık görüntüyü indirir (yaklaşık 4–6 GB, Wi-Fi önerilir); node yalnızca son birkaç günü tamamlar. Dosya, sunucunun yayınladığı sağlama toplamıyla doğrulanır. Normal eşitleme her zaman çalışır ve varsayılan olarak o kullanılır. Bu işlem node durduğunda başlar ve yarım kalmış zincir verisinin yerine geçer.": "Facultatif. Au lieu de synchroniser la chaîne depuis zéro, il télécharge un instantané récent publié par des serveurs communautaires (environ 4 à 6 Go, Wi-Fi conseillé) ; le nœud ne rattrape ensuite que les derniers jours. Le fichier est vérifié avec la somme de contrôle publiée par le serveur. La synchronisation normale fonctionne toujours et reste l'option par défaut. Cela démarre quand le nœud est arrêté et remplace une chaîne à moitié synchronisée.",
+ "Anlık görüntüden indir": "Télécharger depuis un instantané",
+ "Durdur": "Arrêter",
+ "Sunucular kontrol ediliyor…": "Vérification des serveurs…",
+ "İndiriliyor: {a} / {b} GB ({host})": "Téléchargement : {a} / {b} Go ({host})",
+ "Açılıyor… %{p}": "Décompression… {p} %",
+ "Yerleştiriliyor…": "Mise en place…",
+ "Hazır. Node başlatıldı, son blokları tamamlıyor.": "Prêt. Le nœud a démarré et rattrape les derniers blocs.",
+ "Durduruldu. Tekrar başlatırsan kaldığı yerden devam eder.": "Arrêté. Si tu relances, ça reprend là où ça s'était arrêté.",
+ "Olmadı: {e}. Normal eşitleme etkilenmedi.": "Échec : {e}. La synchronisation normale n'est pas affectée.",
+ "Emin misin? Tekrar dokun": "Sûr ? Touche encore"
 }

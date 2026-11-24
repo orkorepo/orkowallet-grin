@@ -1480,6 +1480,43 @@ $('nb-stop').addEventListener('click', async (e) => {
   });
 });
 
+// ------------------------------------------------------------------ fast sync (opt-in snapshot for the built-in node)
+let fsTimer = 0;
+async function fsRefresh() {
+  let v;
+  try { v = await invoke('fastsync_view'); } catch { return; }
+  const gb = (n) => (n / 1e9).toFixed(1);
+  const pct = v.total ? Math.min(100, Math.floor((v.done / v.total) * 100)) : 0;
+  $('fs-bar').hidden = !(v.active && v.total);
+  $('fs-bar-fill').style.width = `${pct}%`;
+  let msg = '';
+  if (v.phase === 'find') msg = t('Sunucular kontrol ediliyor…');
+  else if (v.phase === 'download') msg = t('İndiriliyor: {a} / {b} GB ({host})', { a: gb(v.done), b: gb(v.total), host: v.host });
+  else if (v.phase === 'unpack') msg = t('Açılıyor… %{p}', { p: pct });
+  else if (v.phase === 'swap') msg = t('Yerleştiriliyor…');
+  else if (v.phase === 'done') msg = t('Hazır. Node başlatıldı, son blokları tamamlıyor.');
+  else if (v.phase === 'paused') msg = t('Durduruldu. Tekrar başlatırsan kaldığı yerden devam eder.');
+  $('fs-state').textContent = msg;
+  $('fs-error').textContent = v.phase === 'failed' ? t('Olmadı: {e}. Normal eşitleme etkilenmedi.', { e: v.error }) : '';
+  $('fs-go').disabled = v.active;
+  $('fs-cancel').hidden = !v.active;
+  if (v.active && !fsTimer) fsTimer = setInterval(fsRefresh, 1500);
+  if (!v.active && fsTimer) { clearInterval(fsTimer); fsTimer = 0; }
+}
+let fsArmed = 0;
+$('fs-go').addEventListener('click', async (e) => {
+  const b = e.currentTarget;
+  if (!fsArmed) { // second tap confirms: it replaces a half-synced chain
+    b.textContent = t('Emin misin? Tekrar dokun');
+    fsArmed = setTimeout(() => { fsArmed = 0; b.textContent = t('Anlık görüntüden indir'); }, 5000);
+    return;
+  }
+  clearTimeout(fsArmed); fsArmed = 0; b.textContent = t('Anlık görüntüden indir');
+  $('fs-error').textContent = '';
+  try { await invoke('fastsync_start'); fsRefresh(); } catch (x) { $('fs-error').textContent = E(x); }
+});
+$('fs-cancel').addEventListener('click', async () => { try { await invoke('fastsync_cancel'); } catch { /* ignore */ } });
+
 // ------------------------------------------------------------------ node pool dialog
 function renderNodeList(list) {
   const ul = $('nd-list'); ul.replaceChildren();
@@ -1682,6 +1719,7 @@ const SHEET = matchMedia('(max-width: 720px)');
 function fillSettingsForm() {
   const s = state.status.settings;
   syncTorMode();
+  fsRefresh();
   syncBioForm();
   $('set-box').dataset.wallet = state.open ? '1' : '0';
   $('set-lang').value = s.language;
