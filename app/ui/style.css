@@ -590,7 +590,9 @@ li.enter { animation: slidein .55s cubic-bezier(.2, .8, .2, 1); }
 
 /* themed drop-downs (dropdown.js) */
 .dd { position: relative; display: block; min-width: 0; }
-.dd-native { position: absolute; left: 0; top: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+/* The real <select> only keeps the value. It is not drawn at all: a select that exists as a box (even an invisible one,
+   the field rules gave it 26x22 px) can still open the system's own grey list. */
+.dd-native { display: none !important; }
 .dd-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; text-align: left; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line-strong); background: var(--bg-2); color: var(--text); font: 400 var(--fs-md) var(--font); cursor: pointer; transition: border-color .15s, box-shadow .15s; }
 .dd-btn:hover { border-color: var(--input-hover); }
 .dd-btn:focus-visible, .dd-btn[aria-expanded="true"] { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
