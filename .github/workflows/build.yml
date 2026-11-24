@@ -58,7 +58,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev \
-            libssl-dev pkg-config clang libclang-dev build-essential patchelf file
+            libssl-dev pkg-config clang libclang-dev build-essential patchelf file libfuse2
 
       - name: Fetch Tor bundle (signed hash list + signature verified)
         shell: pwsh
@@ -66,6 +66,11 @@ jobs:
 
       - name: Build .deb and AppImage
         working-directory: app
+        env:
+          # linuxdeploy strips every library it packs; Ubuntu 22.04's strip cannot read the newer Tor bundle
+          # libraries and the AppImage step fails. Linuxdeploy itself is an AppImage: run it without FUSE.
+          NO_STRIP: 'true'
+          APPIMAGE_EXTRACT_AND_RUN: '1'
         run: |
           npm ci
           npx tauri build --bundles deb,appimage
