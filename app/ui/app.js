@@ -1044,30 +1044,43 @@ $('del-form').addEventListener('submit', async (e) => {
 // ------------------------------------------------------------------ background chain scan
 let scanSeen = 0;
 let scanStartedAt = 0;
+let scanShown = 0;      // the percentage shown: never goes back during one scan
+let scanEta = null;     // the remaining minutes shown: only goes down, so it does not jump about
+let scanSamples = [];   // [time, percent] over the last minutes, for a steady speed
 async function pollScan() {
   let s;
   try { s = await invoke('scan_status'); } catch { return; }
   const banner = $('scan-banner');
   if (s.active) {
-    if (!scanStartedAt) scanStartedAt = Date.now();
-    const p = Math.max(0, s.progress);
+    const now = Date.now();
+    if (!scanStartedAt) { scanStartedAt = now; scanShown = 0; scanEta = null; scanSamples = []; }
+    scanShown = Math.max(scanShown, Math.min(99, Math.max(0, s.progress)));
+    const p = scanShown;
+    scanSamples.push([now, p]);
+    scanSamples = scanSamples.filter(([t0]) => now - t0 <= 5 * 60000);
     let eta = '';
-    if (p > 2 && p < 100) {
-      const left = Math.round(((Date.now() - scanStartedAt) / p) * (100 - p) / 60000);
-      eta = left >= 1 ? t(' · yaklaşık {n} dk kaldı', { n: left }) : t(' · az kaldı');
+    const [t0, p0] = scanSamples[0];
+    if (now - t0 >= 30000 && p > p0) { // at least 30 s of movement: speed over the window, not since the start
+      const left = ((100 - p) / ((p - p0) / (now - t0))) / 60000;
+      scanEta = scanEta === null ? left : Math.min(scanEta, left);
+      const m = Math.max(1, Math.round(scanEta));
+      eta = t(' · yaklaşık {n} dk kaldı', { n: m });
+    } else if (scanEta !== null) {
+      eta = t(' · yaklaşık {n} dk kaldı', { n: Math.max(1, Math.round(scanEta)) });
     }
     banner.hidden = false; banner.dataset.state = '';
     $('scan-text').textContent = t('Eski işlemlerin taranıyor: %{p}{eta}. Bu sırada bakiye eksik görünebilir; cüzdanı kullanmaya devam edebilirsin.', { p, eta });
     $('scan-fill').style.width = `${p}%`;
     return;
   }
-  scanStartedAt = 0;
+  scanStartedAt = 0; scanEta = null; scanSamples = [];
   if (s.finished_at && s.finished_at !== scanSeen) {
     scanSeen = s.finished_at;
     if (s.error) {
       banner.hidden = false; banner.dataset.state = 'error';
       $('scan-text').textContent = t('Tarama yarıda kaldı: {e}. Cüzdanı yeniden açınca kaldığı yerden sürer; ya da Ayarlar > Bakım ve onarım bölümünden yeniden başlat.', { e: E(s.error) });
     } else {
+      $('scan-fill').style.width = '100%';
       banner.hidden = true; toast(t('Tarama bitti, bakiye güncel')); refresh();
     }
     return;

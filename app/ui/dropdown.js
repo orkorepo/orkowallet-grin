@@ -14,6 +14,13 @@
     d.btn.setAttribute('aria-expanded', 'false');
   }
 
+  /** Scroll only the list itself (never a page or dialog behind it) just enough to show `row`. */
+  function scrollRowIntoView(list, row) {
+    const top = row.offsetTop, bottom = top + row.offsetHeight;
+    if (top < list.scrollTop) list.scrollTop = top - 4;
+    else if (bottom > list.scrollTop + list.clientHeight) list.scrollTop = bottom - list.clientHeight + 4;
+  }
+
   function enhance(sel) {
     if (sel.dataset.dd || sel.multiple) return;
     sel.dataset.dd = '1';
@@ -36,11 +43,14 @@
       btn.disabled = sel.disabled;
     };
     const items = () => [...list.children];
-    const highlight = (i) => {
+    // `scroll` is true only for the keyboard (and when the list opens). With the mouse the row under the
+    // pointer is just marked: scrolling it into view moved the list under the pointer, which marked the next
+    // row, which scrolled again, so the list ran away at its edges.
+    const highlight = (i, scroll = true) => {
       const it = items(); if (!it.length) return;
       dd.active = Math.max(0, Math.min(it.length - 1, i));
       it.forEach((x, k) => x.classList.toggle('on', k === dd.active));
-      it[dd.active].scrollIntoView({ block: 'nearest' });
+      if (scroll) scrollRowIntoView(list, it[dd.active]);
     };
     const choose = (i) => {
       const o = sel.options[i]; if (!o || o.disabled) return;
@@ -68,7 +78,7 @@
         if (i === indexDesc.get.call(sel)) { it.classList.add('sel'); it.setAttribute('aria-selected', 'true'); }
         it.addEventListener('pointerdown', (e) => e.preventDefault());
         it.addEventListener('click', () => choose(i));
-        it.addEventListener('pointermove', () => { if (dd.active !== i) highlight(i); });
+        it.addEventListener('pointermove', () => { if (dd.active !== i) highlight(i, false); });
         list.append(it);
       });
       try { list.showPopover(); } catch { list.hidden = false; }

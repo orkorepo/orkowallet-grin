@@ -593,6 +593,8 @@ li.enter { animation: slidein .55s cubic-bezier(.2, .8, .2, 1); }
 .dd-btn[aria-expanded="true"] .dd-chev { transform: translateY(2px) rotate(-135deg); }
 .dd-list { position: fixed; inset: auto; margin: 0; padding: 4px; overflow-y: auto; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--bg-1); color: var(--text); box-shadow: var(--shadow); }
 .dd-list:not(:popover-open) { display: none; }
+.dd-list { overscroll-behavior: contain; position: fixed; }
+.dd-list { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
 .dd-opt { padding: 8px 10px; border-radius: 8px; font: 400 var(--fs-md) var(--font); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dd-opt.on { background: var(--bg-3); }
 .dd-opt.sel { color: var(--accent); font-weight: 600; background: var(--accent-soft); }

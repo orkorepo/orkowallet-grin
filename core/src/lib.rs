@@ -375,7 +375,9 @@ impl Wallet {
             use grin_wallet_libwallet::StatusMessage;
             for m in status_rx {
                 match m {
-                    StatusMessage::Scanning(_, p) => SCAN_PROGRESS.store(p as i32, Ordering::Relaxed),
+                    // The scan reports its percentage per batch and per phase, and a node switch or a retried batch can
+                    // make it fall back. The shown value only ever goes forward (reset when a scan starts).
+                    StatusMessage::Scanning(_, p) => { SCAN_PROGRESS.fetch_max(p as i32, Ordering::Relaxed); }
                     StatusMessage::ScanningComplete(_) => SCAN_PROGRESS.store(100, Ordering::Relaxed),
                     _ => {}
                 }
