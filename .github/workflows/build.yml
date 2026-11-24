@@ -1,4 +1,4 @@
-name: Build desktop apps (Windows, Linux, macOS)
+name: Build desktop apps (Windows, Linux)
 
 # Free GitHub runners build every desktop version from the same code. A tag v* also publishes the files on
 # the GitHub release, with a download list (names, sizes, links) and SHA256SUMS.txt. "Run workflow"
@@ -108,54 +108,8 @@ jobs:
           name: linux
           path: out/*
 
-  macos:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - runner: macos-latest     # Apple Silicon
-            tor: macos-aarch64
-            arch: arm64
-          - runner: macos-15-intel   # Intel (the last Intel runner GitHub offers)
-            tor: macos-x86_64
-            arch: x64
-    runs-on: ${{ matrix.runner }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: gpg (for the Tor signature check)
-        run: command -v gpg || brew install gnupg
-
-      - name: Fetch Tor bundle (signed hash list + signature verified)
-        shell: pwsh
-        run: ./scripts/fetch-tor.ps1 -Platform ${{ matrix.tor }}
-
-      # Not signed with an Apple Developer ID: the project has no income and stays free of paid accounts.
-      # The release notes explain how to open it (right click > Open the first time).
-      - name: Build .app and .dmg
-        working-directory: app
-        run: |
-          npm ci
-          npx tauri build --bundles app,dmg
-
-      - name: Name the files
-        run: |
-          v=$(node -p "require('./app/src-tauri/tauri.conf.json').version")
-          mkdir -p out
-          cp target/release/bundle/dmg/*.dmg "out/OrkoWallet-$v-macos-${{ matrix.arch }}.dmg"
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: macos-${{ matrix.arch }}
-          path: out/*
-
   release:
-    needs: [windows, linux, macos]
+    needs: [windows, linux]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:

@@ -26,8 +26,16 @@ use tauri::{Manager, State};
 /// ships, plus the community node grinnode.live). The wallet fails over between them on errors.
 fn builtin_nodes(n: Network) -> Vec<String> {
     let v: &[&str] = match n {
-        Network::Mainnet => &["https://main.gri.mw", "https://grincoin.org", "https://grinnode.live:3413"],
-        Network::Testnet => &["https://test.gri.mw", "https://testnet.grincoin.org"],
+        // api.grin.money, api.grinnode.org and testapi.grin.money are community nodes offered by noobvie
+        // (issue #1); they serve the standard /v2/foreign API. Health ordering and failover handle outages.
+        Network::Mainnet => &[
+            "https://main.gri.mw",
+            "https://grincoin.org",
+            "https://grinnode.live:3413",
+            "https://api.grin.money",
+            "https://api.grinnode.org",
+        ],
+        Network::Testnet => &["https://test.gri.mw", "https://testnet.grincoin.org", "https://testapi.grin.money"],
         Network::Usernet => &["http://127.0.0.1:33413"],
     };
     v.iter().map(|s| s.to_string()).collect()

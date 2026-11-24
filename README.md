@@ -6,7 +6,7 @@
 
 <p align="center">
   <b>A private, open-source wallet for <a href="https://grin.mw">Grin</a></b><br>
-  on Windows · Linux · macOS · Android<br>
+  on Windows · Linux · Android<br>
   <sub>Tor is built in. No account, no tracking, no middleman. Free, and made by the community for the community.</sub>
 </p>
 
@@ -20,7 +20,7 @@
 <p align="center">
   <a href="../../releases"><img alt="Version" src="https://img.shields.io/badge/version-0.3.2-ffd60a.svg"></a>
   <a href="LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/license-Apache--2.0-blue.svg"></a>
-  <img alt="Platform: Windows, Linux, macOS and Android" src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS%20%7C%20Android-black.svg">
+  <img alt="Platform: Windows, Linux and Android" src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20Android-black.svg">
   <img alt="Languages: 6" src="https://img.shields.io/badge/languages-6-ffd60a.svg">
   <a href="../../actions/workflows/build.yml"><img alt="Build" src="../../actions/workflows/build.yml/badge.svg"></a>
   <a href="https://t.me/chat_orko"><img alt="Chat on Telegram" src="https://img.shields.io/badge/chat-Telegram-26a5e4.svg?logo=telegram&logoColor=white"></a>
@@ -45,11 +45,9 @@ Get the file for your system from the **[latest release](../../releases/latest)*
 | 🐧 | **Linux** Debian, Ubuntu, Mint | `…-linux-amd64.deb` | 🧪 new |
 | 🐧 | **Linux** Fedora, openSUSE | `…-linux-x86_64.rpm` | 🧪 new |
 | 🐧 | **Linux** any distribution | `…-linux-x86_64.AppImage` · `…-linux-x86_64.tar.gz` | 🧪 new |
-| 🍎 | **macOS** Apple Silicon (M1 and newer) | `…-macos-arm64.dmg` | 🧪 new |
-| 🍎 | **macOS** Intel | `…-macos-x64.dmg` | 🧪 new |
 | 📦 | Source code | `…-source.zip` | |
 
-> **🧪 Linux and macOS are brand new in 0.3.2.** They build and package cleanly, but we have not been able to try them on many real machines yet. If something does not work (Tor does not connect, the window does not open, a button does nothing), **please tell us: [t.me/chat_orko](https://t.me/chat_orko)**. Your feedback is what makes these builds good, and we answer.
+> **🧪 Linux is new.** It builds and packages cleanly, but we have not been able to try it on many real machines yet. If something does not work (Tor does not connect, the window does not open, a button does nothing), **please tell us: [t.me/chat_orko](https://t.me/chat_orko)**. Your feedback is what makes this build good, and we answer.
 
 ---
 
@@ -57,17 +55,17 @@ Get the file for your system from the **[latest release](../../releases/latest)*
 
 ## ✨ What's new in 0.3.2: the big update
 
-> The largest release so far. One settings window instead of three, a phone app that finally feels at home, Linux and macOS builds, and a wallet that understands being used on more than one device.
+> The largest release so far. One settings window instead of three, a phone app that finally feels at home, a Linux build, and a wallet that understands being used on more than one device.
 
 | | |
 |---|---|
 | 🗂️ **One Settings window, eight clear categories** | General, Wallet, Security, Sending, Node, Backup, Maintenance and repair, About: the same on the desktop and the phone. On the phone it opens as a list, a tap opens a category. |
-| 🐧🍎 **Linux and macOS** | `.deb`, `.AppImage` and `.dmg` (Apple Silicon and Intel) next to the Windows installer, built by the same public workflow. Same features on every desktop. |
+| 🐧 **Linux** | `.deb`, `.rpm`, `.AppImage` and `.tar.gz` next to the Windows installer, built by the same public workflow. Same features on every desktop. |
 | 📴 **Slatepack only mode** | Switch Tor off completely: payments go and come as Slatepack texts. One tap, applies at once. |
 | 📱 **A better phone app** | Every page scrolls to the end, pull down to refresh, a scroll button, larger buttons in the node panel, and **Close wallet** right in the notification. |
-| 🔁 **Same wallet on two devices** | Money spent on another device now shows as "Spent on another device", the change is found by a short scan, and a warning explains the risks. |
+| 🔁 **Same wallet on two devices** | Money spent on another device now shows as "Spent on another device", the change is found by a short scan, and a note explains how to use two devices safely. |
 | ⚡ **Instant Max** | The Max amount is ready the moment the Send window opens. |
-| 🧹 **Tidy accounts** | Remove an account from the list (it is only hidden; its money and address stay). Deleting a wallet stays a separate, clearly warned step. |
+| 🧹 **Tidy accounts** | Remove an account from the list (it is only hidden; its money and address stay). Deleting a wallet stays a separate step with its own confirmation. |
 | 🔎 **Kernel link on Android**, **rescan from this year by default**, and many small fixes. | |
 
 See the [changelog](CHANGELOG.md) for every detail.
@@ -211,7 +209,7 @@ The same wallet in a narrow window or on a phone-sized screen: one column, botto
 
 3. Run it. It installs for the current user and needs no administrator rights.
 
-The installer is **not code-signed yet**, so Windows SmartScreen may show "Windows protected your PC". That only means the file is new and unsigned. If the SHA-256 matches, choose **More info → Run anyway**. See the [code signing policy](#code-signing-policy).
+On the first start Windows may ask you to confirm the new installer ("Windows protected your PC": choose **More info → Run anyway**). Compare the SHA-256 first, as above. We are applying for free open-source code signing; see the [code signing policy](#code-signing-policy).
 
 ### Linux
 
@@ -224,18 +222,10 @@ Tor is included, nothing else to install. The tray icon needs an AppIndicator-ca
 
 🧪 *New in 0.3.2 and not yet tried on many machines. Does it work for you? Tell us at [t.me/chat_orko](https://t.me/chat_orko).*
 
-### macOS
-
-Download the `.dmg` for your Mac (**Apple Silicon** or **Intel**) from the [Releases](../../releases) page, check its SHA-256 (`shasum -a 256 <file>`), open it and drag the app to *Applications*.
-
-The app is **not signed with an Apple Developer ID**: the project has no income and does not pay for one. macOS will say it cannot check the developer. The first time, **right-click the app → Open → Open**. If it still refuses, open *System Settings → Privacy & Security* and press **Open Anyway**.
-
-🧪 *New in 0.3.2 and not yet tried on many Macs. Does it work for you? Tell us at [t.me/chat_orko](https://t.me/chat_orko).*
-
 ### Android
 
 1. Download `OrkoWallet-<version>-android-arm64.apk` from the [Releases](../../releases) page on your phone.
-2. Compare its SHA-256 with the value in the release notes (on a computer: `Get-FileHash .\OrkoWallet-0.3.2-android-arm64.apk -Algorithm SHA256`, or `sha256sum` on Linux and macOS).
+2. Compare its SHA-256 with the value in the release notes (on a computer: `Get-FileHash .\OrkoWallet-0.3.2-android-arm64.apk -Algorithm SHA256`, or `sha256sum` on Linux).
 3. Open the file. Android asks you to allow installing apps from this source (your browser or file manager); allow it for this one install.
 4. When you open a wallet for the first time, allow notifications. The "OrkoWallet is running" notification is what keeps your Tor address online in the background, so please leave it alone.
 
@@ -262,7 +252,7 @@ The wallet connected to Tor, but your address cannot be reached from outside yet
 4. Turn a VPN off or on and compare.
 5. Pick **Snowflake** (or **obfs4**) in the *Tor connection* card and press **Apply**. This avoids relays that are slow or blocked on your network.
 6. Open **Settings → Maintenance and repair → Reset the connection and restart**. It deletes Tor's saved state (the entry relays it picked and its cache) and restarts the app. Your wallets, recovery phrase and balance are not touched.
-7. Allow `tor.exe` (`tor` on Linux and macOS) and OrkoWallet through your firewall or antivirus.
+7. Allow `tor.exe` (`tor` on Linux) and OrkoWallet through your firewall or antivirus.
 8. Tor blocked where you are, or you simply do not want it? Switch to **Slatepack only** (*Settings → General → Connection mode*).
 
 The wallet also restarts Tor from a clean state on its own, once, if the address has been unreachable for four minutes. While your address is not online you can still send payments, and you can receive with Slatepack.
@@ -285,26 +275,25 @@ Two copies of the app were started. Since 0.1.2 only one copy can run: opening i
 - Wallet files are encrypted by grin-wallet with your password. The recovery phrase is shown only after you type the password, and the window is hidden from screen capture while it is on screen (on Android the screen is protected against screenshots and screen recording at that moment).
 - Report vulnerabilities privately; see [SECURITY.md](SECURITY.md).
 
-> **This wallet has not had an independent security audit.** Use it with amounts you can afford to lose, and always keep your recovery phrase on paper.
+> **Open to review.** The code is public and built on the official grin and grin-wallet libraries; an independent audit is still ahead of us, and reviews from the community are very welcome. As with every wallet, keep your recovery phrase on paper.
 
 ## Build from source
 
-Requirements: [Rust](https://rustup.rs) (stable), Node.js 20+, PowerShell 7 (`pwsh`, also on Linux and macOS) and:
+Requirements: [Rust](https://rustup.rs) (stable), Node.js 20+, PowerShell 7 (`pwsh`, also on Linux) and:
 
 - **Windows** 10 or 11 with WebView2.
 - **Linux**: `libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libssl-dev pkg-config clang build-essential` (Debian/Ubuntu names) and `gpg`.
-- **macOS**: Xcode command line tools and `gpg` (`brew install gnupg`).
 
 ```sh
-pwsh scripts/fetch-tor.ps1 -Platform windows-x86_64   # or linux-x86_64, macos-aarch64, macos-x86_64
-cd app && npm ci && npx tauri build                   # Windows: --bundles nsis · Linux: --bundles deb,appimage · macOS: --bundles app,dmg
+pwsh scripts/fetch-tor.ps1 -Platform windows-x86_64   # or linux-x86_64
+cd app && npm ci && npx tauri build                   # Windows: --bundles nsis · Linux: --bundles deb,appimage
 ```
 
-The Tor bundle comes from the Tor Project's permanent archive. Its SHA-256 is pinned (Windows) or taken from the Tor Project's signed hash list, whose GPG signature must verify (Linux, macOS).
+The Tor bundle comes from the Tor Project's permanent archive. Its SHA-256 is pinned (Windows) or taken from the Tor Project's signed hash list, whose GPG signature must verify (Linux).
 
 Use `cargo build --locked` so `Cargo.lock` is honoured. `ORKOWALLET_DATA=<dir>` runs a portable copy that never touches the normal data folder (and may run next to a normal copy).
 
-Release files for Windows, Linux and macOS are built by the public workflow in [`.github/workflows/build.yml`](.github/workflows/build.yml) when a `v*` tag is pushed; "Run workflow" builds them without publishing.
+Release files for Windows and Linux are built by the public workflow in [`.github/workflows/build.yml`](.github/workflows/build.yml) when a `v*` tag is pushed; "Run workflow" builds them without publishing.
 
 ### Android
 
@@ -327,7 +316,7 @@ Add `--debug` for a debug build. A release build is signed with the key named in
 | `app/` | Tauri 2 shell and the user interface (`app/ui`, plain HTML, CSS and JavaScript, no remote content) |
 | `app/src-tauri/gen/android/` | Android project (Gradle, the foreground service `OrkoService.kt`, the activity bridge); the Tor binaries for it are fetched by `scripts/fetch-tor-android.py` |
 | `vendor/patches/` | A one-line fix for the `lmdb-master-sys` build script so it cross-compiles for Android |
-| `scripts/` | Tor bundle download with checksum and signature verification (Windows, Linux, macOS and Android), translation tooling |
+| `scripts/` | Tor bundle download with checksum and signature verification (Windows, Linux and Android), translation tooling |
 | `docs/` | Banner, logo and screenshots |
 
 ## Translations
@@ -348,7 +337,7 @@ Your feedback matters to us: a bug, something confusing, an idea, a translation 
 - **A clear bug or a feature idea** → a [GitHub issue](../../issues/new/choose) (templates included), so it does not get lost.
 - **A security problem** → privately, see [SECURITY.md](SECURITY.md). Never post a recovery phrase, a password or a wallet file anywhere.
 
-When you report a problem please add your system (Windows, Linux distribution, macOS version, Android model), the OrkoWallet version (*Settings → About*) and the last lines of `orkowallet.log` (*Settings → About → Open the log folder*), with anything private removed.
+When you report a problem please add your system (Windows, Linux distribution, Android model), the OrkoWallet version (*Settings → About*) and the last lines of `orkowallet.log` (*Settings → About → Open the log folder*), with anything private removed.
 
 ## Contributing
 
@@ -370,7 +359,7 @@ grin1tzlscdyzl0pgns8rw9sl7q9wqptftjez2xsdrszj9se4vmvwj8wqajj4yz
 
 ## Code signing policy
 
-Release files for Windows, Linux and macOS are built from this repository by the public GitHub Actions workflow in `.github/workflows/build.yml`, and `SHA256SUMS.txt` lists the hash of every file. The Android APK is built on a maintainer's machine from the same sources and signed with the project's release key; its SHA-256 is on the release page. Code signing is not active yet: we plan to use the free signing for open-source projects offered by [SignPath Foundation](https://signpath.org/); until that is approved the installer is unsigned and Windows SmartScreen may warn. The macOS app is not signed with an Apple Developer ID (a paid programme this non-profit project does not use), so macOS asks you to confirm the first start. Always compare the SHA-256 on the release page with your download.
+Release files for Windows and Linux are built from this repository by the public GitHub Actions workflow in `.github/workflows/build.yml`, and `SHA256SUMS.txt` lists the hash of every file. The Android APK is built on a maintainer's machine from the same sources and signed with the project's release key; its SHA-256 is on the release page. We are applying for the free code signing for open-source projects offered by [SignPath Foundation](https://signpath.org/). Until then, compare the SHA-256 on the release page with your download; Windows may ask you to confirm the first start.
 
 - Only maintainers of this repository can approve a release for signing.
 - The wallet does not collect or send telemetry; network access is limited to the Grin nodes you choose and Tor.

@@ -2,7 +2,7 @@
 
 ## 0.3.2 – 2026-11-24 · The big update
 
-- **Linux and macOS.** The desktop app is now built for Linux (`.deb`, `.AppImage`) and macOS (`.dmg`, Apple Silicon and Intel) by the same public GitHub workflow as Windows, with the same features. Tor comes from the Tor Project's permanent archive (the old download address only keeps the newest releases): pinned SHA-256 for Windows, the Tor Project's GPG-signed hash list for Linux and macOS. Opening the log folder and the kernel link work on every desktop. The macOS app is not signed with a paid Apple Developer ID; the README explains how to open it
+- **Linux.** The desktop app is now built for Linux (`.deb`, `.rpm`, `.AppImage`, `.tar.gz`) by the same public GitHub workflow as Windows, with the same features. (macOS is not part of this release.) Tor comes from the Tor Project's permanent archive (the old download address only keeps the newest releases): pinned SHA-256 for Windows, the Tor Project's GPG-signed hash list for Linux. Opening the log folder and the kernel link work on every desktop.
 - **Remove an account from the list.** Settings → Wallet → Accounts: "Remove from list" only hides an account (its money and address stay; "Show hidden accounts" brings it back). Deleting a wallet stays a separate step with its own warning
 - **Phone: pull down to refresh** the wallet, the wallet list or the node panel
 - **Connection mode in Settings → General** as well (With Tor / Slatepack only), not only on the Tor card
@@ -11,6 +11,8 @@
 - Fixed: the Settings window could scroll sideways on the desktop
 - Fixed: the health dots in the node list were always grey
 - On the phone, the "Wallet settings" and "Node settings" buttons now open the list of settings categories first (the category you asked for is marked), instead of jumping straight into it
+- **More public nodes in the pool**, offered by the community: `api.grin.money` and `api.grinnode.org` (mainnet), `testapi.grin.money` (testnet). Health ordering and failover work as before (thanks to noobvie, issue #1)
+- Fixed: a click on the text next to a drop-down could open the system's own grey list, which ignores the theme; the real list is now always the themed one
 - Fixed: in the drop-down lists (years, language, node and so on) the list moved by itself when the mouse rested on a half-visible row at its edge, and changed the marked row; now only the keyboard scrolls the list, the mouse just marks the row
 - Fixed: the progress bar of the scan of old transactions went up and down; it now only goes forward, and the "minutes left" estimate is steady (it follows the speed of the last minutes and only counts down)
 - **One Settings window, in categories.** Settings, Wallet settings and Node settings are now a single window with the same eight categories on the desktop and the phone: General, Wallet, Security, Sending, Node, Backup, Maintenance and repair, About. On the desktop the categories are on the left; on the phone Settings opens as a list of categories, a tap opens one, the back arrow returns. The wallet card shows only the transactions, with a "Wallet settings" button that opens Settings → Wallet (name, accounts, delete). The node connection is chosen with three large options in Settings → Node

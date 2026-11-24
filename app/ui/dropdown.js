@@ -34,6 +34,12 @@
     list.setAttribute('popover', 'manual');
     sel.before(wrap); wrap.append(sel, btn, list);
     sel.classList.add('dd-native'); sel.tabIndex = -1;
+    // The real <select> only holds the value. `inert` keeps it from ever taking focus or a click (a click on
+    // the text of the surrounding <label> used to be forwarded to it, which opened the system's own list,
+    // the grey Windows one that ignores the theme).
+    sel.inert = true; sel.setAttribute('aria-hidden', 'true');
+    const lab = sel.closest('label');
+    if (lab) lab.addEventListener('click', (e) => { if (!e.target.closest('.dd')) { e.preventDefault(); btn.focus(); } });
     const al = sel.getAttribute('aria-label'); if (al) btn.setAttribute('aria-label', al);
     const dd = { sel, btn, list, active: -1 };
 
