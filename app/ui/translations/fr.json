@@ -635,5 +635,8 @@
  "Cüzdanı sil:": "Supprimer le portefeuille :",
  "cüzdanın tamamı bu cihazdan silinir.": "tout le portefeuille est supprimé de cet appareil.",
  "“Yalnızca Slatepack”: Tor hiç çalışmaz, ödemeler Slatepack metniyle gider ve gelir. Hemen uygulanır.": "« Slatepack uniquement » : Tor ne tourne pas du tout, les paiements partent et arrivent en textes Slatepack. Appliqué tout de suite.",
- "Ana hesap listeden kaldırılamaz.": "Le compte principal ne peut pas être retiré de la liste."
+ "Ana hesap listeden kaldırılamaz.": "Le compte principal ne peut pas être retiré de la liste.",
+ "Ayrıntılar": "Détails",
+ "Zincir taramasıyla bulundu. Tarama yalnızca şu an sahip olduğun parayı görür; giden ödemeler yalnızca onları yapan cihazda listelenir.": "Trouvé en analysant la chaîne. Une analyse ne voit que l'argent que tu détiens maintenant ; les paiements envoyés ne sont listés que sur l'appareil qui les a faits.",
+ "Bu para başka bir cihazda (aynı kurtarma ifadesiyle) harcandı. Alıcı, ağ ücreti ve tam tarih yalnızca o cihazda kayıtlı. Kalan para üstü bu cüzdana döndüyse ayrıca “Taramayla bulundu” olarak görünür.": "Cet argent a été dépensé sur un autre appareil (même phrase de récupération). Le destinataire, les frais et la date exacte ne sont enregistrés que là-bas. Si de la monnaie est revenue dans ce portefeuille, elle apparaît aussi comme « Trouvé par analyse »."
 }

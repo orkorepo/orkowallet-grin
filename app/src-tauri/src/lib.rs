@@ -1736,13 +1736,15 @@ fn reach_watcher(state: Arc<AppState>, ow: Arc<OpenWallet>) {
         // The loop sleeps at most about two minutes; a much longer gap on the wall clock means the computer
         // was asleep (or frozen), and tor's circuits and published address are dead after that.
         let mut last_tick = std::time::SystemTime::now();
+        // How long the previous round slept; the sleep-detection below allows for it.
+        let mut prev_pause = 0u64;
         loop {
             let open_still = state.open.read().unwrap().as_ref().map(|o| Arc::ptr_eq(&o.wallet, &ow.wallet)).unwrap_or(false);
             if !open_still {
                 state.reachable.store(false, Relaxed);
                 return;
             }
-            let woke = std::time::SystemTime::now().duration_since(last_tick).map(|d| d > Duration::from_secs(240)).unwrap_or(false);
+            let woke = std::time::SystemTime::now().duration_since(last_tick).map(|d| d > Duration::from_secs(prev_pause + 180)).unwrap_or(false);
             last_tick = std::time::SystemTime::now();
             if woke {
                 orko_grin_core::tor::glog(log::Level::Info, "tor: the computer was asleep, starting tor again with fresh circuits");
@@ -1761,7 +1763,9 @@ fn reach_watcher(state: Arc<AppState>, ow: Arc<OpenWallet>) {
                     fails = 0;
                     stuck_since = None;
                     state.reachable.store(true, Relaxed);
-                    90
+                    // Healthy: look again only now and then. Every check builds a circuit to our own onion
+                    // address, which costs battery and bandwidth, so a quiet wallet should not do it often.
+                    if cfg!(target_os = "android") { 420 } else { 240 }
                 } else {
                     fails += 1;
                     if fails >= 2 {
@@ -1777,7 +1781,8 @@ fn reach_watcher(state: Arc<AppState>, ow: Arc<OpenWallet>) {
                             orko_grin_core::tor::glog(log::Level::Warn, &format!("tor: clean restart failed: {e}"));
                         }
                     }
-                    8
+                    // Retry quickly at first, then back off so a network that is down does not keep Tor busy.
+                    (8u64 << fails.saturating_sub(1).min(3)).min(60)
                 }
             } else {
                 // Tor (re)starting, e.g. after an account switch or a bridge change, or it has stopped.
@@ -1795,6 +1800,7 @@ fn reach_watcher(state: Arc<AppState>, ow: Arc<OpenWallet>) {
                 }
                 2
             };
+            prev_pause = pause;
             std::thread::sleep(Duration::from_secs(pause));
         }
     });

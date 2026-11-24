@@ -638,4 +638,7 @@ const LANG_RU = {
   "cüzdanın tamamı bu cihazdan silinir.": "весь кошелёк удаляется с этого устройства.",
   "“Yalnızca Slatepack”: Tor hiç çalışmaz, ödemeler Slatepack metniyle gider ve gelir. Hemen uygulanır.": "«Только Slatepack»: Tor не запускается совсем, платежи отправляются и приходят текстами Slatepack. Применяется сразу.",
   "Ana hesap listeden kaldırılamaz.": "Основной счёт нельзя убрать из списка.",
+  "Ayrıntılar": "Подробности",
+  "Zincir taramasıyla bulundu. Tarama yalnızca şu an sahip olduğun parayı görür; giden ödemeler yalnızca onları yapan cihazda listelenir.": "Найдено при сканировании цепочки. Сканирование видит только те средства, которые есть у тебя сейчас; отправленные платежи видны только на устройстве, которое их сделало.",
+  "Bu para başka bir cihazda (aynı kurtarma ifadesiyle) harcandı. Alıcı, ağ ücreti ve tam tarih yalnızca o cihazda kayıtlı. Kalan para üstü bu cüzdana döndüyse ayrıca “Taramayla bulundu” olarak görünür.": "Эти средства потрачены на другом устройстве (с той же фразой восстановления). Получатель, комиссия и точная дата хранятся только там. Если сдача вернулась в этот кошелёк, она также появится как «Найдено сканированием».",
 };

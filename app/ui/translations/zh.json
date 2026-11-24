@@ -635,5 +635,8 @@
  "Cüzdanı sil:": "删除钱包：",
  "cüzdanın tamamı bu cihazdan silinir.": "整个钱包将从此设备删除。",
  "“Yalnızca Slatepack”: Tor hiç çalışmaz, ödemeler Slatepack metniyle gider ve gelir. Hemen uygulanır.": "“仅 Slatepack”：Tor 完全不运行，付款以 Slatepack 文本收发。立即生效。",
- "Ana hesap listeden kaldırılamaz.": "主账户不能从列表移除。"
+ "Ana hesap listeden kaldırılamaz.": "主账户不能从列表移除。",
+ "Ayrıntılar": "详情",
+ "Zincir taramasıyla bulundu. Tarama yalnızca şu an sahip olduğun parayı görür; giden ödemeler yalnızca onları yapan cihazda listelenir.": "通过扫描区块链找到。扫描只能看到你现在拥有的资金;发出的付款只显示在发出它们的设备上。",
+ "Bu para başka bir cihazda (aynı kurtarma ifadesiyle) harcandı. Alıcı, ağ ücreti ve tam tarih yalnızca o cihazda kayıtlı. Kalan para üstü bu cüzdana döndüyse ayrıca “Taramayla bulundu” olarak görünür.": "这笔钱已在另一台设备上花掉(使用相同的恢复短语)。收款人、手续费和确切日期只保存在那台设备上。如果找零回到了这个钱包,它也会显示为“扫描发现”。"
 }

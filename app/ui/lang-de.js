@@ -638,4 +638,7 @@ const LANG_DE = {
   "cüzdanın tamamı bu cihazdan silinir.": "die ganze Wallet wird von diesem Gerät gelöscht.",
   "“Yalnızca Slatepack”: Tor hiç çalışmaz, ödemeler Slatepack metniyle gider ve gelir. Hemen uygulanır.": "„Nur Slatepack“: Tor läuft gar nicht, Zahlungen gehen und kommen als Slatepack-Texte. Gilt sofort.",
   "Ana hesap listeden kaldırılamaz.": "Das Hauptkonto kann nicht aus der Liste entfernt werden.",
+  "Ayrıntılar": "Details",
+  "Zincir taramasıyla bulundu. Tarama yalnızca şu an sahip olduğun parayı görür; giden ödemeler yalnızca onları yapan cihazda listelenir.": "Beim Scan der Chain gefunden. Ein Scan sieht nur das Geld, das du jetzt besitzt; gesendete Zahlungen stehen nur auf dem Gerät, das sie gemacht hat.",
+  "Bu para başka bir cihazda (aynı kurtarma ifadesiyle) harcandı. Alıcı, ağ ücreti ve tam tarih yalnızca o cihazda kayıtlı. Kalan para üstü bu cüzdana döndüyse ayrıca “Taramayla bulundu” olarak görünür.": "Dieses Geld wurde auf einem anderen Gerät ausgegeben (gleiche Wiederherstellungsphrase). Empfänger, Gebühr und genaues Datum sind nur dort gespeichert. Kam Wechselgeld in diese Wallet zurück, erscheint es zusätzlich als „Per Scan gefunden“.",
 };

@@ -543,7 +543,9 @@ function enterWallet() {
   fillSince($('rescan-since'), false);
   pollScan();
   const every = (fn, ms) => setInterval(() => { if (!document.hidden && !locked) fn(); }, ms);
-  walletTimers = [every(pollTor, 3000), every(refresh, 30000), every(watchPending, 4000), every(pollScan, 3000), every(pollJobs, 5000)];
+  // A phone asks less often: every call wakes the app, and the screen rarely shows anything that fast.
+  const k = PHONE.matches ? 2.5 : 1;
+  walletTimers = [every(pollTor, 3000 * k), every(refresh, 30000 * (PHONE.matches ? 2 : 1)), every(watchPending, 4000 * k), every(pollScan, 3000 * k), every(pollJobs, 5000 * k)];
 }
 
 async function refresh() {
@@ -826,19 +828,23 @@ $('tx-list').addEventListener('click', (e) => {
   const b = e.target.closest('.tx'); if (!b) return;
   const x = state.txCache[+b.dataset.i]; txOpen = x;
   const kv = $('tx-kv'); kv.replaceChildren();
-  const add = (k, v) => { if (!v && v !== 0) return; kv.append(el('dt', '', t(k)), el('dd', '', String(v))); };
+  const kv2 = $('tx-kv2'); kv2.replaceChildren(); $('tx-more').hidden = true; $('tx-more').open = false;
+  const put = (box) => (k, v) => { if (!v && v !== 0) return; box.append(el('dt', '', t(k)), el('dd', '', String(v))); };
+  const add = put(kv);
   if (elsewhere(x)) return showElsewhere(x, add);
+  // First what matters: state, amount, fee, when. The technical rest is folded away.
   add('Durum', txStatus(x));
   add('Tutar', `${x.incoming ? '+' : '−'}${amt(x.amount)} ツ`);
   if (!x.incoming && x.fee) add('Ağ ücreti', `${x.fee} ツ`);
-  add('Oluşturuldu', fmtDate(x.time));
-  if (x.confirmed_time) add('Onaylandı', fmtDate(x.confirmed_time));
-  add('Girdi / çıktı', `${x.inputs} / ${x.outputs}`);
-  if (x.ttl_height) add('Geçerlilik (blok)', fmtNum(x.ttl_height));
-  add('İşlem kimliği', x.slate_id);
-  add('Kernel', x.kernel);
+  add(x.confirmed_time ? 'Onaylandı' : 'Oluşturuldu', fmtDate(x.confirmed_time || x.time));
+  const more = put(kv2);
+  if (x.confirmed_time) more('Oluşturuldu', fmtDate(x.time));
+  more('Girdi / çıktı', `${x.inputs} / ${x.outputs}`);
+  if (x.ttl_height) more('Geçerlilik (blok)', fmtNum(x.ttl_height));
+  more('İşlem kimliği', x.slate_id);
+  more('Kernel', x.kernel);
   if (x.kernel && state.status.network === 'mainnet') { // link to the block explorer, next to the kernel text
-    const dd = kv.lastElementChild;
+    const dd = kv2.lastElementChild;
     const a = el('button', 'kernel-link'); a.type = 'button';
     a.title = t('Grin Scan\'de aç'); a.setAttribute('aria-label', t('Grin Scan\'de aç'));
     a.innerHTML = ICON_EXT;
@@ -851,9 +857,10 @@ $('tx-list').addEventListener('click', (e) => {
     });
     dd.append(' ', a);
   }
-  add('Yerel no', x.id);
+  more('Yerel no', x.id);
+  $('tx-more').hidden = !kv2.children.length;
   if (fromScan(x)) {
-    kv.append(el('dt', '', t('Not')), el('dd', '', t('Bu kayıt zincir taramasıyla bulundu (kurtarma ifadesiyle içe aktarma ya da yeniden tarama). Tarama yalnızca şu an sahip olduğun çıktıları görür: giden ödemeler listede görünmez, bir gönderimden kalan para üstü de “Taramayla bulundu” olarak görünür. Aynı cüzdanı iki cihazda kullanırsan her cihaz yalnızca kendi yaptığı gönderimleri listeler.')));
+    kv.append(el('dt', '', t('Not')), el('dd', '', t('Zincir taramasıyla bulundu. Tarama yalnızca şu an sahip olduğun parayı görür; giden ödemeler yalnızca onları yapan cihazda listelenir.')));
   }
   $('tx-title').textContent = txTitle(x);
   $('tx-proof-box').hidden = true;
@@ -870,9 +877,7 @@ function showElsewhere(x, add) {
   add('Tutar', `−${amt(x.amount)} ツ`);
   add('Harcanan çıktı', x.inputs);
   add(x.early ? 'İlk kontrol' : 'Fark edildi', fmtDate(x.time));
-  $('tx-kv').append(el('dt', '', t('Not')), el('dd', '', x.early
-    ? t('Bu para, bu cihazda ilk kontrol yapılmadan önce başka bir cihazda (aynı kurtarma ifadesiyle) harcanmış. Ödemenin alıcısı, ağ ücreti ve tam tarihi yalnızca o cihazda kayıtlı. Tutar, harcanan çıktıların toplamıdır; ödemeden kalan para üstü bu cüzdana döndüyse ayrı bir “Taramayla bulundu” kaydı olarak görünür (görünmüyorsa Ayarlar → Bakım ve onarım bölümünden yeniden tara).')
-    : t('Bu para başka bir cihazda (aynı kurtarma ifadesiyle) harcandı. Ödemenin alıcısı, ağ ücreti ve tam tarihi yalnızca o cihazda kayıtlı; burada görünen tarih bu cihazın fark ettiği andır. Tutar, harcanan çıktıların toplamıdır; para üstünü bulmak için kısa bir tarama kendiliğinden başlar ve bulunan para üstü “Taramayla bulundu” olarak görünür.')));
+  $('tx-kv').append(el('dt', '', t('Not')), el('dd', '', t('Bu para başka bir cihazda (aynı kurtarma ifadesiyle) harcandı. Alıcı, ağ ücreti ve tam tarih yalnızca o cihazda kayıtlı. Kalan para üstü bu cüzdana döndüyse ayrıca “Taramayla bulundu” olarak görünür.')));
   $('tx-title').textContent = txTitle(x);
   ['tx-proof-box', 'tx-proof-btn', 'tx-repost', 'tx-cancel', 'tx-sp'].forEach((id) => { $(id).hidden = true; });
   err('tx-error');

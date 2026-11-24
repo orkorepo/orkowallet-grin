@@ -4,6 +4,8 @@
 
 - **Linux.** The desktop app is now built for Linux (`.deb`, `.rpm`, `.AppImage`, `.tar.gz`) by the same public GitHub workflow as Windows, with the same features. (macOS is not part of this release.) Tor comes from the Tor Project's permanent archive (the old download address only keeps the newest releases): pinned SHA-256 for Windows, the Tor Project's GPG-signed hash list for Linux. Opening the log folder and the kernel link work on every desktop.
 - **Remove an account from the list.** Settings → Wallet → Accounts: "Remove from list" only hides an account (its money and address stay; "Show hidden accounts" brings it back). Deleting a wallet stays a separate step with its own warning
+- **Lighter on the phone and on batteries.** Tor now checks its own address far less often when everything works (and backs off when the network is down), the app asks the background less often on a phone, and Tor runs as a plain client with reduced idle traffic on Android.
+- **Calmer transaction details.** A transaction opens with what matters (state, amount, fee, date); the technical fields (inputs/outputs, id, kernel) sit under "Details". Notes are shorter.
 - **Phone: pull down to refresh** the wallet, the wallet list or the node panel
 - **Connection mode in Settings → General** as well (With Tor / Slatepack only), not only on the Tor card
 - **Repair (rescan) on testnet** also offers the years (counted back from the chain height)

@@ -697,6 +697,11 @@ const EN = {
   'cüzdanın tamamı bu cihazdan silinir.': 'the whole wallet is deleted from this device.',
   '“Yalnızca Slatepack”: Tor hiç çalışmaz, ödemeler Slatepack metniyle gider ve gelir. Hemen uygulanır.': '“Slatepack only”: Tor does not run at all, payments go and come as Slatepack texts. Applies at once.',
   'Ana hesap listeden kaldırılamaz.': 'The main account cannot be removed from the list.',
+
+  // ---- 0.3.2: account hiding, pull to refresh
+  'Ayrıntılar': 'Details',
+  'Zincir taramasıyla bulundu. Tarama yalnızca şu an sahip olduğun parayı görür; giden ödemeler yalnızca onları yapan cihazda listelenir.': 'Found by scanning the chain. A scan only sees the money you hold now; payments you sent are listed only on the device that made them.',
+  'Bu para başka bir cihazda (aynı kurtarma ifadesiyle) harcandı. Alıcı, ağ ücreti ve tam tarih yalnızca o cihazda kayıtlı. Kalan para üstü bu cüzdana döndüyse ayrıca “Taramayla bulundu” olarak görünür.': 'This money was spent on another device (same recovery phrase). The recipient, fee and exact date are only stored on that device. If change came back to this wallet it also shows up as “Found by scan”.',
 };
 
 // lang-xx.js (loaded before this file) define LANG_DE/FR/RU/ZH; a missing entry falls back to English.
