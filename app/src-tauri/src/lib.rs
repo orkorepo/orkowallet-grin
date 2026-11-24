@@ -1311,14 +1311,16 @@ struct Overview {
 }
 
 #[tauri::command]
-async fn overview(state: St<'_>) -> Result<Overview, String> {
+async fn overview(state: St<'_>, fast: Option<bool>) -> Result<Overview, String> {
+    let fast = fast.unwrap_or(false);
     let o = state.open()?;
     let elsewhere_at = state.elsewhere_at.load(std::sync::atomic::Ordering::Relaxed);
     let min_conf = state.settings.lock().unwrap().send.min_confirmations.clamp(1, 10);
     blocking(move || {
         let w = &o.wallet;
         let (sp, onion) = w.address()?;
-        let (fresh, i) = w.balance(min_conf)?;
+        // `fast`: from the wallet's own records, no node round trip (instant); the full one asks the node.
+        let (fresh, i) = if fast { w.balance_with(min_conf, false)? } else { w.balance(min_conf)? };
         let account = w.accounts()?.into_iter().find(|a| a.2).map(|a| a.0).unwrap_or_default();
         Ok(Overview {
             name: o.meta.name.clone(),

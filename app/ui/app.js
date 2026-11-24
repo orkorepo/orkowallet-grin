@@ -64,7 +64,7 @@ function setMobileTab(tab) {
     ind.hidden = false; ind.classList.add('spin');
     try {
       if (document.body.dataset.mtab === 'node') await pollNode();
-      else if (document.body.dataset.view === 'wallet') await Promise.all([refresh(), pollTor(), pollScan()]);
+      else if (document.body.dataset.view === 'wallet') { await Promise.all([refresh('quick'), pollTor(), pollScan()]); refresh(); } // the node answers later
       else if (document.body.dataset.view === 'wallets') { state.status = await invoke('status'); renderWallets(); }
       toast(t('Yenilendi'));
     } finally { ind.classList.remove('spin'); ind.hidden = true; }
@@ -552,10 +552,21 @@ function enterWallet() {
   walletTimers = [every(pollTor, 3000 * k), every(refresh, 30000 * (PHONE.matches ? 2 : 1)), every(watchPending, 4000 * k), every(pollScan, 3000 * k), every(pollJobs, 5000 * k)];
 }
 
-async function refresh() {
+/** Refresh: first what the wallet already knows (instant), then one round trip to the node. A slow or far node
+ *  never keeps the screen waiting; the numbers update when it answers. refresh('quick') is the first step only. */
+let fullRun = null;
+async function refresh(mode) {
+  if (locked) return;
+  if (mode === 'quick') return paint(true);
+  await paint(true);
+  if (fullRun) return fullRun;
+  fullRun = paint(false).finally(() => { fullRun = null; });
+  return fullRun;
+}
+async function paint(quick) {
   if (locked) return;
   try {
-    const o = await invoke('overview');
+    const o = await invoke('overview', { fast: quick });
     state.overview = o;
     setText($('b-spendable'), amt(o.spendable));
     setText($('b-awaiting'), amt(o.awaiting));
@@ -569,7 +580,7 @@ async function refresh() {
     $('tc-account').textContent = t('Hesap: {name} · her hesabın adresi ayrıdır', { name: o.account || 'default' });
     $('tc-node').textContent = t('Kullanılan node: {url}', { url: hostOf(o.node_in_use) });
     const warn = $('node-warn');
-    warn.hidden = o.node_ok;
+    if (!quick) warn.hidden = o.node_ok; // the quick step never asked the node, so it says nothing about it
     warn.textContent = o.connection === 'integrated'
       ? t('Kendi node\'una ulaşılamıyor ya da node henüz senkronize değil; gösterilen bakiye son bilinen değer. Node panelinden node\'u başlat.')
       : t('Node\'a ulaşılamıyor; gösterilen bakiye son bilinen değer.');
