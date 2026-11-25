@@ -10,7 +10,8 @@
   function closeOpen() {
     if (!openDd) return;
     const d = openDd; openDd = null;
-    try { d.list.hidePopover(); } catch { d.list.hidden = true; }
+    try { d.list.hidePopover(); } catch { /* no popover support */ }
+    d.list.hidden = true; // also the way to hide it where the browser has no popover support (older WebKitGTK)
     d.btn.setAttribute('aria-expanded', 'false');
   }
 
@@ -32,6 +33,7 @@
     btn.append(label, chev);
     const list = document.createElement('div'); list.className = 'dd-list'; list.setAttribute('role', 'listbox');
     list.setAttribute('popover', 'manual');
+    list.hidden = true;
     sel.before(wrap); wrap.append(sel, btn, list);
     sel.classList.add('dd-native'); sel.tabIndex = -1;
     // The real <select> only holds the value. `inert` keeps it from ever taking focus or a click (a click on
@@ -87,7 +89,8 @@
         it.addEventListener('pointermove', () => { if (dd.active !== i) highlight(i, false); });
         list.append(it);
       });
-      try { list.showPopover(); } catch { list.hidden = false; }
+      list.hidden = false;
+      try { list.showPopover(); } catch { /* shown by `hidden = false` alone */ }
       place(); openDd = dd; btn.setAttribute('aria-expanded', 'true');
       highlight(indexDesc.get.call(sel));
     };
