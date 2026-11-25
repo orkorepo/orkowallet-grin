@@ -349,6 +349,7 @@ function openForm(mode) {
   $('wf-words-f').hidden = mode !== 'seed';
   $('wf-since-f').hidden = mode !== 'seed';
   $('wf-len-f').hidden = mode !== 'create'; $('wf-len').value = '24';
+  $('wf-bio-f').hidden = !bioAvail(); $('wf-bio').checked = true; // asked right when the wallet is set up
   fillSince($('wf-since'), true);
   $('wf-since').value = 'all';
   $('wf-path-f').hidden = mode !== 'folder';
@@ -449,6 +450,7 @@ $('wf').addEventListener('submit', async (e) => {
   const mode = state.formMode;
   const name = $('wf-name').value.trim() || t('Cüzdan');
   const password = $('wf-pass').value, connection = $('wf-conn').value;
+  const wantBio = bioAvail() && $('wf-bio').checked;
   let phrase = '';
   if (mode === 'seed') {
     const boxes = seedBoxes();
@@ -468,12 +470,15 @@ $('wf').addEventListener('submit', async (e) => {
       if (!(await closeOpenFirst())) return;
       if (mode === 'create') {
         state.createdWords = await invoke('wallet_create', { name, password, connection, words: Number($('wf-len').value) || 24 });
+        if (wantBio) await offerFingerprint(password);
         showWords();
       } else if (mode === 'seed') {
         await invoke('wallet_restore', { name, password, words: phrase, connection, since: $('wf-since').value });
+        if (wantBio) await offerFingerprint(password);
         state.status = await invoke('status'); enterWallet();
       } else {
         await invoke('wallet_import', { name, path: $('wf-path').value, password, connection });
+        if (wantBio) await offerFingerprint(password);
         state.status = await invoke('status'); enterWallet();
       }
       ['wf-pass', 'wf-pass2'].forEach((id) => { $(id).value = ''; });
@@ -627,6 +632,16 @@ const bioCall = (fn, ...args) => new Promise((res) => {
 });
 const bioReady = (id) => { try { return !!BIO && !!id && BIO.bioAvailable() && BIO.bioHas(id); } catch { return false; } };
 const bioFilled = {}; // which form got its password from the fingerprint
+const bioAvail = () => { try { return !!BIO && BIO.bioAvailable(); } catch { return false; } };
+/** Right after a wallet is created, restored or imported: remember its password behind the fingerprint. */
+async function offerFingerprint(password) {
+  try {
+    const id = (await invoke('status')).open_wallet?.id;
+    if (!id) return;
+    const r = await bioCall('bioEnroll', id, password, t('Parmak izini onayla'), t('Vazgeç'));
+    toast(r.ok ? t('Parmak izi açıldı') : t('Parmak izi açılamadı'));
+  } catch { /* the wallet is made either way; Settings → Security can turn it on later */ }
+}
 /** Ask for the fingerprint; on success put the password in the form and submit it like a typed one. */
 async function bioFill(prefix, id) {
   const r = await bioCall('bioUnlock', id, t('Parmak iziyle aç'), t('Parolayı kullan'));
