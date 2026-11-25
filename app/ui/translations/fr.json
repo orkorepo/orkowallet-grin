@@ -661,5 +661,6 @@
  "Hazır. Node başlatıldı, son blokları tamamlıyor.": "Prêt. Le nœud a démarré et rattrape les derniers blocs.",
  "Durduruldu. Tekrar başlatırsan kaldığı yerden devam eder.": "Arrêté. Si tu relances, ça reprend là où ça s'était arrêté.",
  "Olmadı: {e}. Normal eşitleme etkilenmedi.": "Échec : {e}. La synchronisation normale n'est pas affectée.",
- "Emin misin? Tekrar dokun": "Sûr ? Touche encore"
+ "Emin misin? Tekrar dokun": "Sûr ? Touche encore",
+ "Yok: Grin'de çıktılar işlemin kernel'ına bağlı değildir. Kernel yalnızca işlemi yapan cihazda kayıtlı.": "Aucun : dans Grin, les sorties ne sont pas liées au kernel d'une transaction. Le kernel n'est enregistré que sur l'appareil qui a fait la transaction."
 }

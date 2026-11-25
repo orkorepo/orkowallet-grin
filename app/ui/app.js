@@ -35,6 +35,16 @@ function setMobileTab(tab) {
   if (tab === 'node') requestAnimationFrame(() => fitAll());
 }
 
+// Desktop: the shell tells us when the window is minimised or hidden to the tray. Nothing is asked in the background
+// meanwhile, and one refresh runs as soon as the window is back.
+let winOff = false;
+try {
+  window.__TAURI__.event.listen('win-visible', (e) => {
+    winOff = !e.payload;
+    if (!winOff && state.open && !locked) { refresh(); pollTor(); pollScan(); }
+  });
+} catch { /* no event bus (browser preview, phone) */ }
+
 // Phone: pull the page down at the top to refresh (wallet: balance and history; list: wallets; node tab:
 // the node panel). The browser's own pull-to-refresh is off (overscroll-behavior), this one reloads data only.
 (function pullToRefresh() {
@@ -546,9 +556,10 @@ function enterWallet() {
   walletTimers.forEach(clearInterval);
   fillSince($('rescan-since'), false);
   pollScan();
-  const every = (fn, ms) => setInterval(() => { if (!document.hidden && !locked) fn(); }, ms);
-  // A phone asks less often: every call wakes the app, and the screen rarely shows anything that fast.
-  const k = PHONE.matches ? 2.5 : 1;
+  const every = (fn, ms) => setInterval(() => { if (!document.hidden && !winOff && !locked) fn(); }, ms);
+  // Quieter background: a phone asks 2.5 times less often (every call wakes the app), a desktop window 1.5 times.
+  // Nothing is asked while the window is hidden or minimised (see `every`). The balance refresh keeps its own pace.
+  const k = PHONE.matches ? 2.5 : 1.5;
   walletTimers = [every(pollTor, 3000 * k), every(refresh, 30000 * (PHONE.matches ? 2 : 1)), every(watchPending, 4000 * k), every(pollScan, 3000 * k), every(pollJobs, 5000 * k)];
 }
 
@@ -934,6 +945,7 @@ $('tx-list').addEventListener('click', (e) => {
     dd.append(' ', a);
   }
   more('Yerel no', x.id);
+  if (!x.kernel && fromScan(x)) more('Kernel', t('Yok: Grin\'de çıktılar işlemin kernel\'ına bağlı değildir. Kernel yalnızca işlemi yapan cihazda kayıtlı.'));
   $('tx-more').hidden = !kv2.children.length;
   if (fromScan(x)) {
     kv.append(el('dt', '', t('Not')), el('dd', '', t('Zincir taramasıyla bulundu. Tarama yalnızca şu an sahip olduğun parayı görür; giden ödemeler yalnızca onları yapan cihazda listelenir.')));
@@ -952,6 +964,7 @@ $('tx-list').addEventListener('click', (e) => {
 function showElsewhere(x, add) {
   add('Tutar', `−${amt(x.amount)} ツ`);
   add('Harcanan çıktı', x.inputs);
+  add('Kernel', t('Yok: Grin\'de çıktılar işlemin kernel\'ına bağlı değildir. Kernel yalnızca işlemi yapan cihazda kayıtlı.'));
   add(x.early ? 'İlk kontrol' : 'Fark edildi', fmtDate(x.time));
   $('tx-kv').append(el('dt', '', t('Not')), el('dd', '', t('Bu para başka bir cihazda (aynı kurtarma ifadesiyle) harcandı. Alıcı, ağ ücreti ve tam tarih yalnızca o cihazda kayıtlı. Kalan para üstü bu cüzdana döndüyse ayrıca “Taramayla bulundu” olarak görünür.')));
   $('tx-title').textContent = txTitle(x);

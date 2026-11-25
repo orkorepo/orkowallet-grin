@@ -729,6 +729,9 @@ const EN = {
   'Durduruldu. Tekrar başlatırsan kaldığı yerden devam eder.': 'Stopped. If you start it again it carries on where it left off.',
   'Olmadı: {e}. Normal eşitleme etkilenmedi.': 'Did not work: {e}. The normal sync is not affected.',
   'Emin misin? Tekrar dokun': 'Sure? Tap again',
+
+  // ---- 0.3.2: account hiding, pull to refresh
+  'Yok: Grin\'de çıktılar işlemin kernel\'ına bağlı değildir. Kernel yalnızca işlemi yapan cihazda kayıtlı.': 'None: in Grin, outputs are not tied to a transaction\'s kernel. The kernel is only recorded on the device that made the transaction.',
 };
 
 // lang-xx.js (loaded before this file) define LANG_DE/FR/RU/ZH; a missing entry falls back to English.

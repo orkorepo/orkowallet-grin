@@ -2563,6 +2563,21 @@ struct TrayItems {
     quit: tauri::menu::MenuItem<tauri::Wry>,
 }
 
+/// Is the main window on screen (shown and not minimised)? The page stops asking the background while it is not.
+#[cfg(desktop)]
+static WIN_VISIBLE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(true);
+
+/// Tell the page when the window goes off screen (minimised, hidden to the tray) and when it is back.
+#[cfg(desktop)]
+fn emit_visibility(app: &tauri::AppHandle) {
+    use tauri::Emitter;
+    let Some(w) = app.get_webview_window("main") else { return };
+    let vis = w.is_visible().unwrap_or(true) && !w.is_minimized().unwrap_or(false);
+    if WIN_VISIBLE.swap(vis, std::sync::atomic::Ordering::Relaxed) != vis {
+        let _ = app.emit("win-visible", vis);
+    }
+}
+
 #[cfg(desktop)]
 fn show_main(app: &tauri::AppHandle) {
     if let Some(w) = app.get_webview_window("main") {
@@ -2571,6 +2586,7 @@ fn show_main(app: &tauri::AppHandle) {
         let _ = w.show();
         let _ = w.set_focus();
     }
+    emit_visibility(app);
 }
 
 fn toast(app: &tauri::AppHandle, title: &str, body: &str) {
@@ -2609,6 +2625,7 @@ fn on_close_request(app: &tauri::AppHandle) -> bool {
             let _ = w.unminimize();
             let _ = w.set_focus();
         }
+        emit_visibility(app);
         let _ = app.emit("close-ask", ());
         return true;
     }
@@ -2622,12 +2639,14 @@ fn hide_window(app: &tauri::AppHandle) {
         if let Some(w) = app.get_webview_window("main") {
             let _ = w.minimize();
         }
+        emit_visibility(app);
         return;
     }
     let Some(st) = app.try_state::<Arc<AppState>>() else { return };
     if let Some(w) = app.get_webview_window("main") {
         let _ = w.hide();
     }
+    emit_visibility(app);
     let first = {
         let mut s = st.settings.lock().unwrap();
         let first = !s.tray_hint_shown;
@@ -2650,6 +2669,7 @@ fn hide_to_tray(app: &tauri::AppHandle) -> bool {
     if let Some(w) = app.get_webview_window("main") {
         let _ = w.hide();
     }
+    emit_visibility(app);
     let first = {
         let mut s = st.settings.lock().unwrap();
         let first = !s.tray_hint_shown;
@@ -2849,11 +2869,19 @@ pub fn run() {
                 let _ = w.show();
                 let _ = w.set_focus();
             }
+            emit_visibility(app);
         }));
     }
     builder
         .plugin(tauri_plugin_notification::init())
         .on_window_event(|window, event| {
+            // Minimise and restore show up as a resize, a move or a focus change.
+            #[cfg(desktop)]
+            if window.label() == "main"
+                && matches!(event, tauri::WindowEvent::Resized(_) | tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Focused(_))
+            {
+                emit_visibility(window.app_handle());
+            }
             // Alt+F4 and the system close: hide to the tray when that is switched on.
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                 if window.label() == "main" && on_close_request(window.app_handle()) {
