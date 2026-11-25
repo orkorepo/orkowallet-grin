@@ -945,7 +945,7 @@ $('tx-list').addEventListener('click', (e) => {
     dd.append(' ', a);
   }
   more('Yerel no', x.id);
-  if (!x.kernel && fromScan(x)) more('Kernel', t('Yok: Grin\'de çıktılar işlemin kernel\'ına bağlı değildir. Kernel yalnızca işlemi yapan cihazda kayıtlı.'));
+  if (!x.kernel && fromScan(x)) more('Kernel', t('Yalnızca işlemi yapan cihazda kayıtlı'));
   $('tx-more').hidden = !kv2.children.length;
   if (fromScan(x)) {
     kv.append(el('dt', '', t('Not')), el('dd', '', t('Zincir taramasıyla bulundu. Tarama yalnızca şu an sahip olduğun parayı görür; giden ödemeler yalnızca onları yapan cihazda listelenir.')));
@@ -964,7 +964,7 @@ $('tx-list').addEventListener('click', (e) => {
 function showElsewhere(x, add) {
   add('Tutar', `−${amt(x.amount)} ツ`);
   add('Harcanan çıktı', x.inputs);
-  add('Kernel', t('Yok: Grin\'de çıktılar işlemin kernel\'ına bağlı değildir. Kernel yalnızca işlemi yapan cihazda kayıtlı.'));
+  add('Kernel', t('Yalnızca işlemi yapan cihazda kayıtlı'));
   add(x.early ? 'İlk kontrol' : 'Fark edildi', fmtDate(x.time));
   $('tx-kv').append(el('dt', '', t('Not')), el('dd', '', t('Bu para başka bir cihazda (aynı kurtarma ifadesiyle) harcandı. Alıcı, ağ ücreti ve tam tarih yalnızca o cihazda kayıtlı. Kalan para üstü bu cüzdana döndüyse ayrıca “Taramayla bulundu” olarak görünür.')));
   $('tx-title').textContent = txTitle(x);

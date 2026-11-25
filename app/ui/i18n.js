@@ -731,7 +731,9 @@ const EN = {
   'Emin misin? Tekrar dokun': 'Sure? Tap again',
 
   // ---- 0.3.2: account hiding, pull to refresh
-  'Yok: Grin\'de çıktılar işlemin kernel\'ına bağlı değildir. Kernel yalnızca işlemi yapan cihazda kayıtlı.': 'None: in Grin, outputs are not tied to a transaction\'s kernel. The kernel is only recorded on the device that made the transaction.',
+
+  // ---- 0.3.2: account hiding, pull to refresh
+  'Yalnızca işlemi yapan cihazda kayıtlı': 'Only recorded on the device that made the transaction',
 };
 
 // lang-xx.js (loaded before this file) define LANG_DE/FR/RU/ZH; a missing entry falls back to English.

@@ -662,5 +662,5 @@
  "Durduruldu. Tekrar başlatırsan kaldığı yerden devam eder.": "Gestoppt. Beim erneuten Start geht es dort weiter, wo es aufgehört hat.",
  "Olmadı: {e}. Normal eşitleme etkilenmedi.": "Hat nicht geklappt: {e}. Die normale Synchronisierung ist nicht betroffen.",
  "Emin misin? Tekrar dokun": "Sicher? Nochmal tippen",
- "Yok: Grin'de çıktılar işlemin kernel'ına bağlı değildir. Kernel yalnızca işlemi yapan cihazda kayıtlı.": "Keiner: In Grin sind Outputs nicht mit dem Kernel einer Transaktion verknüpft. Der Kernel ist nur auf dem Gerät gespeichert, das die Transaktion erstellt hat."
+ "Yalnızca işlemi yapan cihazda kayıtlı": "Nur auf dem Gerät gespeichert, das die Transaktion erstellt hat"
 }

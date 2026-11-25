@@ -664,5 +664,5 @@ const LANG_RU = {
   "Durduruldu. Tekrar başlatırsan kaldığı yerden devam eder.": "Остановлено. При повторном запуске продолжится с того же места.",
   "Olmadı: {e}. Normal eşitleme etkilenmedi.": "Не получилось: {e}. Обычная синхронизация не затронута.",
   "Emin misin? Tekrar dokun": "Уверен? Нажми ещё раз",
-  "Yok: Grin'de çıktılar işlemin kernel'ına bağlı değildir. Kernel yalnızca işlemi yapan cihazda kayıtlı.": "Нет: в Grin выходы не связаны с ядром (kernel) транзакции. Kernel записан только на устройстве, которое выполнило транзакцию.",
+  "Yalnızca işlemi yapan cihazda kayıtlı": "Хранится только на устройстве, которое выполнило транзакцию",
 };

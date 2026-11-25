@@ -664,5 +664,5 @@ const LANG_ZH = {
   "Durduruldu. Tekrar başlatırsan kaldığı yerden devam eder.": "已停止。再次开始时会从中断处继续。",
   "Olmadı: {e}. Normal eşitleme etkilenmedi.": "未成功:{e}。正常同步不受影响。",
   "Emin misin? Tekrar dokun": "确定吗?再点一次",
-  "Yok: Grin'de çıktılar işlemin kernel'ına bağlı değildir. Kernel yalnızca işlemi yapan cihazda kayıtlı.": "无:在 Grin 中,输出与交易的 kernel 没有关联。Kernel 只记录在发起该交易的设备上。",
+  "Yalnızca işlemi yapan cihazda kayıtlı": "仅记录在发起该交易的设备上",
 };
