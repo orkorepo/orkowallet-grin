@@ -2750,10 +2750,11 @@ fn notifier(app: tauri::AppHandle, state: Arc<AppState>) {
         let mut told_down = false;
         let mut last_refresh = Instant::now();
         let mut last_tip = 0u64;
-        let mut round = 0u32;
+        let mut last_tip_check = Instant::now();
+        // A payment is on its way to its first confirmation: look more often until it is there.
+        let mut waiting_now = false;
         loop {
-            std::thread::sleep(Duration::from_secs(10));
-            round = round.wrapping_add(1);
+            std::thread::sleep(Duration::from_secs(if waiting_now { 5 } else { 10 }));
             let Some(ow) = state.open.read().unwrap().clone() else {
                 seen = None;
                 wid.clear();
@@ -2814,17 +2815,34 @@ fn notifier(app: tauri::AppHandle, state: Arc<AppState>) {
                 let _ = ow.wallet.balance(min_conf);
             }
 
-            // Follow the chain closely, whatever the window does: one small request for the tip (every 10 s, every
-            // 20 s on a phone). A new block, or a payment still waiting for its first confirmation, means "ask the node
-            // now": confirmations, and money another copy of this wallet spent, then show within seconds instead of
-            // at the next slow refresh. The page repaints from the wallet's own records when told.
-            if !scanning && (!cfg!(target_os = "android") || round % 2 == 0) {
+            // Follow the chain closely, whatever the window does: one small request for the tip. A new block, or a
+            // payment still waiting for its first confirmation, means "ask the node now": confirmations, and money
+            // another copy of this wallet spent, then show within seconds instead of at the next slow refresh.
+            // The page repaints from the wallet's own records when told. How often: every 10 s when nothing waits
+            // (20 s on a phone, to spare the battery and the public nodes), every 5 s (10 s) while a payment waits.
+            let android = cfg!(target_os = "android");
+            let gap = match (waiting_now, android) {
+                (true, false) => 5,
+                (true, true) => 10,
+                (false, false) => 10,
+                (false, true) => 20,
+            };
+            if !scanning && last_tip_check.elapsed() + Duration::from_millis(500) >= Duration::from_secs(gap) {
                 use tauri::Emitter;
+                last_tip_check = Instant::now();
+                // Waiting = posted or received, not yet in a block, and recent. A transaction that was never finished
+                // (an unanswered Slatepack, an abandoned payment) must not keep the fast pace for ever.
+                let recent = now_secs() as i64 - 3 * 3600;
                 let waiting = ow
                     .wallet
                     .transactions(false)
-                    .map(|v| v.into_iter().map(tx_dto).any(|t| !t.confirmed && !t.cancelled))
+                    .map(|v| {
+                        v.into_iter()
+                            .map(tx_dto)
+                            .any(|t| !t.confirmed && !t.cancelled && (t.incoming || t.finalized) && t.time > recent)
+                    })
                     .unwrap_or(false);
+                waiting_now = waiting;
                 let tip = ow.wallet.node_tip();
                 let new_block = matches!(tip, Some(h) if h != last_tip);
                 if let Some(h) = tip {
