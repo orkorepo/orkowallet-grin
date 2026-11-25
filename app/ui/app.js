@@ -45,6 +45,12 @@ try {
   });
 } catch { /* no event bus (browser preview, phone) */ }
 
+// The shell follows the chain (a new block, a payment waiting for its confirmation) and says when the wallet's
+// own records changed: repaint from them at once.
+try {
+  window.__TAURI__.event.listen('wallet-changed', () => { if (state.open && !locked && !winOff) refresh('quick'); });
+} catch { /* no event bus */ }
+
 // Phone: pull the page down at the top to refresh (wallet: balance and history; list: wallets; node tab:
 // the node panel). The browser's own pull-to-refresh is off (overscroll-behavior), this one reloads data only.
 (function pullToRefresh() {

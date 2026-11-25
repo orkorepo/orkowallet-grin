@@ -2749,8 +2749,11 @@ fn notifier(app: tauri::AppHandle, state: Arc<AppState>) {
         let mut down_since: Option<Instant> = None;
         let mut told_down = false;
         let mut last_refresh = Instant::now();
+        let mut last_tip = 0u64;
+        let mut round = 0u32;
         loop {
             std::thread::sleep(Duration::from_secs(10));
+            round = round.wrapping_add(1);
             let Some(ow) = state.open.read().unwrap().clone() else {
                 seen = None;
                 wid.clear();
@@ -2809,6 +2812,32 @@ fn notifier(app: tauri::AppHandle, state: Arc<AppState>) {
             if window_idle && !scanning && last_refresh.elapsed() >= Duration::from_secs(60) {
                 last_refresh = Instant::now();
                 let _ = ow.wallet.balance(min_conf);
+            }
+
+            // Follow the chain closely, whatever the window does: one small request for the tip (every 10 s, every
+            // 20 s on a phone). A new block, or a payment still waiting for its first confirmation, means "ask the node
+            // now": confirmations, and money another copy of this wallet spent, then show within seconds instead of
+            // at the next slow refresh. The page repaints from the wallet's own records when told.
+            if !scanning && (!cfg!(target_os = "android") || round % 2 == 0) {
+                use tauri::Emitter;
+                let waiting = ow
+                    .wallet
+                    .transactions(false)
+                    .map(|v| v.into_iter().map(tx_dto).any(|t| !t.confirmed && !t.cancelled))
+                    .unwrap_or(false);
+                let tip = ow.wallet.node_tip();
+                let new_block = matches!(tip, Some(h) if h != last_tip);
+                if let Some(h) = tip {
+                    last_tip = h;
+                }
+                if new_block || (waiting && last_refresh.elapsed() >= Duration::from_secs(20)) {
+                    last_refresh = Instant::now();
+                    let _ = ow.wallet.balance(min_conf);
+                    // Coins another copy of this wallet spent: noticing them starts the short scan for the change
+                    // that came back, without waiting for the page to ask.
+                    let _ = elsewhere_entries(&state, &ow);
+                    let _ = app.emit("wallet-changed", ());
+                }
             }
 
             // Payments.

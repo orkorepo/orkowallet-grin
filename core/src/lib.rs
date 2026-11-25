@@ -405,6 +405,11 @@ impl Wallet {
         self.mask.as_ref()
     }
 
+    /// Height of the chain tip as the node reports it right now (one tiny request); None when no node answers.
+    pub fn node_tip(&self) -> Option<u64> {
+        grin_wallet_libwallet::NodeClient::get_chain_tip(&self.pool).ok().map(|(h, _)| h)
+    }
+
     /// The node the wallet is talking to right now (changes when the pool fails over).
     pub fn node_in_use(&self) -> String {
         self.pool.current_url()
@@ -758,6 +763,9 @@ impl Wallet {
             .map(|d| SlatepackAddress::try_from(d.trim()))
             .transpose()
             .map_err(|_| anyhow!("not a valid Grin address"))?;
+        // Another copy of this wallet (same phrase, another device) may have spent coins since the last look:
+        // ask the node first, so only coins that are still ours get picked.
+        let _ = self.balance_with(min_confirmations, true);
         let args = InitTxArgs {
             src_acct_name: None,
             amount,
