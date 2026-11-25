@@ -55,7 +55,7 @@ Get the file for your system from the **[latest release](../../releases/latest)*
 
 ## ✨ What's new in 0.3.2: the big update
 
-> The largest release so far. One settings window instead of three, a phone app that finally feels at home, a Linux build, and a wallet that understands being used on more than one device.
+> The largest release so far. One settings window instead of three, a phone app that feels at home (with fingerprint unlock), a Linux build, an optional fast sync for your own node, a lighter Tor and a wallet that understands being used on more than one device.
 
 | | |
 |---|---|
@@ -66,6 +66,11 @@ Get the file for your system from the **[latest release](../../releases/latest)*
 | 🔁 **Same wallet on two devices** | Money spent on another device now shows as "Spent on another device", the change is found by a short scan, and a note explains how to use two devices safely. |
 | ⚡ **Instant Max** | The Max amount is ready the moment the Send window opens. |
 | 🧹 **Tidy accounts** | Remove an account from the list (it is only hidden; its money and address stay). Deleting a wallet stays a separate step with its own confirmation. |
+| 👆 **Fingerprint unlock (Android)** | Open the wallet with your fingerprint, on the lock screen and when opening a wallet. Optional, off until you switch it on in *Settings → Security*; your password keeps working next to it. |
+| ⚡ **Fast sync for your own node (optional)** | *Settings → Node → Fast sync* downloads a recent snapshot published by community servers (the public Grin Node Toolkit list, newest first). The download resumes where it stopped, the node then only catches up the last few days, and the normal sync is always there. Thanks to noobvie for the idea and the extra public nodes. |
+| 🪶 **Lighter and calmer** | Tor looks at its own address far less often when everything works and takes a breath on a flaky network; the phone app asks the background less often and the balance appears at once, then updates from the node. |
+| 🧾 **Clearer history** | A transaction opens with what matters (state, amount, fee, date); the technical fields sit under *Details*. |
+| 🎨 **Smoother lists and scrollbars** | Drop-down lists follow the theme everywhere, and the scrollbars are slim and themed. |
 | 🔎 **Kernel link on Android**, **rescan from this year by default**, and many small fixes. | |
 
 See the [changelog](CHANGELOG.md) for every detail.
@@ -103,7 +108,8 @@ It is meant to be easy for people who are not experts: a clear first-run flow, p
 - Tor built in (official Tor 0.4.9, obfs4, Snowflake and webtunnel bridges). Pay a Grin address directly over Tor.
 - **Slatepack only mode**: switch Tor off entirely (*Settings → General → Connection mode*, or the Tor card) and pay with Slatepack texts.
 - If the recipient is offline the wallet retries on its own (default: every minute for 30 minutes), or you can switch to Slatepack.
-- A pool of public nodes with automatic failover and health ordering, or your own built-in node.
+- A pool of public nodes with automatic failover and health ordering (five community nodes on mainnet), or your own built-in node.
+- **Fast sync (optional)** for the built-in node: start from a recent community snapshot instead of syncing from zero. It resumes after interruptions, can be stopped any time, and the normal sync stays the default.
 - A connection diagnosis that finds out why Tor will not connect (internet, clock, blocked network, log), and a repair option that rebuilds the Tor connection when it will not come up, and an automatic clean restart of Tor when your address stays unreachable.
 
 **Wallet**
@@ -115,7 +121,7 @@ It is meant to be easy for people who are not experts: a clear first-run flow, p
 - **Max** button to send the whole spendable balance, and a setting for how many confirmations (1 to 10) a payment needs before you can spend it.
 - Slatepack send and receive.
 - An unfinished Slatepack exchange is kept: open the transaction later to copy the text again, or paste the reply and finish.
-- Transaction history with paging, CSV export, payment proofs, wallet backup.
+- Transaction history with paging, CSV export, payment proofs, wallet backup. Each transaction opens with the essentials; the technical details are one tap away.
 - Delete a wallet from the list, even if you forgot its password. It asks for confirmation first, and the encrypted key file stays for 30 days under "Recently deleted", so a mistake can be undone.
 - **Repair (rescan)** starts from the current year by default, the fastest choice; "from the start" is still there.
 
@@ -137,7 +143,8 @@ It is meant to be easy for people who are not experts: a clear first-run flow, p
 - Keeps receiving with the screen off: while a wallet is open a small ongoing notification ("OrkoWallet is running") keeps the app and its Tor address alive, even in Android's deep sleep. The Back button sends the app to the background; logging out of the wallet stops it.
 - Payment and Tor notifications, and a screen that cannot be captured while the recovery phrase is visible.
 - **Close wallet** in the ongoing notification shuts the wallet and Tor down cleanly and quits the app.
-- Pull down to refresh, pages that always scroll to the end, and a round scroll button.
+- **Fingerprint unlock** (optional): your password stays encrypted in the phone's secure hardware and is released by your fingerprint. The password always works too.
+- Pull down to refresh (your wallet's own data shows at once, the node follows), pages that always scroll to the end, and a round scroll button.
 
 **Comfort**
 
@@ -176,25 +183,27 @@ The default is the black-and-yellow Grin look. Prefer the blue Orko colours? Pic
 
 ![Send, Orko blue, dark](docs/screenshots/send-orko-dark.png)
 
-### Compact layout
+### Fresh in 0.3.2
 
-The same wallet in a narrow window or on a phone-sized screen: one column, bottom tabs for Wallet, Tor and Node.
+| Clearer history | Fast sync, optional |
+|---|---|
+| ![A transaction with the essentials and a Details fold](docs/screenshots/tx-details.png) | ![Settings, Node: Fast sync](docs/screenshots/settings-fastsync.png) |
 
-<p>
-  <img src="docs/screenshots/mobile-wallet.png" alt="Compact layout: wallet" width="270">
-  &nbsp;
-  <img src="docs/screenshots/mobile-tor.png" alt="Compact layout: Tor address" width="270">
-</p>
+### Compact layout: phone and small windows
 
-### Android
+The same wallet in a narrow window or on a phone: one column, bottom tabs for Wallet, Tor and Node, and the Settings list with one tap per category. The Android app shows the fingerprint option under *Security*.
 
 <p>
-  <img src="docs/screenshots/android-wallet.png" alt="Android: wallet" width="270">
+  <img src="docs/screenshots/mobile-wallet.png" alt="Compact layout: wallet" width="230">
   &nbsp;
-  <img src="docs/screenshots/android-backup.png" alt="Android: Settings, Backup, Recovery phrase" width="270">
+  <img src="docs/screenshots/mobile-tor.png" alt="Compact layout: Tor address" width="230">
+  &nbsp;
+  <img src="docs/screenshots/mobile-settings.png" alt="Compact layout: Settings categories" width="230">
+  &nbsp;
+  <img src="docs/screenshots/mobile-security.png" alt="Compact layout: Settings, Security, with fingerprint unlock on Android" width="230">
 </p>
 
-> The screenshots show demo data or an empty test wallet, not a real wallet.
+> The screenshots show demo data, not a real wallet.
 
 ## Install
 
